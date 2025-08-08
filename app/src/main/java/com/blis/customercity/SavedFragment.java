@@ -27,6 +27,7 @@ public class SavedFragment extends Fragment {
 
         ListView listView = linearLayout.findViewById(R.id.saved_view_list);
         if (savedObject == null) return linearLayout;
+        @SuppressWarnings("unchecked")
         ArrayList<Record> savedList = (ArrayList<Record>) savedObject;
         if(savedList.isEmpty()) return linearLayout;
 

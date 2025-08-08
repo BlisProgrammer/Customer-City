@@ -22,7 +22,6 @@ public class FindFragment extends Fragment {
     private static String selectedCategory, selectedType, selectedCompany;
     public static ArrayList<Record> selectedRecords;
     private static ArrayList<String> resultList;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
