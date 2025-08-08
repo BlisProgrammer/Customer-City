@@ -21,6 +21,7 @@ public class Main extends AppCompatActivity {
 
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
+        Fragment searchFragment = new SearchFragment();
         setCurrentFragment(findFragment);
         // navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation_view);
@@ -34,6 +35,10 @@ public class Main extends AppCompatActivity {
                 }
                 if(id == R.id.nav_find){
                     setCurrentFragment(findFragment);
+                    return true;
+                }
+                if(id == R.id.nav_search){
+                    setCurrentFragment(searchFragment);
                     return true;
                 }
                 return false;
