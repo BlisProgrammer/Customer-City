@@ -52,5 +52,15 @@ public class RecordActivity extends AppCompatActivity {
         backButton.setOnClickListener(v->{
             RecordActivity.this.finish();
         });
+
+        // share button
+        Button shareButton = findViewById(R.id.share_button);
+        shareButton.setOnClickListener(v->{
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, selectedRecord.getShareString());
+            Intent chooser = Intent.createChooser(shareIntent, "Share with...");
+            startActivity(chooser);
+        });
     }
 }

@@ -29,6 +29,9 @@ public class Record implements Serializable{
 
         return stringBuilder.toString();
     }
+    public String getShareString(){
+        return "Contact information for " + company + ": \n" + formatToString();
+    }
     public String getLine1Text() {
         return company;
     }
