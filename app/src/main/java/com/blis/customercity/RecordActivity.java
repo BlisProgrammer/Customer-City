@@ -33,7 +33,7 @@ public class RecordActivity extends AppCompatActivity {
         TextView recordViewCompany = findViewById(R.id.record_view_company);
         recordViewCompany.setText(selectedRecord.company);
         TextView recordViewCategory = findViewById(R.id.record_view_category);
-        recordViewCategory.setText(String.format("%s/%s", selectedRecord.sub_category, selectedRecord.sub_category));
+        recordViewCategory.setText(String.format("%s/%s", selectedRecord.category, selectedRecord.sub_category));
         TextView recordViewDetails = findViewById(R.id.record_view_details);
         recordViewDetails.setText(selectedRecord.formatToString());
 

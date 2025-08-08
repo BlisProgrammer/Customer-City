@@ -23,14 +23,14 @@
         android:layout_margin="10dp"
         android:text="Customer City"
         android:textAlignment="center"
-        android:textSize="40sp" />
+        android:textSize="40sp"/>
 
     <TextView
         android:id="@+id/company_textview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:text=""
+        android:text="Advocating Customer Rights"
         android:textAlignment="center"
         android:textSize="20sp" />
 
