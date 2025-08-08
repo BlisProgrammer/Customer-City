@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -29,6 +30,11 @@ public class SavedFragment extends Fragment {
         ListView listView = linearLayout.findViewById(R.id.saved_view_list);
         if (savedObject == null) return linearLayout;
         ArrayList<Record> savedList = (ArrayList<Record>) savedObject;
+        if(savedList.isEmpty()) return linearLayout;
+
+        TextView textView = linearLayout.findViewById(R.id.saved_view_tips);
+        textView.setText("Long click item to remove");
+
         TwoLineAdapter adapter = new TwoLineAdapter(requireContext(), savedList);
         listView.setAdapter(adapter);
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -42,6 +48,9 @@ public class SavedFragment extends Fragment {
                             savedList.remove(position);
                             FileHandler.saveObjectToFile(requireContext(), "saved_list", savedList);
                             adapter.notifyDataSetChanged();
+                            Toast toast = new Toast(requireContext());
+                            toast.setText("Item removed");
+                            toast.show();
                             dialog.dismiss();
                         },
                         (dialog, which) -> {
