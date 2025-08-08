@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -23,12 +22,6 @@ public class FindFragment extends Fragment {
     private static String selectedCategory, selectedType, selectedCompany;
     public static ArrayList<Record> selectedRecords;
     private static ArrayList<String> resultList;
-    public static FindFragment newInstance(String param1, String param2) {
-        FindFragment fragment = new FindFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

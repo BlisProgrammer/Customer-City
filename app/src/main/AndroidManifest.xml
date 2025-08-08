@@ -18,7 +18,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".RecordActivity" android:exported="true"/>
-        <activity android:name=".SavedFragment" android:exported="true"/>
     </application>
 </manifest>
 

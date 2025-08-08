@@ -18,4 +18,5 @@
         <item>娛樂</item>
     </string-array>
     <string name="hello_blank_fragment">Hello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\n</string>
+    <string name="long_click_item_to_remove">Long click item to remove</string>
 </resources>

@@ -1,7 +1,5 @@
 package com.blis.customercity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,7 +31,7 @@ public class SavedFragment extends Fragment {
         if(savedList.isEmpty()) return linearLayout;
 
         TextView textView = linearLayout.findViewById(R.id.saved_view_tips);
-        textView.setText("Long click item to remove");
+        textView.setText(R.string.long_click_item_to_remove);
 
         TwoLineAdapter adapter = new TwoLineAdapter(requireContext(), savedList);
         listView.setAdapter(adapter);
@@ -53,9 +51,7 @@ public class SavedFragment extends Fragment {
                             toast.show();
                             dialog.dismiss();
                         },
-                        (dialog, which) -> {
-                            dialog.dismiss();
-                        }
+                        (dialog, which) -> dialog.dismiss()
 
                 );
                 return false;
