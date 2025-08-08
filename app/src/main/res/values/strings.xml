@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">Customer City</string>
+    <string name="click_me">CLICK ME!!!!</string>
+    <string name="channel_name">Blis Test</string>
+    <string name="channel_description">This is a channel for testing the notification system.</string>
+    <string-array name="default_spinner_items">
+        <item>私家車相關</item>
+        <item>金融</item>
+        <item>科技</item>
+        <item>地產</item>
+        <item>零售</item>
+        <item>消費用品</item>
+        <item>保健美容</item>
+        <item>鐘錶珠寶</item>
+        <item>旅遊</item>
+        <item>教育</item>
+        <item>公共服務</item>
+        <item>娛樂</item>
+    </string-array>
+    <string name="hello_blank_fragment">Hello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\n</string>
+</resources>

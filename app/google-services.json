@@ -1,0 +1,105 @@
+{
+  "project_info": {
+    "project_number": "906365026699",
+    "project_id": "test-v2-eec05",
+    "storage_bucket": "test-v2-eec05.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906365026699:android:92fa7a3cfbb54d869d6f8e",
+        "android_client_info": {
+          "package_name": "com.blis.MultiTest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9ZW4UAq3XhmpomSiyj06Fm-YRBDcE05w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906365026699:android:5fe9a79e087f39c89d6f8e",
+        "android_client_info": {
+          "package_name": "com.blis.customercity"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9ZW4UAq3XhmpomSiyj06Fm-YRBDcE05w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906365026699:android:81dfb61d32bdb9b09d6f8e",
+        "android_client_info": {
+          "package_name": "com.example.blistest"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9ZW4UAq3XhmpomSiyj06Fm-YRBDcE05w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906365026699:android:f99b56a10ec89df49d6f8e",
+        "android_client_info": {
+          "package_name": "com.test1.multiscreen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9ZW4UAq3XhmpomSiyj06Fm-YRBDcE05w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:906365026699:android:676bf85cb0cb6fcf9d6f8e",
+        "android_client_info": {
+          "package_name": "com.test2.multiscreen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9ZW4UAq3XhmpomSiyj06Fm-YRBDcE05w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
