@@ -1,5 +1,6 @@
 package com.blis.customercity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,6 +57,14 @@ public class SavedFragment extends Fragment {
 
                 );
                 return false;
+            }
+        });
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+                recordIntent.putExtra("selected_record", savedList.get(position));
+                startActivity(recordIntent);
             }
         });
         return linearLayout;

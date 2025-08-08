@@ -2,6 +2,7 @@ package com.blis.customercity;
 
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -18,11 +19,16 @@ public class RecordActivity extends AppCompatActivity {
         setContentView(R.layout.record_view);
 
         Intent intent = getIntent();
-        int ID = intent.getIntExtra("selected_record_id", -1);
+        Record selectedRecord;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            selectedRecord = intent.getSerializableExtra("selected_record", Record.class);
+        } else {
+            selectedRecord = (Record) intent.getSerializableExtra("selected_record");
+        }
         if(FindFragment.selectedRecords.isEmpty()){
             return;
         }
-        Record selectedRecord = FindFragment.selectedRecords.get(ID);
+//        Record selectedRecord = FindFragment.selectedRecords.get(ID);
 
         TextView recordViewCompany = findViewById(R.id.record_view_company);
         recordViewCompany.setText(selectedRecord.company);

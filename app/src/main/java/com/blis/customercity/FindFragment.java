@@ -113,7 +113,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id){
                 Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                recordIntent.putExtra("selected_record_id", position);
+                recordIntent.putExtra("selected_record", selectedRecords.get(position));
                 startActivity(recordIntent);
             }
         });
