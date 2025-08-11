@@ -21,13 +21,16 @@ public class RecordActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Record selectedRecord;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            selectedRecord = intent.getSerializableExtra("selected_record", Record.class);
+            selectedRecord = intent.getParcelableExtra("selected_record", Record.class);
         } else {
-            selectedRecord = (Record) intent.getSerializableExtra("selected_record");
+            selectedRecord = intent.getParcelableExtra("selected_record");
         }
-        if(FindFragment.selectedRecords.isEmpty()){
+        if(selectedRecord == null){
             return;
         }
+//        if(FindFragment.selectedRecords.isEmpty()){
+//            return;
+//        }
 //        Record selectedRecord = FindFragment.selectedRecords.get(ID);
 
         TextView recordViewCompany = findViewById(R.id.record_view_company);

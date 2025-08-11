@@ -1,7 +1,5 @@
 package com.blis.customercity;
 
-import org.checkerframework.checker.units.qual.A;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +21,6 @@ public class DataConverter {
                 }
                 if(firstLine[i].equals(targetColumn)){
                     targetIndex = i;
-                    continue;
                 }
             }
             while((line=reader.readLine())!= null){
@@ -58,7 +55,6 @@ public class DataConverter {
                 }
                 if(firstLine[i].equals("sub_category_cn")){
                     sub_category_cnColumn = i;
-                    continue;
                 }
             }
             ArrayList<String> allSubCategories = new ArrayList<>();
@@ -126,7 +122,6 @@ public class DataConverter {
                 }
                 if(firstLine[i].equals("company_name_cn")){
                     company_name_cnColumn = i;
-                    continue;
                 }
             }
             ArrayList<String> allCompanies = new ArrayList<>();
@@ -166,7 +161,6 @@ public class DataConverter {
             for (int i = 0; i < firstLine.length; i++) {
                 if(firstLine[i].equals("company_id")){
                     companyIdColumn = i;
-                    continue;
                 }
             }
             ArrayList<Record> allRecords = new ArrayList<>();

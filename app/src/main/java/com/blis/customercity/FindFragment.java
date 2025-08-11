@@ -109,13 +109,10 @@ public class FindFragment extends Fragment {
 
         // List view on click
         ListView listView = linearLayout.findViewById(R.id.resultView);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
-                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                recordIntent.putExtra("selected_record", selectedRecords.get(position));
-                startActivity(recordIntent);
-            }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+            recordIntent.putExtra("selected_record", selectedRecords.get(position));
+            startActivity(recordIntent);
         });
         return linearLayout;
     }

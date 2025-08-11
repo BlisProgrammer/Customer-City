@@ -13,10 +13,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.TextView;
 
-import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class SearchFragment extends Fragment {
@@ -36,16 +33,13 @@ public class SearchFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, allCompanies);
         listView.setAdapter(adapter);
 
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (hasFocus) {
-                    listView.setVisibility(View.VISIBLE);
-                    resultView.setVisibility(View.GONE);
-                } else {
-                    listView.setVisibility(View.GONE);
-                    resultView.setVisibility(View.VISIBLE);
-                }
+        searchView.setOnQueryTextFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                listView.setVisibility(View.VISIBLE);
+                resultView.setVisibility(View.GONE);
+            } else {
+                listView.setVisibility(View.GONE);
+                resultView.setVisibility(View.VISIBLE);
             }
         });
 
@@ -61,40 +55,34 @@ public class SearchFragment extends Fragment {
             }
         });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedCompany = (String) parent.getItemAtPosition(position);
-                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
-                ArrayList<Record> selectedRecords = DataConverter.getRecords(
-                        companyId,
-                        getResources().openRawResource(R.raw.records),
-                        DataConverter.companyIDToCategory(companyId, getResources().openRawResource(R.raw.categories)),
-                        DataConverter.companyIDToSubCategory(companyId, getResources().openRawResource(R.raw.sub_categories)),
-                        selectedCompany);
-                if(selectedRecords.isEmpty()) return;
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedCompany = (String) parent.getItemAtPosition(position);
+            String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
+            ArrayList<Record> selectedRecords = DataConverter.getRecords(
+                    companyId,
+                    getResources().openRawResource(R.raw.records),
+                    DataConverter.companyIDToCategory(companyId, getResources().openRawResource(R.raw.categories)),
+                    DataConverter.companyIDToSubCategory(companyId, getResources().openRawResource(R.raw.sub_categories)),
+                    selectedCompany);
+            if(selectedRecords.isEmpty()) return;
 
-                // set list view
-                ArrayList<String> resultList = new ArrayList<>();
-                for (Record record : selectedRecords) {
-                    resultList.add(record.formatToString());
-                }
-                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
-                resultView.setAdapter(adapter1);
-                listView.setVisibility(View.GONE);
-                resultView.setVisibility(View.VISIBLE);
-                searchView.clearFocus();
-
-
-                resultView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                        recordIntent.putExtra("selected_record", selectedRecords.get(position));
-                        startActivity(recordIntent);
-                    }
-                });
+            // set list view
+            ArrayList<String> resultList = new ArrayList<>();
+            for (Record record : selectedRecords) {
+                resultList.add(record.formatToString());
             }
+            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
+            resultView.setAdapter(adapter1);
+            listView.setVisibility(View.GONE);
+            resultView.setVisibility(View.VISIBLE);
+            searchView.clearFocus();
+
+
+            resultView.setOnItemClickListener((parent1, view1, position1, id1) -> {
+                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+                recordIntent.putExtra("selected_record", selectedRecords.get(position1));
+                startActivity(recordIntent);
+            });
         });
 
         return linearLayout;

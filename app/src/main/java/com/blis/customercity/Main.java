@@ -25,24 +25,21 @@ public class Main extends AppCompatActivity {
         setCurrentFragment(findFragment);
         // navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation_view);
-        bottomNavigationView.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                if(id == R.id.nav_saved){
-                    setCurrentFragment(savedFragment);
-                    return true;
-                }
-                if(id == R.id.nav_find){
-                    setCurrentFragment(findFragment);
-                    return true;
-                }
-                if(id == R.id.nav_search){
-                    setCurrentFragment(searchFragment);
-                    return true;
-                }
-                return false;
+        bottomNavigationView.setOnItemSelectedListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if(id == R.id.nav_saved){
+                setCurrentFragment(savedFragment);
+                return true;
             }
+            if(id == R.id.nav_find){
+                setCurrentFragment(findFragment);
+                return true;
+            }
+            if(id == R.id.nav_search){
+                setCurrentFragment(searchFragment);
+                return true;
+            }
+            return false;
         });
 
 

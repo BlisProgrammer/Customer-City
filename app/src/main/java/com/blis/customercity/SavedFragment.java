@@ -37,35 +37,29 @@ public class SavedFragment extends Fragment {
 
         TwoLineAdapter adapter = new TwoLineAdapter(requireContext(), savedList);
         listView.setAdapter(adapter);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ConfirmationDialog.showConfirmationDialog(
-                        requireContext(),
-                        "Confirm Action",
-                        "Delete saved record? ",
-                        (dialog, which) -> {
-                            savedList.remove(position);
-                            FileHandler.saveObjectToFile(requireContext(), "saved_list", savedList);
-                            adapter.notifyDataSetChanged();
-                            Toast toast = new Toast(requireContext());
-                            toast.setText("Item removed");
-                            toast.show();
-                            dialog.dismiss();
-                        },
-                        (dialog, which) -> dialog.dismiss()
+        listView.setOnItemLongClickListener((parent, view, position, id) -> {
+            ConfirmationDialog.showConfirmationDialog(
+                    requireContext(),
+                    "Confirm Action",
+                    "Delete saved record? ",
+                    (dialog, which) -> {
+                        savedList.remove(position);
+                        FileHandler.saveObjectToFile(requireContext(), "saved_list", savedList);
+                        adapter.notifyDataSetChanged();
+                        Toast toast = new Toast(requireContext());
+                        toast.setText("Item removed");
+                        toast.show();
+                        dialog.dismiss();
+                    },
+                    (dialog, which) -> dialog.dismiss()
 
-                );
-                return true;
-            }
+            );
+            return true;
         });
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                recordIntent.putExtra("selected_record", savedList.get(position));
-                startActivity(recordIntent);
-            }
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+            recordIntent.putExtra("selected_record", savedList.get(position));
+            startActivity(recordIntent);
         });
         return linearLayout;
     }
