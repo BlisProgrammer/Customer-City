@@ -1,6 +1,7 @@
 package com.blis.customercity;
 
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,9 +22,9 @@ public class RecordActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Record selectedRecord;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            selectedRecord = intent.getParcelableExtra("selected_record", Record.class);
+            selectedRecord = intent.getSerializableExtra("selected_record", Record.class);
         } else {
-            selectedRecord = intent.getParcelableExtra("selected_record");
+            selectedRecord = (Record) intent.getSerializableExtra("selected_record");
         }
         if(selectedRecord == null){
             return;
@@ -42,24 +43,48 @@ public class RecordActivity extends AppCompatActivity {
 
         // save button
         Button saveButton = findViewById(R.id.save_button);
-        saveButton.setOnClickListener(v -> {
-            Object savedObject = FileHandler.loadObjectFromFile(this, "saved_list");
-            ArrayList<Record> savedArraylist = new ArrayList<>();
 
-            if(savedObject != null){
-                savedArraylist = (ArrayList<Record>) savedObject;
+        Object savedObject = FileHandler.loadObjectFromFile(this, "saved_list");
+        ArrayList<Record> savedArraylist;
+        if(savedObject != null){
+            savedArraylist = (ArrayList<Record>) savedObject;
+        } else {
+            savedArraylist = new ArrayList<>();
+        }
+        if(savedArraylist.contains(selectedRecord)){
+            saveButton.setText("Saved");
+        }
+        saveButton.setOnClickListener(v -> {
+            Object savedObject2 = FileHandler.loadObjectFromFile(this, "saved_list");
+            ArrayList<Record> savedArraylist2;
+            if(savedObject2 != null){
+                savedArraylist2 = (ArrayList<Record>) savedObject2;
+            } else {
+                savedArraylist2 = new ArrayList<>();
             }
-            savedArraylist.add(selectedRecord);
-            FileHandler.saveObjectToFile(this, "saved_list", savedArraylist);
+            String displayText;
+            if(savedArraylist2.contains(selectedRecord)){
+                savedArraylist2.remove(selectedRecord);
+                displayText = "Record removed";
+                saveButton.setText("Save");
+            }else{
+                savedArraylist2.add(selectedRecord);
+                displayText = "Record saved";
+                saveButton.setText("Saved");
+            }
+            FileHandler.saveObjectToFile(this, "saved_list", savedArraylist2);
             Toast toast = new Toast(this);
-            toast.setText("Record saved");
+            toast.setText(displayText);
             toast.show();
         });
 
         // back button
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v->{
-            RecordActivity.this.finish();
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("key", "value");
+            setResult(Activity.RESULT_OK, resultIntent);
+            finish();
         });
 
         // share button

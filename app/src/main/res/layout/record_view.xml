@@ -57,7 +57,6 @@
         </LinearLayout>
 
         <LinearLayout
-            style="?android:attr/buttonBarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
@@ -68,7 +67,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="25dp"
                 android:text="Save" />
 
             <Button
@@ -77,7 +76,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginHorizontal="10dp"
+                android:layout_marginHorizontal="25dp"
                 android:text="Share" />
         </LinearLayout>
 

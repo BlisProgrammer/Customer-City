@@ -18,7 +18,7 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
-
+//        FileHandler.removeFile(this, "saved_list"); // for debugging purposes
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();

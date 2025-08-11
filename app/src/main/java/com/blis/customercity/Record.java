@@ -1,6 +1,7 @@
 package com.blis.customercity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Record implements Serializable{
     public String id, services_scope_cn, service_hotline, email, address_cn, added_detail_cn, tips_cn;
@@ -37,5 +38,13 @@ public class Record implements Serializable{
     }
     public String getLine2Text() {
         return formatToString();
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if(!(obj instanceof Record)){
+            return false;
+        }
+        Record record2 = (Record) obj;
+        return Objects.equals(record2.id, this.id);
     }
 }
