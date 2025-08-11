@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:gravity="center_horizontal"
-        >
+        android:background="#f5f5f5">
 
         <TextView
             android:id="@+id/textView"

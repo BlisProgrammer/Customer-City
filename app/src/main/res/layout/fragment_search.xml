@@ -24,6 +24,7 @@
         android:textSize="40sp" />
 
     <SearchView
+        android:id="@+id/search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
@@ -31,5 +32,13 @@
         android:id="@+id/search_list_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:visibility="gone"
+        android:layout_weight="1"/>
+
+    <ListView
+        android:id="@+id/search_result_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="visible"
         android:layout_weight="1"/>
 </LinearLayout>

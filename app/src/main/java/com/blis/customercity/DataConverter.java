@@ -1,5 +1,7 @@
 package com.blis.customercity;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,6 +77,38 @@ public class DataConverter {
     public static String subCategoryToID(String subCategoryName, InputStream inputStream){
         return searchInCSV("sub_category_cn", subCategoryName, "id", inputStream);
     }
+    public static ArrayList<String> searchCompanies(String companyName, InputStream inputStream){
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+
+            // get first line
+            String[] firstLine =reader.readLine().split("\\|");
+            int company_name_cnColumn = 2;
+            for (int i = 0; i < firstLine.length; i++) {
+                if(firstLine[i].equals("company_name_cn")){
+                    company_name_cnColumn = i;
+                    break;
+                }
+            }
+
+            ArrayList<String> result = new ArrayList<>();
+            while((line=reader.readLine())!= null){
+                if(line.contains(companyName)){
+                    String companyString = line.split("\\|")[company_name_cnColumn];
+                    if(result.contains(companyString))continue;
+                    result.add(companyString);
+                }
+            }
+            reader.close();
+            return result;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public static ArrayList<String> getAllCompanies(InputStream inputStream){
+        return searchCompanies("", inputStream);
+    }
 
     public static ArrayList<String> getCompanies(String subCategoryID, InputStream inputStream) {
         try{
@@ -111,6 +145,14 @@ public class DataConverter {
 
     public static String companyToID(String selectedCompany, InputStream inputStream) {
         return searchInCSV("company_name_cn", selectedCompany, "id", inputStream);
+    }
+    public static String companyIDToSubCategory(String companyID, InputStream inputStream) {
+        String subCategoryID = companyID.substring(0, 7);
+        return searchInCSV("id", subCategoryID, "sub_category_cn", inputStream);
+    }
+    public static String companyIDToCategory(String companyID, InputStream inputStream) {
+        String categoryID = companyID.substring(0, 3);
+        return searchInCSV("id", categoryID, "category_cn", inputStream);
     }
 
     public static ArrayList<Record> getRecords(String companyId, InputStream inputStream, String selectedCategory, String selectedType, String selectedCompany) {
