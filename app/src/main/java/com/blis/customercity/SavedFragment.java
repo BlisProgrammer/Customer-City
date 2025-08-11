@@ -56,7 +56,7 @@ public class SavedFragment extends Fragment {
                         (dialog, which) -> dialog.dismiss()
 
                 );
-                return false;
+                return true;
             }
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
