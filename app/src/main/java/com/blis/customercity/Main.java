@@ -13,8 +13,6 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Main extends AppCompatActivity {
 
-    public static boolean loggedIn = false;
-    public static String idToken;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);

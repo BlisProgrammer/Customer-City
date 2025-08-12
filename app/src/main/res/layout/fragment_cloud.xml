@@ -80,12 +80,18 @@
             android:layout_height="wrap_content"
             android:text="Saved Online"
             android:layout_margin="10dp"/>
-        <ListView
-            style="android.R.layout.simple_list_item_2"
-            android:id="@+id/online_saved_view_list"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swiperefresh"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1"/>
+            android:layout_weight="1">
+            <ListView
+                style="android.R.layout.simple_list_item_2"
+                android:id="@+id/online_saved_view_list"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
         <Button
             android:id="@+id/logoutButton"
             android:layout_width="match_parent"

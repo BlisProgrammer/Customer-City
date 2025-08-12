@@ -1,11 +1,12 @@
 package com.blis.customercity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -31,7 +31,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import okhttp3.ResponseBody;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -54,11 +54,15 @@ public class CloudFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_cloud, container, false);
+        assert getContext() != null;
+        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+        String idToken = loginInfo.getString("idToken", null);
 
         LinearLayout loginLayout = linearLayout.findViewById(R.id.login_layout);
         LinearLayout logoutLayout = linearLayout.findViewById(R.id.logout_layout);
         TextView loginTitleView = linearLayout.findViewById(R.id.login_title_view);
-        if(Main.loggedIn && Main.idToken != null){
+        if(loggedIn && idToken != null){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
             loginTitleView.setText("Logged In");
@@ -110,10 +114,13 @@ public class CloudFragment extends Fragment {
                             Gson gson = new Gson();
                             Type type = new TypeToken<HashMap<String, String>>() {}.getType();
                             HashMap<String, String> hashMap = gson.fromJson(responseBody, type);
-                            Main.idToken = hashMap.get("idToken");
+                            String idToken1 = hashMap.get("idToken");
+                            SharedPreferences.Editor editor = loginInfo.edit();
+                            editor.putString("idToken", idToken1);
 
                             // Login in successful, show logged in screen
-                            Main.loggedIn = true;
+                            editor.putBoolean("loggedIn", true);
+                            editor.apply();
                             assert getActivity() != null;
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -142,24 +149,39 @@ public class CloudFragment extends Fragment {
         });
         return linearLayout;
     }
-    private LinearLayout updateOnlineList(LinearLayout linearLayout, LinearLayout loginLayout, LinearLayout logoutLayout){
+    private void updateOnlineList(LinearLayout linearLayout, LinearLayout loginLayout, LinearLayout logoutLayout){
         ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
-        if(Main.loggedIn && Main.idToken != null){
+        SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(() -> {
+                updateOnlineList(linearLayout, loginLayout, logoutLayout);
+            }
+        );
+        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+        String idToken = loginInfo.getString("idToken", null);
+        if(loggedIn && idToken != null){
             ArrayList<Record> onlineRecordList = new ArrayList<>();
 
             // get records from online
             Request request = new Request.Builder()
                     .url("https://www.customer.city/api/getHistory/")
-                    .addHeader("Cookie", "token=" + Main.idToken)
+                    .addHeader("Cookie", "token=" + idToken)
                     .build();
             client.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException e) {
-                    e.printStackTrace();
+                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                    SharedPreferences.Editor editor = loginInfo.edit();
+                    editor.putString("loggedIn", null);
+                    editor.putBoolean("idToken", false);
+                    editor.apply();
+
+                    logoutLayout.setVisibility(View.GONE);
+                    loginLayout.setVisibility(View.VISIBLE);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     if (response.isSuccessful()) {
                         String responseBody = response.body().string();
                         System.out.println("Response: " + responseBody);
@@ -167,9 +189,10 @@ public class CloudFragment extends Fragment {
                         Type type = new TypeToken<HashMap<String, HashMap<String, List<OnlineRecord>>>>() {}.getType();
                         HashMap<String, HashMap<String, List<OnlineRecord>>> hashMap = gson.fromJson(responseBody, type);
                         HashMap<String, List<OnlineRecord>> allData = hashMap.get("data");
-                        assert allData != null;
+                        if(allData == null) return;
                         for (List<OnlineRecord> value : allData.values()) {
                             OnlineRecord thisOnlineRecord = value.get(0);
+                            if(!isAdded())return;
                             onlineRecordList.add(
                                     new Record(
                                             thisOnlineRecord.getId(),
@@ -187,12 +210,11 @@ public class CloudFragment extends Fragment {
                         }
 
                         assert getActivity() != null;
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                TwoLineAdapter onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
-                                onlineListView.setAdapter(onlineAdapter);
-                            }
+                        getActivity().runOnUiThread(() -> {
+                            if(!isAdded())return;
+                            TwoLineAdapter onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
+                            onlineListView.setAdapter(onlineAdapter);
+                            swipeRefreshLayout.setRefreshing(false);
                         });
                     } else {
                         System.out.println("Unsuccessful response: " + response.code());
@@ -203,16 +225,13 @@ public class CloudFragment extends Fragment {
         }
 
         Button logoutButton = linearLayout.findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Main.loggedIn = false;
-                Main.idToken = null;
-                logoutLayout.setVisibility(View.GONE);
-                loginLayout.setVisibility(View.VISIBLE);
-
-            }
+        logoutButton.setOnClickListener(v -> {
+            SharedPreferences.Editor editor = loginInfo.edit();
+            editor.putString("loggedIn", null);
+            editor.putBoolean("idToken", false);
+            editor.apply();
+            logoutLayout.setVisibility(View.GONE);
+            loginLayout.setVisibility(View.VISIBLE);
         });
-        return linearLayout;
     }
 }

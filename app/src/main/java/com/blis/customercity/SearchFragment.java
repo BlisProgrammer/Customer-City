@@ -30,7 +30,9 @@ public class SearchFragment extends Fragment {
         ListView resultView = linearLayout.findViewById(R.id.search_result_view);
         SearchView searchView = linearLayout.findViewById(R.id.search_view);
         new Thread(()->{
+            if(!isAdded())return;
             ArrayList<String> allCompanies = DataConverter.getAllCompanies(getResources().openRawResource(R.raw.companies));
+            if(!isAdded())return;
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, allCompanies);
             if(getView() == null) return;
             getView().post(()->{
