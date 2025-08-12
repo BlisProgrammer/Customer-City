@@ -35,6 +35,14 @@ public class RecordActivity extends AppCompatActivity {
     private Toast savedToast;
     private final OkHttpClient client = new OkHttpClient();
     private boolean isSavedOnline = false;
+
+    private void showToast(String text){
+        if(savedToast != null){
+            savedToast.cancel();
+        }
+        savedToast = Toast.makeText(RecordActivity.this, text, Toast.LENGTH_SHORT);
+        savedToast.show();
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -93,18 +101,13 @@ public class RecordActivity extends AppCompatActivity {
                 saveButton.setText("Saved");
             }
             FileHandler.saveObjectToFile(this, "saved_list", savedArraylist2);
-            if(savedToast != null){
-                savedToast.cancel();
-            }
-            savedToast = Toast.makeText(this, displayText, Toast.LENGTH_SHORT);
-            savedToast.show();
+            showToast(displayText);
         });
 
         // back button
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v->{
             Intent resultIntent = new Intent();
-            resultIntent.putExtra("key", "value");
             setResult(Activity.RESULT_OK, resultIntent);
             finish();
         });
@@ -119,6 +122,7 @@ public class RecordActivity extends AppCompatActivity {
             startActivity(chooser);
         });
 
+        // Save online button
         SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         if(!loggedIn) return;
@@ -177,22 +181,14 @@ public class RecordActivity extends AppCompatActivity {
                 client.newCall(request).enqueue(new Callback() {
                     @Override
                     public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        if (savedToast != null) {
-                            savedToast.cancel();
-                        }
-                        savedToast = Toast.makeText(RecordActivity.this, "Error Occurred", Toast.LENGTH_SHORT);
-                        savedToast.show();
+                        showToast("Error Occurred");
                     }
 
                     @Override
                     public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                         if (response.isSuccessful()) {
                             runOnUiThread(() -> {
-                                if (savedToast != null) {
-                                    savedToast.cancel();
-                                }
-                                savedToast = Toast.makeText(RecordActivity.this, "Updated Online Record", Toast.LENGTH_SHORT);
-                                savedToast.show();
+                                showToast("Updated Online Record");
                                 isSavedOnline = !isSavedOnline;
                                 if(isSavedOnline){
                                     saveOnlineButton.setText("Saved Online");
@@ -201,11 +197,7 @@ public class RecordActivity extends AppCompatActivity {
                                 }
                             });
                         } else {
-                            if (savedToast != null) {
-                                savedToast.cancel();
-                            }
-                            savedToast = Toast.makeText(RecordActivity.this, "Error Occurred", Toast.LENGTH_SHORT);
-                            savedToast.show();
+                            showToast("Error Occurred");
                         }
                         response.body().close();
                     }

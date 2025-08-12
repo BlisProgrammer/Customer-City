@@ -1,16 +1,11 @@
 package com.blis.customercity;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.MenuItem;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Main extends AppCompatActivity {
@@ -21,19 +16,18 @@ public class Main extends AppCompatActivity {
 
         setContentView(R.layout.main);
 
-
 //        FileHandler.removeFile(this, "saved_list"); // for debugging purposes
 //        SharedPreferences preferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
 //        editor.clear();
 //        editor.apply();
 
-
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
         Fragment cloudFragment = new CloudFragment();
         setCurrentFragment(findFragment);
+
         // navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation_view);
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
@@ -66,7 +60,7 @@ public class Main extends AppCompatActivity {
         bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "image");
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
     }
-    private void setCurrentFragment(Fragment fragment) {
+    private void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment)

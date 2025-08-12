@@ -14,13 +14,10 @@ public class ConfirmationDialog {
         builder.setMessage(message);
         builder.setCancelable(true); // Allows dismissing the dialog by tapping outside or pressing back
 
-        // Set the positive button (e.g., "Confirm", "Yes")
         builder.setPositiveButton("Confirm", positiveClickListener);
 
-        // Set the negative button (e.g., "Cancel", "No")
         builder.setNegativeButton("Cancel", negativeClickListener);
 
-        // Create and show the AlertDialog
         AlertDialog dialog = builder.create();
         dialog.show();
     }

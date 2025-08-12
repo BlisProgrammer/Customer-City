@@ -67,6 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Login"
+            android:backgroundTint="#0E7BA1"
             android:layout_margin="10dp" />
     </LinearLayout>
     <LinearLayout
@@ -97,6 +98,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Logout"
+            android:backgroundTint="#0E7BA1"
             android:layout_margin="10dp" />
     </LinearLayout>
 </LinearLayout>

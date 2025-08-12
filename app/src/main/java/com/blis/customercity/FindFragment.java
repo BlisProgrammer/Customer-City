@@ -33,6 +33,8 @@ public class FindFragment extends Fragment {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(requireContext(), R.array.default_spinner_items, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         final Spinner categorySpinner = linearLayout.findViewById(R.id.category_spinner);
+        final Spinner typeSpinner = linearLayout.findViewById(R.id.type_spinner);
+        final Spinner companySpinner = linearLayout.findViewById(R.id.company_spinner);
         categorySpinner.setAdapter(adapter);
 
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -49,31 +51,29 @@ public class FindFragment extends Fragment {
                 // add list to spinner
                 ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, subCategories);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                final Spinner typeSpinner = linearLayout.findViewById(R.id.type_spinner);
                 typeSpinner.setAdapter(adapter);
-                typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        // save selected item
-                        String selectedItem = parent.getItemAtPosition(position).toString();
-                        selectedType = selectedItem;
 
-                        // get list of companies
-                        String sub_categoryID = DataConverter.subCategoryToID(selectedItem, getResources().openRawResource(R.raw.sub_categories));
-                        ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-                        // add list to spinner
-                        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, companies);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        final Spinner companySpinner = linearLayout.findViewById(R.id.company_spinner);
-                        companySpinner.setAdapter(adapter);
-                    }
+            }
+        });
+        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // save selected item
+                String selectedItem = parent.getItemAtPosition(position).toString();
+                selectedType = selectedItem;
 
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
+                // get list of companies
+                String sub_categoryID = DataConverter.subCategoryToID(selectedItem, getResources().openRawResource(R.raw.sub_categories));
+                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
 
-                    }
-                });
+                // add list to spinner
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, companies);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                companySpinner.setAdapter(adapter);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -87,7 +87,6 @@ public class FindFragment extends Fragment {
         button.setOnClickListener(v -> {
             new Thread(()->{
                 // get list of companies
-                Spinner companySpinner = linearLayout.findViewById(R.id.company_spinner);
                 if(companySpinner.getSelectedItemPosition() == -1) return;
                 selectedCompany = companySpinner.getSelectedItem().toString();
                 String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
