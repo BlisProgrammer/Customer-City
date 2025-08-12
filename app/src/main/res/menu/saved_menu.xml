@@ -14,4 +14,8 @@
         android:title="Saved"
         android:icon="@drawable/saved_icon"
         android:id="@+id/nav_saved"/>
+    <item
+        android:title="Online"
+        android:icon="@drawable/cloud_icon"
+        android:id="@+id/nav_cloud"/>
 </menu>

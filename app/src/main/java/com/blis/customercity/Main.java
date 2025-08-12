@@ -13,6 +13,8 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Main extends AppCompatActivity {
 
+    public static boolean loggedIn = false;
+    public static String idToken;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -22,6 +24,7 @@ public class Main extends AppCompatActivity {
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
+        Fragment cloudFragment = new CloudFragment();
         setCurrentFragment(findFragment);
         // navigation view
         BottomNavigationView bottomNavigationView = findViewById(R.id.navigation_view);
@@ -37,6 +40,10 @@ public class Main extends AppCompatActivity {
             }
             if(id == R.id.nav_search){
                 setCurrentFragment(searchFragment);
+                return true;
+            }
+            if(id == R.id.nav_cloud){
+                setCurrentFragment(cloudFragment);
                 return true;
             }
             return false;
