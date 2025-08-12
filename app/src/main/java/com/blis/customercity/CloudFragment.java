@@ -81,8 +81,18 @@ public class CloudFragment extends Fragment {
                 String finalUrl = urlBuilder.build().toString();
 
                 HashMap<String, String> body = new HashMap<>();
-                body.put("email", String.valueOf(emailInput.getText()));
-                body.put("password", String.valueOf(passwordInput.getText()));
+                String emailInputString = String.valueOf(emailInput.getText());
+                String passwordInputString = String.valueOf(passwordInput.getText());
+                if(emailInputString.isEmpty()){
+                    errorTextView.setText("Please input a valid Email");
+                    return;
+                }
+                if(passwordInputString.isEmpty()){
+                    errorTextView.setText("Please input password");
+                    return;
+                }
+                body.put("email", emailInputString);
+                body.put("password", passwordInputString);
                 body.put("returnSecureToken", "true");
 
                 Gson gson = new Gson();
@@ -171,8 +181,8 @@ public class CloudFragment extends Fragment {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
                     SharedPreferences.Editor editor = loginInfo.edit();
-                    editor.putString("loggedIn", null);
-                    editor.putBoolean("idToken", false);
+                    editor.putBoolean("loggedIn", false);
+                    editor.putString("idToken", null);
                     editor.apply();
 
                     logoutLayout.setVisibility(View.GONE);
@@ -227,8 +237,8 @@ public class CloudFragment extends Fragment {
         Button logoutButton = linearLayout.findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> {
             SharedPreferences.Editor editor = loginInfo.edit();
-            editor.putString("loggedIn", null);
-            editor.putBoolean("idToken", false);
+            editor.putString("idToken", null);
+            editor.putBoolean("loggedIn", false);
             editor.apply();
             logoutLayout.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);

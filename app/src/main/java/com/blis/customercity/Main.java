@@ -1,5 +1,7 @@
 package com.blis.customercity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -18,7 +20,15 @@ public class Main extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.main);
+
+
 //        FileHandler.removeFile(this, "saved_list"); // for debugging purposes
+//        SharedPreferences preferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.clear();
+//        editor.apply();
+
+
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
