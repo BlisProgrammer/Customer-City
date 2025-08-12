@@ -29,11 +29,6 @@ public class RecordActivity extends AppCompatActivity {
         if(selectedRecord == null){
             return;
         }
-//        if(FindFragment.selectedRecords.isEmpty()){
-//            return;
-//        }
-//        Record selectedRecord = FindFragment.selectedRecords.get(ID);
-
         TextView recordViewCompany = findViewById(R.id.record_view_company);
         recordViewCompany.setText(selectedRecord.company);
         TextView recordViewCategory = findViewById(R.id.record_view_category);
@@ -44,16 +39,20 @@ public class RecordActivity extends AppCompatActivity {
         // save button
         Button saveButton = findViewById(R.id.save_button);
 
-        Object savedObject = FileHandler.loadObjectFromFile(this, "saved_list");
-        ArrayList<Record> savedArraylist;
-        if(savedObject != null){
-            savedArraylist = (ArrayList<Record>) savedObject;
-        } else {
-            savedArraylist = new ArrayList<>();
-        }
-        if(savedArraylist.contains(selectedRecord)){
-            saveButton.setText("Saved");
-        }
+        new Thread(()->{
+            Object savedObject = FileHandler.loadObjectFromFile(this, "saved_list");
+            ArrayList<Record> savedArraylist;
+            if(savedObject != null){
+                savedArraylist = (ArrayList<Record>) savedObject;
+            } else {
+                savedArraylist = new ArrayList<>();
+            }
+            if(savedArraylist.contains(selectedRecord)){
+                saveButton.post(()->{
+                    saveButton.setText("Saved");
+                });
+            }
+        }).start();
         saveButton.setOnClickListener(v -> {
             Object savedObject2 = FileHandler.loadObjectFromFile(this, "saved_list");
             ArrayList<Record> savedArraylist2;

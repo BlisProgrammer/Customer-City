@@ -85,26 +85,30 @@ public class FindFragment extends Fragment {
         // Search button
         final Button button = linearLayout.findViewById(R.id.button_id);
         button.setOnClickListener(v -> {
-            // get list of companies
-            Spinner companySpinner = linearLayout.findViewById(R.id.company_spinner);
-            if(companySpinner.getSelectedItemPosition() == -1) return;
-            selectedCompany = companySpinner.getSelectedItem().toString();
-            String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
-            selectedRecords = DataConverter.getRecords(companyId, getResources().openRawResource(R.raw.records), selectedCategory, selectedType, selectedCompany);
-            if(selectedRecords.isEmpty()) return;
+            new Thread(()->{
+                // get list of companies
+                Spinner companySpinner = linearLayout.findViewById(R.id.company_spinner);
+                if(companySpinner.getSelectedItemPosition() == -1) return;
+                selectedCompany = companySpinner.getSelectedItem().toString();
+                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
+                selectedRecords = DataConverter.getRecords(companyId, getResources().openRawResource(R.raw.records), selectedCategory, selectedType, selectedCompany);
+                if(selectedRecords.isEmpty()) return;
+                resultList = new ArrayList<>();
+                for (Record record : selectedRecords) {
+                    resultList.add(record.formatToString());
+                }
+                if(getView() == null) return;
+                getView().post(() -> {
+                    // set list view
+                    ListView listView = linearLayout.findViewById(R.id.resultView);
+                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
+                    listView.setAdapter(adapter1);
 
-            // set list view
-            ListView listView = linearLayout.findViewById(R.id.resultView);
-            resultList = new ArrayList<>();
-            for (Record record : selectedRecords) {
-                resultList.add(record.formatToString());
-            }
-            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
-            listView.setAdapter(adapter1);
-
-            // set company name
-            TextView companyTextView = linearLayout.findViewById(R.id.company_textview);
-            companyTextView.setText(String.format("%s(%s/%s)", selectedCompany, selectedCategory, selectedType));
+                    // set company name
+                    TextView companyTextView = linearLayout.findViewById(R.id.company_textview);
+                    companyTextView.setText(String.format("%s(%s/%s)", selectedCompany, selectedCategory, selectedType));
+                });
+            }).start();
         });
 
         // List view on click
