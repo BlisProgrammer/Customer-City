@@ -40,7 +40,6 @@ public class SavedFragment extends Fragment {
 
                             assert getView() != null;
                             ListView listView = getView().findViewById(R.id.saved_view_list);
-                            if (savedObject == null) return;
                             savedList = (ArrayList<Record>) savedObject;
                             adapter = new TwoLineAdapter(requireContext(), savedList);
                             listView.setAdapter(adapter);

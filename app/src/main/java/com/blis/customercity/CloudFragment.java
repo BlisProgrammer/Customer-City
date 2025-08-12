@@ -1,9 +1,15 @@
 package com.blis.customercity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -11,10 +17,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
@@ -157,8 +165,20 @@ public class CloudFragment extends Fragment {
 
             }
         });
+
+        recordActivityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        updateOnlineList(linearLayout, loginLayout, logoutLayout);
+                    }
+                });
         return linearLayout;
     }
+    private Toast savedToast;
+    private ActivityResultLauncher<Intent> recordActivityResultLauncher;
+
     private void updateOnlineList(LinearLayout linearLayout, LinearLayout loginLayout, LinearLayout logoutLayout){
         ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
@@ -166,11 +186,11 @@ public class CloudFragment extends Fragment {
                 updateOnlineList(linearLayout, loginLayout, logoutLayout);
             }
         );
+        ArrayList<Record> onlineRecordList = new ArrayList<>();
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
         if(loggedIn && idToken != null){
-            ArrayList<Record> onlineRecordList = new ArrayList<>();
 
             // get records from online
             Request request = new Request.Builder()
@@ -242,6 +262,75 @@ public class CloudFragment extends Fragment {
             editor.apply();
             logoutLayout.setVisibility(View.GONE);
             loginLayout.setVisibility(View.VISIBLE);
+        });
+
+        onlineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+                recordIntent.putExtra("selected_record", onlineRecordList.get(position));
+                recordActivityResultLauncher.launch(recordIntent);
+            }
+        });
+        onlineListView.setOnItemLongClickListener((parent, view, position, id) -> {
+            ConfirmationDialog.showConfirmationDialog(
+                    requireContext(),
+                    "Confirm Action",
+                    "Delete saved record? ",
+                    (dialog, which) -> {
+                        Record selectedRecord = onlineRecordList.get(position);
+
+                        // remove with api call
+                        HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
+                        assert originalUrl != null;
+                        HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
+                        urlBuilder.addQueryParameter("id", selectedRecord.id);
+
+                        Request request = new Request.Builder()
+                                .url(urlBuilder.build())
+                                .addHeader("Cookie", "token=" + idToken)
+                                .build();
+                        client.newCall(request).enqueue(new Callback() {
+                            @Override
+                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                if (savedToast != null) {
+                                    savedToast.cancel();
+                                }
+                                savedToast = Toast.makeText(requireContext(), "Error Occurred", Toast.LENGTH_SHORT);
+                                savedToast.show();
+                            }
+
+                            @Override
+                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                if (response.isSuccessful()) {
+                                    assert getActivity() != null;
+                                    getActivity().runOnUiThread(() -> {
+                                        if (savedToast != null) {
+                                            savedToast.cancel();
+                                        }
+                                        savedToast = Toast.makeText(requireContext(), "Item removed", Toast.LENGTH_SHORT);
+                                        savedToast.show();
+
+                                        onlineRecordList.remove(position);
+                                        TwoLineAdapter onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
+                                        onlineListView.setAdapter(onlineAdapter);
+                                        dialog.dismiss();
+                                    });
+                                } else {
+                                    if (savedToast != null) {
+                                        savedToast.cancel();
+                                    }
+                                    savedToast = Toast.makeText(requireContext(), "Error Occurred", Toast.LENGTH_SHORT);
+                                    savedToast.show();
+                                }
+                                response.body().close();
+                            }
+                        });
+                    },
+                    (dialog, which) -> dialog.dismiss()
+
+            );
+            return true;
         });
     }
 }
