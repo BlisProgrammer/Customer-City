@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import java.util.ArrayList;
 
 public class RecordActivity extends AppCompatActivity {
+    private Toast savedToast;
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -72,9 +73,11 @@ public class RecordActivity extends AppCompatActivity {
                 saveButton.setText("Saved");
             }
             FileHandler.saveObjectToFile(this, "saved_list", savedArraylist2);
-            Toast toast = new Toast(this);
-            toast.setText(displayText);
-            toast.show();
+            if(savedToast != null){
+                savedToast.cancel();
+            }
+            savedToast = Toast.makeText(this, displayText, Toast.LENGTH_SHORT);
+            savedToast.show();
         });
 
         // back button
