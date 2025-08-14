@@ -3,7 +3,7 @@
     <string name="click_me">CLICK ME!!!!</string>
     <string name="channel_name">Blis Test</string>
     <string name="channel_description">This is a channel for testing the notification system.</string>
-    <string-array name="default_spinner_items">
+    <string-array name="default_categories">
         <item>私家車相關</item>
         <item>金融</item>
         <item>科技</item>
@@ -19,4 +19,7 @@
     </string-array>
     <string name="hello_blank_fragment">Hello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\n</string>
     <string name="long_click_item_to_remove">Long click item to remove</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
 </resources>

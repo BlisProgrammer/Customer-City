@@ -3,19 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Find"
-        android:icon="@drawable/filter_icon"
-        android:id="@+id/nav_find"/>
-    <item
         android:title="Search"
         android:icon="@drawable/search_icon"
         android:id="@+id/nav_search"/>
     <item
+        android:title="Directory"
+        android:icon="@drawable/directory_icon"
+        android:id="@+id/nav_directory"/>
+    <item
         android:title="Saved"
         android:icon="@drawable/saved_icon"
-        android:id="@+id/nav_saved"/>
-    <item
-        android:title="Online"
-        android:icon="@drawable/cloud_icon"
-        android:id="@+id/nav_cloud"/>
+        android:id="@+id/nav_save"/>
 </menu>
