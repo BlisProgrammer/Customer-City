@@ -150,7 +150,38 @@ public class DataConverter {
         return searchInCSV("id", categoryID, "category_cn", inputStream);
     }
 
-    public static ArrayList<Record> getRecords(String companyId, InputStream inputStream, String selectedCategory, String selectedType, String selectedCompany) {
+    public static ArrayList<String> companyNameToIDs(String companyName, InputStream inputStream){
+        try{
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            String line;
+
+            // get first line
+            String[] firstLine =reader.readLine().split("\\|");
+            int companyNameColumn = 2;
+            int idColumn = 0;
+            for (int i = 0; i < firstLine.length; i++) {
+                if(firstLine[i].equals("company_name_cn")){
+                    companyNameColumn = i;
+                }
+                if(firstLine[i].equals("id")){
+                    idColumn = i;
+                }
+            }
+            ArrayList<String> allIDs = new ArrayList<>();
+            while((line=reader.readLine())!= null){
+                String[] data = line.split("\\|", -1);
+                if(data[companyNameColumn].equals(companyName)){
+                    allIDs.add(data[idColumn]);
+                }
+            }
+            reader.close();
+            return allIDs;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static ArrayList<Record> companyToRecords(String companyId, InputStream inputStream, String selectedCategory, String selectedType, String selectedCompany) {
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
             String line;

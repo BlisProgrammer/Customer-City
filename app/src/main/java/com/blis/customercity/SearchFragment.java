@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -68,7 +67,7 @@ public class SearchFragment extends Fragment {
                 String selectedCompany = (String) parent.getItemAtPosition(position);
 //                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
                 String companyId = "000";
-                ArrayList<Record> selectedRecords = DataConverter.getRecords(
+                ArrayList<Record> selectedRecords = DataConverter.companyToRecords(
                         companyId,
                         getResources().openRawResource(R.raw.records),
                         DataConverter.companyIDToCategory(companyId, getResources().openRawResource(R.raw.categories)),

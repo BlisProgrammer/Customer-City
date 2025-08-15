@@ -1,6 +1,5 @@
 package com.blis.customercity;
 
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -13,15 +12,12 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.SearchView;
 
 import com.blis.customercity.Data.Company;
 import com.blis.customercity.Data.DataAPI;
@@ -48,7 +44,7 @@ public class FindFragment extends Fragment {
         ChipGroup categoryChipGroup = scrollView.findViewById(R.id.category_chip_group);
         ChipGroup subCategoryChipGroup = scrollView.findViewById(R.id.sub_category_chip_group);
         ProgressBar progressBar = scrollView.findViewById(R.id.progressBar);
-        ListView listView = scrollView.findViewById(R.id.resultView);
+        ListView resultView = scrollView.findViewById(R.id.resultView);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, // Width
                 ViewGroup.LayoutParams.WRAP_CONTENT  // Height
@@ -72,7 +68,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
-                listView.setVisibility(View.GONE);
+                resultView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 subCategoryChipGroup.removeAllViews();
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
@@ -102,7 +98,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
-                listView.setVisibility(View.GONE);
+                resultView.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
 
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
@@ -121,17 +117,19 @@ public class FindFragment extends Fragment {
                     ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                     if(getActivity() == null) return;
                     getActivity().runOnUiThread(() -> {
-                        listView.setVisibility(View.VISIBLE);
+                        resultView.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
-                        listView.setAdapter(adapter1);
+                        resultView.setAdapter(adapter1);
                     });
                 }).start();
             }
         });
         // List view on click
-        listView.setOnItemClickListener((parent, view, position, id) -> {
+        resultView.setOnItemClickListener((parent, view, position, id) -> {
             Bundle args = new Bundle();
-            args.putString("company_id", companies.get(position).getId());
+            ArrayList<String> companyIDs = new ArrayList<>();
+            companyIDs.add(companies.get(position).getId());
+            args.putStringArrayList("company_ids", companyIDs);
 
             Fragment resultFragment = new ResultFragment();
             resultFragment.setArguments(args);
@@ -142,6 +140,61 @@ public class FindFragment extends Fragment {
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
+
+        LinearLayout filterSection = scrollView.findViewById(R.id.filter_section);
+        ListView searchListView = scrollView.findViewById(R.id.search_list_view);
+        SearchView searchView = scrollView.findViewById(R.id.search_view);
+        new Thread(()->{
+            if(!isAdded())return;
+            ArrayList<String> allCompanies = DataConverter.getAllCompanies(getResources().openRawResource(R.raw.companies));
+            if(!isAdded())return;
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, allCompanies);
+            if(getView() == null) return;
+            getView().post(()->{
+                if(!isAdded())return;
+                searchListView.setAdapter(adapter);
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        return false;
+                    }
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        adapter.getFilter().filter(newText);
+                        return false;
+                    }
+                });
+            });
+        }).start();
+
+        searchView.setOnQueryTextFocusChangeListener((view, hasFocus) -> {
+            if (hasFocus) {
+                searchListView.setVisibility(View.VISIBLE);
+                filterSection.setVisibility(View.GONE);
+            } else {
+                searchListView.setVisibility(View.GONE);
+                filterSection.setVisibility(View.VISIBLE);
+            }
+        });
+
+
+        searchListView.setOnItemClickListener((parent, view, position, id) -> {
+            String selectedCompany = (String) parent.getItemAtPosition(position);
+            ArrayList<String> companyIDs = DataConverter.companyNameToIDs(selectedCompany, getResources().openRawResource(R.raw.companies));
+
+            Bundle args = new Bundle();
+            args.putStringArrayList("company_ids", companyIDs);
+
+            Fragment resultFragment = new ResultFragment();
+            resultFragment.setArguments(args);
+
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.add(R.id.flFragment, resultFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
+
         return scrollView;
     }
 }

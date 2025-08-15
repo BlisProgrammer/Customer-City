@@ -31,14 +31,15 @@ public class ResultFragment extends Fragment{
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_result, container, false);
         Bundle bundle = getArguments();
         if(bundle == null) return linearLayout;
-        String companyId = bundle.getString("company_id");
-        if(companyId == null)return linearLayout;
+        ArrayList<String> companyIDs = bundle.getStringArrayList("company_ids");
+        if(companyIDs == null)return linearLayout;
+        if(companyIDs.isEmpty())return linearLayout;
 
         ListView mainListView = linearLayout.findViewById(R.id.result_view);
         ProgressBar progressBar = linearLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
         new Thread(()->{
-            ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyId);
+            ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyIDs);
             if(selectedRecords.isEmpty()) return;
 
             // set list view
