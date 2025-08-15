@@ -15,6 +15,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.blis.customercity.Data.DataAPI;
+import com.blis.customercity.Data.OnlineRecord;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -49,60 +51,25 @@ public class RecordActivity extends AppCompatActivity {
         setContentView(R.layout.record_view);
 
         Intent intent = getIntent();
-        Record selectedRecord;
+        OnlineRecord selectedRecord;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            selectedRecord = intent.getSerializableExtra("selected_record", Record.class);
+            selectedRecord = intent.getSerializableExtra("selected_record", OnlineRecord.class);
         } else {
-            selectedRecord = (Record) intent.getSerializableExtra("selected_record");
+            selectedRecord = (OnlineRecord) intent.getSerializableExtra("selected_record");
         }
         if(selectedRecord == null){
             return;
         }
         TextView recordViewCompany = findViewById(R.id.record_view_company);
-        recordViewCompany.setText(selectedRecord.company);
+        recordViewCompany.setText(DataConverter.companyIDToCompany(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.companies)));
         TextView recordViewCategory = findViewById(R.id.record_view_category);
-        recordViewCategory.setText(String.format("%s/%s", selectedRecord.category, selectedRecord.sub_category));
+        recordViewCategory.setText(String.format(
+                "%s/%s",
+                DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories)),
+                DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories))
+        ));
         TextView recordViewDetails = findViewById(R.id.record_view_details);
         recordViewDetails.setText(selectedRecord.formatToString());
-
-        // save button
-        Button saveButton = findViewById(R.id.save_button);
-
-        new Thread(()->{
-            Object savedObject = FileHandler.loadObjectFromFile(this, "saved_list");
-            ArrayList<Record> savedArraylist;
-            if(savedObject != null){
-                savedArraylist = (ArrayList<Record>) savedObject;
-            } else {
-                savedArraylist = new ArrayList<>();
-            }
-            if(savedArraylist.contains(selectedRecord)){
-                saveButton.post(()->{
-                    saveButton.setText("Saved");
-                });
-            }
-        }).start();
-        saveButton.setOnClickListener(v -> {
-            Object savedObject2 = FileHandler.loadObjectFromFile(this, "saved_list");
-            ArrayList<Record> savedArraylist2;
-            if(savedObject2 != null){
-                savedArraylist2 = (ArrayList<Record>) savedObject2;
-            } else {
-                savedArraylist2 = new ArrayList<>();
-            }
-            String displayText;
-            if(savedArraylist2.contains(selectedRecord)){
-                savedArraylist2.remove(selectedRecord);
-                displayText = "Record removed";
-                saveButton.setText("Save");
-            }else{
-                savedArraylist2.add(selectedRecord);
-                displayText = "Record saved";
-                saveButton.setText("Saved");
-            }
-            FileHandler.saveObjectToFile(this, "saved_list", savedArraylist2);
-            showToast(displayText);
-        });
 
         // back button
         Button backButton = findViewById(R.id.back_button);
@@ -125,84 +92,42 @@ public class RecordActivity extends AppCompatActivity {
         // Save online button
         SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
-        if(!loggedIn) return;
-        String idToken = loginInfo.getString("idToken", null);
-        Button saveOnlineButton = findViewById(R.id.save_online_button);
-        saveOnlineButton.setVisibility(Button.VISIBLE);
-        Request request = new Request.Builder()
-                .url("https://www.customer.city/api/getHistory/")
-                .addHeader("Cookie", "token=" + idToken)
-                .build();
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                if(savedToast != null){
-                    savedToast.cancel();
+        Button saveOnlineButton = findViewById(R.id.save_button);
+        if(!loggedIn) {
+            saveOnlineButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showToast("Login to save");
                 }
-                savedToast = Toast.makeText(RecordActivity.this, "Load Error", Toast.LENGTH_SHORT);
-                savedToast.show();
-            }
-
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseBody = response.body().string();
-                    System.out.println("Response: " + responseBody);
-                    Gson gson = new Gson();
-                    Type type = new TypeToken<HashMap<String, HashMap<String, List<OnlineRecord>>>>() {}.getType();
-                    HashMap<String, HashMap<String, List<OnlineRecord>>> hashMap = gson.fromJson(responseBody, type);
-                    HashMap<String, List<OnlineRecord>> allData = hashMap.get("data");
-                    if(allData == null) return;
-
-                    runOnUiThread(() -> {
-                        if(allData.containsKey(selectedRecord.id)){
-                            saveOnlineButton.setText("Saved Online");
-                            isSavedOnline = true;
-                        }
-                    });
-                } else {
-                    System.out.println("Unsuccessful response: " + response.code());
-                }
-                response.body().close();
-            }
-        });
-        saveOnlineButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
-                assert originalUrl != null;
-                HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
-                urlBuilder.addQueryParameter("id", selectedRecord.id);
-
-                Request request = new Request.Builder()
-                    .url(urlBuilder.build())
-                    .addHeader("Cookie", "token=" + idToken)
-                    .build();
-                client.newCall(request).enqueue(new Callback() {
-                    @Override
-                    public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                        showToast("Error Occurred");
-                    }
-
-                    @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                        if (response.isSuccessful()) {
-                            runOnUiThread(() -> {
-                                showToast("Updated Online Record");
-                                isSavedOnline = !isSavedOnline;
-                                if(isSavedOnline){
-                                    saveOnlineButton.setText("Saved Online");
-                                }else{
-                                    saveOnlineButton.setText("Save Online");
-                                }
-                            });
-                        } else {
-                            showToast("Error Occurred");
-                        }
-                        response.body().close();
+            });
+        }else{
+            String idToken = loginInfo.getString("idToken", null);
+            new Thread(()->{
+                HashMap<String, ArrayList<OnlineRecord>> savedRecords = DataAPI.getSavedRecords(idToken);
+                runOnUiThread(()->{
+                    if(savedRecords.containsKey(selectedRecord.getId())){
+                        saveOnlineButton.setText("Saved");
+                        isSavedOnline = true;
                     }
                 });
-            }
-        });
+            }).start();
+            saveOnlineButton.setOnClickListener(v -> {
+                new Thread(()->{
+                    boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
+                    runOnUiThread(()->{
+                        if (result){
+                            isSavedOnline = !isSavedOnline;
+                        }
+                        if(isSavedOnline){
+                            saveOnlineButton.setText("Saved");
+                            showToast("Saved Record");
+                        }else{
+                            saveOnlineButton.setText("Save");
+                            showToast("Removed Record");
+                        }
+                    });
+                }).start();
+            });
+        }
     }
 }

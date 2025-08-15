@@ -1,6 +1,8 @@
-package com.blis.customercity;
+package com.blis.customercity.Data;
 
-public class OnlineRecord {
+import java.io.Serializable;
+
+public class OnlineRecord implements Serializable {
     private String id;
     private String company_id;
     private String company_name_en;
@@ -216,5 +218,25 @@ public class OnlineRecord {
 
     public void setCompanies_meta_desc_cn(String companies_meta_desc_cn) {
         this.companies_meta_desc_cn = companies_meta_desc_cn;
+    }
+    public String formatToString(){
+        StringBuilder stringBuilder = new StringBuilder();
+//        if(!this.id.isEmpty()) stringBuilder.append("ID: ").append(this.id).append("\n");
+        if(!this.services_scope_cn.isEmpty()) stringBuilder.append("").append(this.services_scope_cn).append("\n");
+        if(!this.service_hotline.isEmpty()) stringBuilder.append("Hotline: ").append(this.service_hotline).append("\n");
+        if(!this.email.isEmpty()) stringBuilder.append("Email: ").append(this.email).append("\n");
+        if(!this.address_cn.isEmpty()) stringBuilder.append("Address: ").append(this.address_cn).append("\n");
+        if(!this.added_detail_cn.isEmpty()) stringBuilder.append("Details: ").append(this.added_detail_cn).append("\n");
+        if(!this.tips_cn.isEmpty()) stringBuilder.append("").append(this.tips_cn).append("\n");
+        return stringBuilder.toString();
+    }
+    public String getShareString(){
+        return "Contact information for " + getCompany_name_cn() + ": \n" + formatToString();
+    }
+    public String getLine1Text() {
+        return getCompany_name_cn();
+    }
+    public String getLine2Text() {
+        return formatToString();
     }
 }

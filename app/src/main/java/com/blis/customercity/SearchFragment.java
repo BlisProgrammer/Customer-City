@@ -66,7 +66,8 @@ public class SearchFragment extends Fragment {
         listView.setOnItemClickListener((parent, view, position, id) -> {
             new Thread(()->{
                 String selectedCompany = (String) parent.getItemAtPosition(position);
-                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
+//                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
+                String companyId = "000";
                 ArrayList<Record> selectedRecords = DataConverter.getRecords(
                         companyId,
                         getResources().openRawResource(R.raw.records),

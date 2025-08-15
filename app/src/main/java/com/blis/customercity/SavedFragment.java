@@ -17,10 +17,12 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
+import com.blis.customercity.Data.OnlineRecord;
+
 import java.util.ArrayList;
 
 public class SavedFragment extends Fragment {
-    private static ArrayList<Record> savedList = new ArrayList<>();
+    private static ArrayList<OnlineRecord> savedList = new ArrayList<>();
     private static TwoLineAdapter adapter;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
 
@@ -38,7 +40,7 @@ public class SavedFragment extends Fragment {
 
                             assert getView() != null;
                             ListView listView = getView().findViewById(R.id.saved_view_list);
-                            savedList = (ArrayList<Record>) savedObject;
+                            savedList = (ArrayList<OnlineRecord>) savedObject;
                             adapter = new TwoLineAdapter(requireContext(), savedList);
                             listView.setAdapter(adapter);
                         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
@@ -58,7 +60,7 @@ public class SavedFragment extends Fragment {
 
         ListView listView = linearLayout.findViewById(R.id.saved_view_list);
         if (savedObject == null) return linearLayout;
-        savedList = (ArrayList<Record>) savedObject;
+        savedList = (ArrayList<OnlineRecord>) savedObject;
         if(savedList.isEmpty()) return linearLayout;
 
         TextView textView = linearLayout.findViewById(R.id.saved_view_tips);

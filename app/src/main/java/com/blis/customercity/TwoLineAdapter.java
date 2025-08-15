@@ -9,10 +9,12 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
+import com.blis.customercity.Data.OnlineRecord;
+
 import java.util.ArrayList;
 
-public class TwoLineAdapter extends ArrayAdapter<Record> {
-    public TwoLineAdapter(Context context, ArrayList<Record> items) {
+public class TwoLineAdapter extends ArrayAdapter<OnlineRecord> {
+    public TwoLineAdapter(Context context, ArrayList<OnlineRecord> items) {
         super(context, android.R.layout.simple_list_item_2, android.R.id.text1, items);
     }
 
@@ -25,7 +27,7 @@ public class TwoLineAdapter extends ArrayAdapter<Record> {
         TextView text1 = view.findViewById(android.R.id.text1);
         TextView text2 = view.findViewById(android.R.id.text2);
 
-        Record currentItem = getItem(position);
+        OnlineRecord currentItem = getItem(position);
         if (currentItem != null) {
             text1.setText(currentItem.getLine1Text());
             text1.setTypeface(text1.getTypeface(), Typeface.BOLD);

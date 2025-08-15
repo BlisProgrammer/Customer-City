@@ -1,6 +1,5 @@
 package com.blis.customercity;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blis.customercity.Data.OnlineRecord;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 
@@ -159,6 +159,7 @@ public class CloudFragment extends Fragment {
                             });
                         }
                         response.body().close(); // Close the response body
+                        return;
                     }
                 });
 
@@ -186,7 +187,7 @@ public class CloudFragment extends Fragment {
                 updateOnlineList(linearLayout, loginLayout, logoutLayout);
             }
         );
-        ArrayList<Record> onlineRecordList = new ArrayList<>();
+        ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
@@ -222,21 +223,8 @@ public class CloudFragment extends Fragment {
                         if(allData == null) return;
                         for (List<OnlineRecord> value : allData.values()) {
                             OnlineRecord thisOnlineRecord = value.get(0);
-                            if(!isAdded())return;
-                            onlineRecordList.add(
-                                    new Record(
-                                            thisOnlineRecord.getId(),
-                                            DataConverter.companyIDToCategory(thisOnlineRecord.getCompany_id(), getResources().openRawResource(R.raw.categories)),
-                                            DataConverter.companyIDToSubCategory(thisOnlineRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories)),
-                                            thisOnlineRecord.getCompany_name_cn(),
-                                            thisOnlineRecord.getServices_scope_cn(),
-                                            thisOnlineRecord.getService_hotline(),
-                                            thisOnlineRecord.getEmail(),
-                                            thisOnlineRecord.getAddress_cn(),
-                                            thisOnlineRecord.getAdded_detail_cn(),
-                                            thisOnlineRecord.getTips_cn()
-                                    )
-                            );
+                            if(!isAdded()) return;
+                            onlineRecordList.add(thisOnlineRecord);
                         }
 
                         assert getActivity() != null;
@@ -278,13 +266,13 @@ public class CloudFragment extends Fragment {
                     "Confirm Action",
                     "Delete saved record? ",
                     (dialog, which) -> {
-                        Record selectedRecord = onlineRecordList.get(position);
+                        OnlineRecord selectedRecord = onlineRecordList.get(position);
 
                         // remove with api call
                         HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
                         assert originalUrl != null;
                         HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
-                        urlBuilder.addQueryParameter("id", selectedRecord.id);
+                        urlBuilder.addQueryParameter("id", selectedRecord.getId());
 
                         Request request = new Request.Builder()
                                 .url(urlBuilder.build())

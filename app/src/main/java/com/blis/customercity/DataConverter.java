@@ -138,8 +138,8 @@ public class DataConverter {
         }
     }
 
-    public static String companyToID(String selectedCompany, InputStream inputStream) {
-        return searchInCSV("company_name_cn", selectedCompany, "id", inputStream);
+    public static String companyIDToCompany(String companyID, InputStream inputStream) {
+        return searchInCSV("id", companyID, "company_name_cn", inputStream);
     }
     public static String companyIDToSubCategory(String companyID, InputStream inputStream) {
         String subCategoryID = companyID.substring(0, 7);

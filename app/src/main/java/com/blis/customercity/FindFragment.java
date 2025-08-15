@@ -7,6 +7,8 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,8 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.blis.customercity.Data.Company;
+import com.blis.customercity.Data.DataAPI;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -29,6 +33,7 @@ import java.util.List;
 public class FindFragment extends Fragment {
     private static String selectedCategory, selectedSubCategory, selectedCompany;
     public static ArrayList<Record> selectedRecords;
+    private static ArrayList<Company> companies;
     private static ArrayList<String> resultList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,16 +97,29 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
-                listView.setVisibility(View.VISIBLE);
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
                 selectedSubCategory = (String) selectedChip.getText();
 
                 // get list of companies
                 String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
-                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
+//                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
 
-                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companies);
-                listView.setAdapter(adapter1);
+                new Thread(()->{
+                    companies = DataAPI.subCatIDToCompanies(sub_categoryID);
+                    ArrayList<String> companyNames = new ArrayList<>();
+                    for(Company company : companies){
+                        companyNames.add(company.getCompany_name_cn());
+                    }
+                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
+                    if(getActivity() == null) return;
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listView.setVisibility(View.VISIBLE);
+                            listView.setAdapter(adapter1);
+                        }
+                    });
+                }).start();
             }
         });
 
@@ -179,13 +197,20 @@ public class FindFragment extends Fragment {
 //            }).start();
 //        });
 //
-//        // List view on click
-//        ListView listView = scrollView.findViewById(R.id.resultView);
-//        listView.setOnItemClickListener((parent, view, position, id) -> {
-//            Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-//            recordIntent.putExtra("selected_record", selectedRecords.get(position));
-//            startActivity(recordIntent);
-//        });
+        // List view on click
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            Bundle args = new Bundle();
+            args.putString("company_id", companies.get(position).getId());
+
+            Fragment resultFragment = new ResultFragment();
+            resultFragment.setArguments(args);
+
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.flFragment, resultFragment);
+            fragmentTransaction.addToBackStack(null);
+            fragmentTransaction.commit();
+        });
         return scrollView;
     }
 }
