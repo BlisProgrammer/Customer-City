@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -82,6 +83,16 @@ public class CloudFragment extends Fragment {
                         updateOnlineList(linearLayout, loginLayout, logoutLayout);
                     }
                 });
+
+        Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
+        switchToUserButton.setOnClickListener(v->{
+            Fragment userFragment = new UserFragment();
+            getParentFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.flFragment, userFragment)
+                    .commit();
+        });
+
         return linearLayout;
     }
     private Toast savedToast;
@@ -98,6 +109,7 @@ public class CloudFragment extends Fragment {
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
+        swipeRefreshLayout.setRefreshing(true);
         if(loggedIn && idToken != null){
 
             // get records from online
@@ -230,12 +242,5 @@ public class CloudFragment extends Fragment {
             );
             return true;
         });
-    }
-    public static void logout(Context context){
-        SharedPreferences loginInfo = context.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = loginInfo.edit();
-        editor.putString("idToken", null);
-        editor.putBoolean("loggedIn", false);
-        editor.apply();
     }
 }

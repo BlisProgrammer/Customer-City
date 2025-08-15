@@ -26,7 +26,14 @@
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textSize="30sp"
-            android:text="Login to View Saved Records"/>
+            android:text="登入儲存你的常用熱線聯絡，\n下次唔使左搵右搵！"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:id="@+id/switch_to_user_button"
+            android:layout_marginTop="20dp"
+            android:text="立即登入"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
