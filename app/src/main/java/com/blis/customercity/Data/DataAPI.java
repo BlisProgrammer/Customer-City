@@ -1,27 +1,14 @@
 package com.blis.customercity.Data;
 
-import android.content.SharedPreferences;
-import android.util.Log;
-import android.view.View;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-
-import com.blis.customercity.Record;
-import com.blis.customercity.RecordActivity;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.checkerframework.checker.units.qual.A;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -57,6 +44,7 @@ class SearchResult{
 public class DataAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final HashMap<String, ArrayList<Company>> companies = new HashMap<>();
+    private static final HashMap<String, ArrayList<OnlineRecord>> records = new HashMap<>();
     public static ArrayList<Company> subCatIDToCompanies(String subCatID){
         // https://www.customer.city/api/getCompanies/?subCatId={subCatID}
 
@@ -90,6 +78,10 @@ public class DataAPI {
     public static ArrayList<OnlineRecord> companyIDtoRecords(String companyID){
         // https://www.customer.city/api/search/?ids={companyID}
         String[] id = companyID.split("-");
+
+        if(records.containsKey(id[2])){
+            return records.get(id[2]);
+        }
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/search").newBuilder();
         urlBuilder.addQueryParameter("ids", id[2]);

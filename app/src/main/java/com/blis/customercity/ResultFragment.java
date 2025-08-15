@@ -6,10 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.blis.customercity.Data.DataAPI;
 import com.blis.customercity.Data.OnlineRecord;
@@ -31,13 +35,8 @@ public class ResultFragment extends Fragment{
         if(companyId == null)return linearLayout;
 
         ListView mainListView = linearLayout.findViewById(R.id.result_view);
-
-//        ArrayList<Record> selectedRecords = DataConverter.getRecords(
-//                companyId,
-//                getResources().openRawResource(R.raw.records),
-//                DataConverter.companyIDToCategory(companyId, getResources().openRawResource(R.raw.categories)),
-//                DataConverter.companyIDToSubCategory(companyId, getResources().openRawResource(R.raw.sub_categories)),
-//                DataConverter.companyIDToCompany(companyId, getResources().openRawResource(R.raw.companies)));
+        ProgressBar progressBar = linearLayout.findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.VISIBLE);
         new Thread(()->{
             ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyId);
             if(selectedRecords.isEmpty()) return;
@@ -52,6 +51,7 @@ public class ResultFragment extends Fragment{
             if(getActivity() == null) return;
             getActivity().runOnUiThread(()->{
                 mainListView.setAdapter(adapter1);
+                progressBar.setVisibility(View.GONE);
 
                 mainListView.setOnItemClickListener((parent1, view1, position1, id1) -> {
                     Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
@@ -60,6 +60,15 @@ public class ResultFragment extends Fragment{
                 });
             });
         }).start();
+        Button backButton = linearLayout.findViewById(R.id.back_button);
+        backButton.setOnClickListener(v -> {
+            Fragment findFragment = new FindFragment();
+
+            FragmentManager fragmentManager = getParentFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.flFragment, findFragment);
+            fragmentTransaction.commit();
+        });
         return linearLayout;
     }
 }

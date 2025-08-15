@@ -11,9 +11,21 @@
         android:textSize="30sp"
         android:textAlignment="center"
         android:text="Company" />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:visibility="gone"/>
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:id="@+id/result_view">
-</ListView>
+    </ListView>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/back_button"
+        android:text="Back"/>
 </LinearLayout>

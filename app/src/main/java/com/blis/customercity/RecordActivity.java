@@ -61,15 +61,23 @@ public class RecordActivity extends AppCompatActivity {
             return;
         }
         TextView recordViewCompany = findViewById(R.id.record_view_company);
-        recordViewCompany.setText(DataConverter.companyIDToCompany(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.companies)));
         TextView recordViewCategory = findViewById(R.id.record_view_category);
-        recordViewCategory.setText(String.format(
-                "%s/%s",
-                DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories)),
-                DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories))
-        ));
         TextView recordViewDetails = findViewById(R.id.record_view_details);
-        recordViewDetails.setText(selectedRecord.formatToString());
+        new Thread(()->{
+            selectedRecord.setCompany_name_cn(DataConverter.companyIDToCompany(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.companies)));
+            String subCategory = DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories));
+            String category = DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories));
+
+            runOnUiThread(()->{
+                recordViewCompany.setText(selectedRecord.getCompany_name_cn());
+                recordViewCategory.setText(String.format(
+                        "%s/%s",
+                        subCategory,
+                        category
+                ));
+                recordViewDetails.setText(selectedRecord.formatToString());
+            });
+        }).start();
 
         // back button
         Button backButton = findViewById(R.id.back_button);

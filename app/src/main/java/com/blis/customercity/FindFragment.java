@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class FindFragment extends Fragment {
 
         ChipGroup categoryChipGroup = scrollView.findViewById(R.id.category_chip_group);
         ChipGroup subCategoryChipGroup = scrollView.findViewById(R.id.sub_category_chip_group);
+        ProgressBar progressBar = scrollView.findViewById(R.id.progressBar);
         ListView listView = scrollView.findViewById(R.id.resultView);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT, // Width
@@ -70,6 +72,7 @@ public class FindFragment extends Fragment {
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
                 listView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.GONE);
                 subCategoryChipGroup.removeAllViews();
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
                 selectedCategory = (String) selectedChip.getText();
@@ -97,6 +100,9 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
+                listView.setVisibility(View.GONE);
+                progressBar.setVisibility(View.VISIBLE);
+
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
                 selectedSubCategory = (String) selectedChip.getText();
 
@@ -112,91 +118,14 @@ public class FindFragment extends Fragment {
                     }
                     ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                     if(getActivity() == null) return;
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            listView.setVisibility(View.VISIBLE);
-                            listView.setAdapter(adapter1);
-                        }
+                    getActivity().runOnUiThread(() -> {
+                        listView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                        listView.setAdapter(adapter1);
                     });
                 }).start();
             }
         });
-
-
-//        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                // save selected category
-//                String selectedItem = parent.getItemAtPosition(position).toString();
-//                selectedCategory = selectedItem;
-//
-//                // get list of subcategories
-//                String categoryID = DataConverter.categoryNameToID(selectedItem, getResources().openRawResource(R.raw.categories));
-//                ArrayList<String> subCategories = DataConverter.getSubCategories(categoryID, getResources().openRawResource(R.raw.sub_categories));
-//
-//                // add list to spinner
-//                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, subCategories);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                typeSpinner.setAdapter(adapter);
-//
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-//        typeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                // save selected item
-//                String selectedItem = parent.getItemAtPosition(position).toString();
-//                selectedType = selectedItem;
-//
-//                // get list of companies
-//                String sub_categoryID = DataConverter.subCategoryToID(selectedItem, getResources().openRawResource(R.raw.sub_categories));
-//                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
-//
-//                // add list to spinner
-//                ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, companies);
-//                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                companySpinner.setAdapter(adapter);
-//            }
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//
-//            }
-//        });
-//
-//
-//        // Search button
-//        final Button button = scrollView.findViewById(R.id.button_id);
-//        button.setOnClickListener(v -> {
-//            new Thread(()->{
-//                // get list of companies
-//                if(companySpinner.getSelectedItemPosition() == -1) return;
-//                selectedCompany = companySpinner.getSelectedItem().toString();
-//                String companyId = DataConverter.companyToID(selectedCompany, getResources().openRawResource(R.raw.companies));
-//                selectedRecords = DataConverter.getRecords(companyId, getResources().openRawResource(R.raw.records), selectedCategory, selectedType, selectedCompany);
-//                if(selectedRecords.isEmpty()) return;
-//                resultList = new ArrayList<>();
-//                for (Record record : selectedRecords) {
-//                    resultList.add(record.formatToString());
-//                }
-//                if(getView() == null) return;
-//                getView().post(() -> {
-//                    // set list view
-//                    ListView listView = scrollView.findViewById(R.id.resultView);
-//                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
-//                    listView.setAdapter(adapter1);
-//
-//                    // set company name
-//                    TextView companyTextView = scrollView.findViewById(R.id.company_textview);
-//                    companyTextView.setText(String.format("%s(%s/%s)", selectedCompany, selectedCategory, selectedType));
-//                });
-//            }).start();
-//        });
-//
         // List view on click
         listView.setOnItemClickListener((parent, view, position, id) -> {
             Bundle args = new Bundle();
