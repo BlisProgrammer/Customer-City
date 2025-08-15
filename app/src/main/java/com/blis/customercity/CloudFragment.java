@@ -235,6 +235,18 @@ public class CloudFragment extends Fragment {
                             swipeRefreshLayout.setRefreshing(false);
                         });
                     } else {
+                        if(response.code() == 401){
+                            SharedPreferences.Editor editor = loginInfo.edit();
+                            editor.putBoolean("loggedIn", false);
+                            editor.putString("idToken", null);
+                            editor.apply();
+
+                            getActivity().runOnUiThread(() -> {
+                                logoutLayout.setVisibility(View.GONE);
+                                loginLayout.setVisibility(View.VISIBLE);
+                                swipeRefreshLayout.setRefreshing(false);
+                            });
+                        }
                         System.out.println("Unsuccessful response: " + response.code());
                     }
                     response.body().close();
@@ -255,6 +267,7 @@ public class CloudFragment extends Fragment {
         onlineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(onlineRecordList.isEmpty())return;
                 Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
                 recordIntent.putExtra("selected_record", onlineRecordList.get(position));
                 recordActivityResultLauncher.launch(recordIntent);
