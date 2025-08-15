@@ -66,7 +66,7 @@ public class ResultFragment extends Fragment{
 
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.flFragment, findFragment);
+            fragmentTransaction.remove(this);
             fragmentTransaction.commit();
         });
         return linearLayout;

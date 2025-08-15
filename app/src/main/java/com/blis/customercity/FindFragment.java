@@ -65,6 +65,7 @@ public class FindFragment extends Fragment {
             newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
             newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
             newChip.setChipStrokeWidth(2);
+            newChip.setTextSize(15);
             categoryChipGroup.addView(newChip);
         }
         categoryChipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
@@ -92,6 +93,7 @@ public class FindFragment extends Fragment {
                     newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
                     newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
                     newChip.setChipStrokeWidth(2);
+                    newChip.setTextSize(15);
                     subCategoryChipGroup.addView(newChip);
                 }
             }
@@ -136,7 +138,7 @@ public class FindFragment extends Fragment {
 
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.flFragment, resultFragment);
+            fragmentTransaction.add(R.id.flFragment, resultFragment);
             fragmentTransaction.addToBackStack(null);
             fragmentTransaction.commit();
         });
