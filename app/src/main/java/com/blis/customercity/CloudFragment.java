@@ -69,11 +69,9 @@ public class CloudFragment extends Fragment {
 
         LinearLayout loginLayout = linearLayout.findViewById(R.id.login_layout);
         LinearLayout logoutLayout = linearLayout.findViewById(R.id.logout_layout);
-        TextView loginTitleView = linearLayout.findViewById(R.id.login_title_view);
         if(loggedIn && idToken != null){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
-            loginTitleView.setText("Logged In");
             updateOnlineList(linearLayout, loginLayout, logoutLayout);
         }
         Button loginButton = linearLayout.findViewById(R.id.login_button);
@@ -143,7 +141,6 @@ public class CloudFragment extends Fragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    loginTitleView.setText("Logged In");
                                     loginLayout.setVisibility(View.GONE);
                                     logoutLayout.setVisibility(View.VISIBLE);
                                     updateOnlineList(linearLayout, loginLayout, logoutLayout);
@@ -254,16 +251,6 @@ public class CloudFragment extends Fragment {
             });
         }
 
-        Button logoutButton = linearLayout.findViewById(R.id.logoutButton);
-        logoutButton.setOnClickListener(v -> {
-            SharedPreferences.Editor editor = loginInfo.edit();
-            editor.putString("idToken", null);
-            editor.putBoolean("loggedIn", false);
-            editor.apply();
-            logoutLayout.setVisibility(View.GONE);
-            loginLayout.setVisibility(View.VISIBLE);
-        });
-
         onlineListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -333,5 +320,12 @@ public class CloudFragment extends Fragment {
             );
             return true;
         });
+    }
+    public static void logout(Context context){
+        SharedPreferences loginInfo = context.getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("idToken", null);
+        editor.putBoolean("loggedIn", false);
+        editor.apply();
     }
 }
