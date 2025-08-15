@@ -30,13 +30,13 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <ImageButton
+                <Button
                     android:id="@+id/account_button"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
                     android:layout_marginEnd="25dp"
-                    android:background="@drawable/user_icon"
-                    android:contentDescription="Login button"
+                    android:text="@string/sign_in"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

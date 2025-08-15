@@ -32,6 +32,7 @@ public class Main extends AppCompatActivity {
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
+        Fragment userFragment = new UserFragment();
         Fragment directoryFragment = new DirectoryFragment();
         Fragment cloudFragment = new CloudFragment();
         setCurrentFragment(findFragment);
@@ -44,12 +45,12 @@ public class Main extends AppCompatActivity {
                 setCurrentFragment(findFragment);
                 return true;
             }
-            if(id == R.id.nav_directory){
-                setCurrentFragment(directoryFragment);
-                return true;
-            }
             if(id == R.id.nav_save){
                 setCurrentFragment(cloudFragment);
+                return true;
+            }
+            if(id == R.id.nav_user){
+                setCurrentFragment(userFragment);
                 return true;
             }
             return false;

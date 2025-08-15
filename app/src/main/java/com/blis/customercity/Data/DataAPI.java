@@ -1,5 +1,10 @@
 package com.blis.customercity.Data;
 
+import android.content.SharedPreferences;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -9,9 +14,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 class CompanyResult{
@@ -152,5 +160,40 @@ public class DataAPI {
             System.err.println("Error during request: " + e.getMessage());
         }
         return false;
+    }
+    public static String getToken(String emailInput, String passwordInput){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword").newBuilder();
+        urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
+        String finalUrl = urlBuilder.build().toString();
+
+        HashMap<String, String> body = new HashMap<>();
+        body.put("email", emailInput);
+        body.put("password", passwordInput);
+        body.put("returnSecureToken", "true");
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(body);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Type type = new TypeToken<HashMap<String, String>>() {}.getType();
+                HashMap<String, String> hashMap = gson.fromJson(responseBody, type);
+
+                // Login in successful, show logged in screen
+                return hashMap.get("idToken");
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return null;
     }
 }

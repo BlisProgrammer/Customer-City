@@ -7,11 +7,11 @@
         android:icon="@drawable/search_icon"
         android:id="@+id/nav_search"/>
     <item
-        android:title="Directory"
-        android:icon="@drawable/directory_icon"
-        android:id="@+id/nav_directory"/>
-    <item
         android:title="Saved"
         android:icon="@drawable/saved_icon"
         android:id="@+id/nav_save"/>
+    <item
+        android:title="User"
+        android:icon="@drawable/user_icon"
+        android:id="@+id/nav_user"/>
 </menu>
