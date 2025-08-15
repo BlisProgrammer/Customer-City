@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -35,9 +36,18 @@ public class ResultFragment extends Fragment{
         if(companyIDs == null)return linearLayout;
         if(companyIDs.isEmpty())return linearLayout;
 
+        TextView companyNameView = linearLayout.findViewById(R.id.company_name_view);
         ListView mainListView = linearLayout.findViewById(R.id.result_view);
         ProgressBar progressBar = linearLayout.findViewById(R.id.progressBar);
         progressBar.setVisibility(View.VISIBLE);
+
+        // get company name
+        new Thread(()->{
+            String companyName = DataConverter.companyIDToCompany(companyIDs.get(0), getResources().openRawResource(R.raw.companies));
+            getActivity().runOnUiThread(()->{
+                companyNameView.setText(companyName);
+            });
+        }).start();
         new Thread(()->{
             ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyIDs);
             if(selectedRecords.isEmpty()) return;
@@ -50,7 +60,9 @@ public class ResultFragment extends Fragment{
             ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
 
             if(getActivity() == null) return;
+
             getActivity().runOnUiThread(()->{
+
                 mainListView.setAdapter(adapter1);
                 progressBar.setVisibility(View.GONE);
 

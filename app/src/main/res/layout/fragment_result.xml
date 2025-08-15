@@ -10,8 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="30sp"
-        android:textAlignment="center"
-        android:text="Company" />
+        android:textAlignment="center" />
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="match_parent"
