@@ -1,7 +1,11 @@
 package com.blis.customercity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,7 +20,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class Main extends AppCompatActivity {
     private DrawerLayout navDrawer;
     private Toolbar toolbar;
-    public static BottomNavigationView bottomNavigationView;
+    public BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -30,16 +34,42 @@ public class Main extends AppCompatActivity {
 //        editor.clear();
 //        editor.apply();
 
+        // Sign in button
+        SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+        String idToken = loginInfo.getString("idToken", null);
+        Button signinButton = findViewById(R.id.account_button);
+        if(loggedIn && idToken != null) {
+            signinButton.setText("Sign Out");
+            signinButton.setOnClickListener(v -> {
+                // Sign out procedure
+                SharedPreferences.Editor editor = loginInfo.edit();
+                editor.putString("idToken", null);
+                editor.putBoolean("loggedIn", false);
+                editor.apply();
+                signinButton.setText("Sign In");
+                signinButton.setOnClickListener(v2 -> {
+                    bottomNavigationView.setSelectedItemId(R.id.nav_user);
+                });
+            });
+        }else{
+            signinButton.setText("Sign In");
+            signinButton.setOnClickListener(v2 -> {
+                bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            });
+        }
+
+        bottomNavigationView = findViewById(R.id.navigation_view);
+
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
-        Fragment userFragment = new UserFragment();
+        Fragment userFragment = new UserFragment(signinButton, bottomNavigationView);
         Fragment directoryFragment = new DirectoryFragment();
-        Fragment cloudFragment = new CloudFragment();
+        Fragment cloudFragment = new CloudFragment(signinButton, bottomNavigationView);
         setCurrentFragment(findFragment);
 
         // navigation view
-        bottomNavigationView = findViewById(R.id.navigation_view);
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
             if(id == R.id.nav_search){

@@ -20,12 +20,10 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blis.customercity.Data.OnlineRecord;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -35,10 +33,8 @@ import java.util.HashMap;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
-import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import java.lang.reflect.Type;
@@ -48,11 +44,12 @@ import com.google.gson.reflect.TypeToken;
 
 
 public class CloudFragment extends Fragment {
-    public static CloudFragment newInstance(String param1, String param2) {
-        CloudFragment fragment = new CloudFragment();
-        Bundle args = new Bundle();
-        fragment.setArguments(args);
-        return fragment;
+    private final BottomNavigationView bottomNavigationView;
+    private final Button signInButton;
+    private SharedPreferences loginInfo;
+    public CloudFragment(Button signInButton, BottomNavigationView bottomNavigationView) {
+        this.bottomNavigationView = bottomNavigationView;
+        this.signInButton = signInButton;
     }
 
     @Override
@@ -64,15 +61,15 @@ public class CloudFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_cloud, container, false);
         assert getContext() != null;
-        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
 
         LinearLayout loginLayout = linearLayout.findViewById(R.id.login_layout);
         LinearLayout logoutLayout = linearLayout.findViewById(R.id.logout_layout);
+
+        updateSignInUI(loggedIn, loginLayout, logoutLayout);
         if(loggedIn && idToken != null){
-            loginLayout.setVisibility(View.GONE);
-            logoutLayout.setVisibility(View.VISIBLE);
             updateOnlineList(linearLayout, loginLayout, logoutLayout);
         }
         recordActivityResultLauncher = registerForActivityResult(
@@ -86,10 +83,32 @@ public class CloudFragment extends Fragment {
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
-            Main.bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            bottomNavigationView.setSelectedItemId(R.id.nav_user);
         });
 
         return linearLayout;
+    }
+
+    private void updateSignInUI(boolean signedIn, LinearLayout loginLayout, LinearLayout logoutLayout) {
+        if(signedIn){
+            loginLayout.setVisibility(View.GONE);
+            logoutLayout.setVisibility(View.VISIBLE);
+            signInButton.setOnClickListener(v -> {
+                // Sign out procedure
+                SharedPreferences.Editor editor = loginInfo.edit();
+                editor.putString("idToken", null);
+                editor.putBoolean("loggedIn", false);
+                editor.apply();
+                signInButton.setText("Sign In");
+                updateSignInUI(false, loginLayout, logoutLayout);
+            });
+        }else{
+            loginLayout.setVisibility(View.VISIBLE);
+            logoutLayout.setVisibility(View.GONE);
+            signInButton.setOnClickListener(v -> {
+                bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            });
+        }
     }
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;

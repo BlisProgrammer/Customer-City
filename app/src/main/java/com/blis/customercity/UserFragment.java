@@ -9,13 +9,23 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
 import com.blis.customercity.Data.DataAPI;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UserFragment extends Fragment {
+    private Button signinButton;
+    private BottomNavigationView bottomNavigationView;
+    private SharedPreferences loginInfo;
+    public UserFragment(Button signinButton, BottomNavigationView bottomNavigationView){
+        this.signinButton = signinButton;
+        this.bottomNavigationView = bottomNavigationView;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,7 +35,7 @@ public class UserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_user, container, false);
         assert getContext() != null;
-        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
 
@@ -35,6 +45,7 @@ public class UserFragment extends Fragment {
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
         }
+        updateLoginUI(loggedIn, loginLayout, logoutLayout);
 
         // Handle login
         Button loginButton = linearLayout.findViewById(R.id.login_button);
@@ -65,8 +76,7 @@ public class UserFragment extends Fragment {
                     editor.putString("idToken", idToken1);
                     editor.putBoolean("loggedIn", true);
                     editor.apply();
-                    loginLayout.setVisibility(View.GONE);
-                    logoutLayout.setVisibility(View.VISIBLE);
+                    updateLoginUI(true, loginLayout, logoutLayout);
                 });
             }).start();
         });
@@ -74,12 +84,8 @@ public class UserFragment extends Fragment {
         // Handle Logout
         Button logoutButton = linearLayout.findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(v -> {
-            SharedPreferences.Editor editor = loginInfo.edit();
-            editor.putString("idToken", null);
-            editor.putBoolean("loggedIn", false);
-            editor.apply();
-            loginLayout.setVisibility(View.VISIBLE);
-            logoutLayout.setVisibility(View.GONE);
+            // Sign out procedure
+            signoutProcedure(loginLayout, logoutLayout);
         });
 
         // Handle register
@@ -97,5 +103,30 @@ public class UserFragment extends Fragment {
         });
 
         return linearLayout;
+    }
+
+    private void signoutProcedure(LinearLayout loginLayout, LinearLayout logoutLayout) {
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("idToken", null);
+        editor.putBoolean("loggedIn", false);
+        editor.apply();
+        updateLoginUI(false, loginLayout, logoutLayout);
+    }
+    private void updateLoginUI(boolean loggedIn, LinearLayout loginLayout, LinearLayout logoutLayout){
+        if(!loggedIn){
+            loginLayout.setVisibility(View.VISIBLE);
+            logoutLayout.setVisibility(View.GONE);
+            signinButton.setText("Sign In");
+            signinButton.setOnClickListener(v2 -> {
+                bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            });
+        }else{
+            loginLayout.setVisibility(View.GONE);
+            logoutLayout.setVisibility(View.VISIBLE);
+            signinButton.setText("Sign Out");
+            signinButton.setOnClickListener(v2 -> {
+                signoutProcedure(loginLayout, logoutLayout);
+            });
+        }
     }
 }
