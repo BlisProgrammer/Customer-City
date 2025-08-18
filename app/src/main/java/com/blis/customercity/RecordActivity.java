@@ -128,10 +128,10 @@ public class RecordActivity extends AppCompatActivity {
                         }
                         if(isSavedOnline){
                             saveOnlineButton.setText("取消儲存");
-                            showToast("Saved Record");
+                            showToast("成功移除記錄");
                         }else{
                             saveOnlineButton.setText("儲存");
-                            showToast("Removed Record");
+                            showToast("儲存成功");
                         }
                     });
                 }).start();

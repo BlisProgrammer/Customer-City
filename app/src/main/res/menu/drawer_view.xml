@@ -1,13 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_about_fragment"
+            android:id="@+id/nav_about"
             android:title="關於我們" />
         <item
-            android:id="@+id/nav_help_fragment"
+            android:id="@+id/nav_help"
             android:title="支援" />
         <item
-            android:id="@+id/nav_logout_fragment"
+            android:id="@+id/nav_logout"
             android:title="登出" />
     </group>
 </menu>
