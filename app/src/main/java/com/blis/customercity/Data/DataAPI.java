@@ -49,6 +49,12 @@ class SearchResult{
     public HashMap<String, String> meta;
 }
 
+class RegisterResult{
+    public int code;
+    public String message;
+    public ArrayList<HashMap<String, String>> errors;
+}
+
 public class DataAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final HashMap<String, ArrayList<Company>> companies = new HashMap<>();
@@ -195,5 +201,46 @@ public class DataAPI {
             System.err.println("Error during request: " + e.getMessage());
         }
         return null;
+    }
+    public static String createAccount(String emailInput, String passwordInput){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:signUp").newBuilder();
+        urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
+        String finalUrl = urlBuilder.build().toString();
+
+        HashMap<String, String> body = new HashMap<>();
+        body.put("email", emailInput);
+        body.put("password", passwordInput);
+        body.put("returnSecureToken", "true");
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(body);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()){
+            String responseBody = response.body().string();
+            System.out.println(responseBody);
+            if (response.isSuccessful()) {
+                return "SUCCESS";
+            } else {
+                int responseCode = response.code();
+                System.err.println("Request failed with code: " + responseCode);
+                if(responseCode == 400){
+                    Type type = new TypeToken<HashMap<String, RegisterResult>>() {}.getType();
+                    HashMap<String, RegisterResult> registerResult = gson.fromJson(responseBody, type);
+                    String errorMessage = registerResult.get("error").message;
+                    if(errorMessage != null){
+                        return errorMessage;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return "ERROR OCCURRED";
     }
 }

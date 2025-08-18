@@ -102,7 +102,64 @@ public class UserFragment extends Fragment {
             loginRegisterLayout.setVisibility(View.GONE);
         });
 
+
+        Button registerButton = linearLayout.findViewById(R.id.register_button);
+        TextInputEditText registerEmail = linearLayout.findViewById(R.id.register_email_text);
+        TextInputEditText registerPassword = linearLayout.findViewById(R.id.register_password_text);
+        TextInputEditText registerPasswordConfirm = linearLayout.findViewById(R.id.register_password_confirm_text);
+        TextView errorRegisterTextView = linearLayout.findViewById(R.id.register_error_text_view);
+        registerButton.setOnClickListener(v -> {
+            String emailInputString = String.valueOf(registerEmail.getText());
+            String passwordInputString = String.valueOf(registerPassword.getText());
+            String passwordConfirmInputString = String.valueOf(registerPasswordConfirm.getText());
+            if(emailInputString.isEmpty()){
+                errorRegisterTextView.setText("請輸入正確電郵地址");
+                return;
+            }
+            if(passwordInputString.isEmpty()){
+                errorRegisterTextView.setText("請輸入密碼");
+                return;
+            }
+            if(passwordConfirmInputString.isEmpty()){
+                errorRegisterTextView.setText("請確認密碼");
+                return;
+            }
+            if(!passwordConfirmInputString.equals(passwordInputString)){
+                errorRegisterTextView.setText("確認密碼錯誤");
+                return;
+            }
+            errorRegisterTextView.setText("");
+            new Thread(()->{
+                String message = DataAPI.createAccount(emailInputString, passwordInputString);
+                getActivity().runOnUiThread(()->{
+                    switch (message) {
+                        case "SUCCESS":
+                            showToast(getActivity(), "登記成功");
+                            loginLoginLayout.setVisibility(View.VISIBLE);
+                            loginRegisterLayout.setVisibility(View.GONE);
+                            return;
+                        case "EMAIL_EXISTS":
+                            errorRegisterTextView.setText("電郵地址已被使用");
+                            showToast(getActivity(), "登記失敗");
+                            return;
+                        case "INVALID_EMAIL":
+                            errorRegisterTextView.setText("電郵地址錯誤");
+                            showToast(getActivity(), "登記失敗");
+                            return;
+                    }
+                });
+            }).start();
+        });
+
         return linearLayout;
+    }
+    private Toast savedToast;
+    private void showToast(Context context, String text){
+        if(savedToast != null){
+            savedToast.cancel();
+        }
+        savedToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
+        savedToast.show();
     }
 
     private void signoutProcedure(LinearLayout loginLayout, LinearLayout logoutLayout) {
