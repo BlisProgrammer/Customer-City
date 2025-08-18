@@ -41,6 +41,9 @@ public class FindFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_find, container, false);
 
+        LinearLayout subCategoryLayout = scrollView.findViewById(R.id.sub_category_layout);
+        LinearLayout resultLayout = scrollView.findViewById(R.id.result_layout);
+
         ChipGroup categoryChipGroup = scrollView.findViewById(R.id.category_chip_group);
         ChipGroup subCategoryChipGroup = scrollView.findViewById(R.id.sub_category_chip_group);
         ProgressBar progressBar = scrollView.findViewById(R.id.progressBar);
@@ -68,7 +71,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
-                resultView.setVisibility(View.GONE);
+                resultLayout.setVisibility(View.GONE);
                 progressBar.setVisibility(View.GONE);
                 subCategoryChipGroup.removeAllViews();
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
@@ -91,6 +94,7 @@ public class FindFragment extends Fragment {
                     newChip.setChipStrokeWidth(2);
                     newChip.setTextSize(15);
                     subCategoryChipGroup.addView(newChip);
+                    subCategoryLayout.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -98,7 +102,7 @@ public class FindFragment extends Fragment {
             @Override
             public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
                 if(list.isEmpty())return;
-                resultView.setVisibility(View.GONE);
+                resultLayout.setVisibility(View.GONE);
                 progressBar.setVisibility(View.VISIBLE);
 
                 Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
@@ -117,7 +121,7 @@ public class FindFragment extends Fragment {
                     ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                     if(getActivity() == null) return;
                     getActivity().runOnUiThread(() -> {
-                        resultView.setVisibility(View.VISIBLE);
+                        resultLayout.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                         resultView.setAdapter(adapter1);
                     });

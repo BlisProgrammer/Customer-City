@@ -21,7 +21,8 @@
         <SearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:queryHint="Search here..."/>
         <ListView
             android:id="@+id/search_list_view"
             android:layout_width="match_parent"
@@ -40,7 +41,6 @@
                 android:layout_gravity="center_horizontal"
                 android:orientation="vertical">
                 <TextView
-                    android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="請選擇類別"/>
@@ -56,9 +56,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:id="@+id/sub_category_layout"
+                android:visibility="gone">
                 <TextView
-                    android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="請選擇分類" />
@@ -76,13 +77,25 @@
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:visibility="gone"/>
-            <ListView
-                android:id="@+id/resultView"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_margin="10dp"
                 android:layout_height="wrap_content"
-                android:divider="@android:color/transparent"
-                android:dividerHeight="10dp" />
+                android:layout_gravity="center_horizontal"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:id="@+id/result_layout">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="請選擇公司/機構" />
+                <ListView
+                    android:id="@+id/resultView"
+                    android:layout_width="match_parent"
+                    android:layout_margin="10dp"
+                    android:layout_height="wrap_content"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="10dp" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
