@@ -75,6 +75,7 @@ public class UserFragment extends Fragment {
                     SharedPreferences.Editor editor = loginInfo.edit();
                     editor.putString("idToken", idToken1);
                     editor.putBoolean("loggedIn", true);
+                    editor.putString("email", emailInputString);
                     editor.apply();
                     updateLoginUI(true, loginLayout, logoutLayout);
                 });
@@ -147,6 +148,40 @@ public class UserFragment extends Fragment {
                             showToast(getActivity(), "登記失敗");
                             return;
                     }
+                });
+            }).start();
+        });
+        Button loginResetPasswordButton = linearLayout.findViewById(R.id.login_reset_password_button);
+        loginResetPasswordButton.setOnClickListener(v -> {
+            String emailInputString = String.valueOf(emailInput.getText());
+            if(emailInputString.isEmpty()){
+                errorTextView.setText("請輸入正確電郵地址");
+                return;
+            }
+            errorTextView.setText("");
+            new Thread(()->{
+                boolean successful = DataAPI.resetPassword(emailInputString);
+                getActivity().runOnUiThread(()->{
+                    if(!successful){
+                        showToast(getActivity(), "重設發生錯誤");
+                        return;
+                    }
+                    showToast(getActivity(), "重設連結己發送到電郵地址");
+                });
+            }).start();
+        });
+
+        Button resetPasswordButton = linearLayout.findViewById(R.id.reset_password_button);
+        resetPasswordButton.setOnClickListener(v -> {
+            String signedEmail = loginInfo.getString("email", null);
+            new Thread(()->{
+                boolean successful = DataAPI.resetPassword(signedEmail);
+                getActivity().runOnUiThread(()->{
+                    if(!successful){
+                        showToast(getActivity(), "重設發生錯誤");
+                        return;
+                    }
+                    showToast(getActivity(), "重設連結己發送");
                 });
             }).start();
         });

@@ -223,7 +223,6 @@ public class DataAPI {
 
         try (Response response = call.execute()){
             String responseBody = response.body().string();
-            System.out.println(responseBody);
             if (response.isSuccessful()) {
                 return "SUCCESS";
             } else {
@@ -242,5 +241,30 @@ public class DataAPI {
             System.err.println("Error during request: " + e.getMessage());
         }
         return "ERROR OCCURRED";
+    }
+    public static boolean resetPassword(String emailInput){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode").newBuilder();
+        urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
+        String finalUrl = urlBuilder.build().toString();
+
+        HashMap<String, String> body = new HashMap<>();
+        body.put("email", emailInput);
+        body.put("requestType", "PASSWORD_RESET");
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(body);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()){
+            return response.isSuccessful();
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return false;
     }
 }

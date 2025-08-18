@@ -68,6 +68,13 @@
                 android:layout_marginHorizontal="10dp"
                 android:id="@+id/switch_to_register_button"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
+            <Button
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:id="@+id/login_reset_password_button"
+                android:text="重設密碼"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -157,6 +164,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:id="@+id/reset_password_button"
             android:text="更改密碼"/>
         <Button
             android:layout_width="match_parent"
