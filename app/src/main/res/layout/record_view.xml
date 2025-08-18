@@ -68,7 +68,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="25dp"
-                android:text="Save" />
+                android:text="儲存" />
 
             <Button
                 android:id="@+id/share_button"
@@ -77,7 +77,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginHorizontal="25dp"
-                android:text="Share" />
+                android:text="分享" />
         </LinearLayout>
 
         <Button
@@ -85,7 +85,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
-            android:text="Back" />
+            android:text="返回" />
 
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

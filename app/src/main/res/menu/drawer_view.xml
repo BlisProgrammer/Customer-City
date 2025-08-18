@@ -2,12 +2,12 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_about_fragment"
-            android:title="About" />
+            android:title="關於我們" />
         <item
             android:id="@+id/nav_help_fragment"
-            android:title="Help" />
+            android:title="支援" />
         <item
             android:id="@+id/nav_logout_fragment"
-            android:title="Logout" />
+            android:title="登出" />
     </group>
 </menu>

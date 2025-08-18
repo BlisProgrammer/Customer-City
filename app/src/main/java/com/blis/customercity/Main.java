@@ -40,20 +40,20 @@ public class Main extends AppCompatActivity {
         String idToken = loginInfo.getString("idToken", null);
         Button signinButton = findViewById(R.id.account_button);
         if(loggedIn && idToken != null) {
-            signinButton.setText("Sign Out");
+            signinButton.setText(R.string.sign_out);
             signinButton.setOnClickListener(v -> {
                 // Sign out procedure
                 SharedPreferences.Editor editor = loginInfo.edit();
                 editor.putString("idToken", null);
                 editor.putBoolean("loggedIn", false);
                 editor.apply();
-                signinButton.setText("Sign In");
+                signinButton.setText(R.string.sign_in);
                 signinButton.setOnClickListener(v2 -> {
                     bottomNavigationView.setSelectedItemId(R.id.nav_user);
                 });
             });
         }else{
-            signinButton.setText("Sign In");
+            signinButton.setText(R.string.sign_in);
             signinButton.setOnClickListener(v2 -> {
                 bottomNavigationView.setSelectedItemId(R.id.nav_user);
             });

@@ -22,5 +22,9 @@
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="sign_in"><u>Sign in</u></string>
+    <string name="sign_in"><u>登入</u></string>
+    <string name="sign_out"><u>登出</u></string>
+    <string name="請選擇類別">請選擇類別</string>
+    <string name="請選擇分類">請選擇分類</string>
+    <string name="請選擇公司機構">請選擇公司/機構</string>
 </resources>

@@ -57,11 +57,11 @@ public class UserFragment extends Fragment {
             String emailInputString = String.valueOf(emailInput.getText());
             String passwordInputString = String.valueOf(passwordInput.getText());
             if(emailInputString.isEmpty()){
-                errorTextView.setText("Please input a valid Email");
+                errorTextView.setText("請輸入正確電郵地址");
                 return;
             }
             if(passwordInputString.isEmpty()){
-                errorTextView.setText("Please input password");
+                errorTextView.setText("請輸入密碼");
                 return;
             }
             errorTextView.setText("");
@@ -69,7 +69,7 @@ public class UserFragment extends Fragment {
                 String idToken1 = DataAPI.getToken(emailInputString, passwordInputString);
                 getActivity().runOnUiThread(() -> {
                     if(idToken1 == null){
-                        errorTextView.setText("An error occured.");
+                        errorTextView.setText("發生錯誤");
                         return;
                     }
                     SharedPreferences.Editor editor = loginInfo.edit();
@@ -116,14 +116,14 @@ public class UserFragment extends Fragment {
         if(!loggedIn){
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
-            signinButton.setText("Sign In");
+            signinButton.setText(R.string.sign_in);
             signinButton.setOnClickListener(v2 -> {
                 bottomNavigationView.setSelectedItemId(R.id.nav_user);
             });
         }else{
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
-            signinButton.setText("Sign Out");
+            signinButton.setText(R.string.sign_out);
             signinButton.setOnClickListener(v2 -> {
                 signoutProcedure(loginLayout, logoutLayout);
             });

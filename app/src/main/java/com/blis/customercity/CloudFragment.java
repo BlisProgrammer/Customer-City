@@ -99,7 +99,7 @@ public class CloudFragment extends Fragment {
                 editor.putString("idToken", null);
                 editor.putBoolean("loggedIn", false);
                 editor.apply();
-                signInButton.setText("Sign In");
+                signInButton.setText(R.string.sign_in);
                 updateSignInUI(false, loginLayout, logoutLayout);
             });
         }else{
