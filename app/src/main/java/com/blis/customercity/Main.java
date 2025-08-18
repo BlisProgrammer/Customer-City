@@ -14,8 +14,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class Main extends AppCompatActivity {
-    DrawerLayout navDrawer;
-    Toolbar toolbar;
+    private DrawerLayout navDrawer;
+    private Toolbar toolbar;
+    public static BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -38,7 +39,7 @@ public class Main extends AppCompatActivity {
         setCurrentFragment(findFragment);
 
         // navigation view
-        BottomNavigationView bottomNavigationView = findViewById(R.id.navigation_view);
+        bottomNavigationView = findViewById(R.id.navigation_view);
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
             if(id == R.id.nav_search){

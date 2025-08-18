@@ -86,11 +86,7 @@ public class CloudFragment extends Fragment {
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
-            Fragment userFragment = new UserFragment();
-            getParentFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.flFragment, userFragment)
-                    .commit();
+            Main.bottomNavigationView.setSelectedItemId(R.id.nav_user);
         });
 
         return linearLayout;
