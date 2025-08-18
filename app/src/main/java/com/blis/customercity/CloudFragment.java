@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 
 import com.blis.customercity.Data.OnlineRecord;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -47,9 +49,11 @@ public class CloudFragment extends Fragment {
     private final BottomNavigationView bottomNavigationView;
     private final Button signInButton;
     private SharedPreferences loginInfo;
-    public CloudFragment(Button signInButton, BottomNavigationView bottomNavigationView) {
+    private NavigationView drawerNavView;
+    public CloudFragment(NavigationView drawerNavView, Button signInButton, BottomNavigationView bottomNavigationView) {
         this.bottomNavigationView = bottomNavigationView;
         this.signInButton = signInButton;
+        this.drawerNavView = drawerNavView;
     }
 
     @Override
@@ -93,6 +97,7 @@ public class CloudFragment extends Fragment {
         if(signedIn){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
+            Menu navMenu = drawerNavView.getMenu();
             signInButton.setOnClickListener(v -> {
                 // Sign out procedure
                 SharedPreferences.Editor editor = loginInfo.edit();
@@ -101,6 +106,8 @@ public class CloudFragment extends Fragment {
                 editor.apply();
                 signInButton.setText(R.string.sign_in);
                 updateSignInUI(false, loginLayout, logoutLayout);
+                navMenu.findItem(R.id.nav_login).setVisible(true);
+                navMenu.findItem(R.id.nav_logout).setVisible(false);
             });
         }else{
             loginLayout.setVisibility(View.VISIBLE);
@@ -109,6 +116,7 @@ public class CloudFragment extends Fragment {
                 bottomNavigationView.setSelectedItemId(R.id.nav_user);
             });
         }
+        drawerNavView.invalidate();
     }
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;

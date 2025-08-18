@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,13 +16,16 @@ import androidx.fragment.app.Fragment;
 
 import com.blis.customercity.Data.DataAPI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UserFragment extends Fragment {
-    private Button signinButton;
-    private BottomNavigationView bottomNavigationView;
+    private final Button signinButton;
+    private final BottomNavigationView bottomNavigationView;
+    private final NavigationView drawerNavView;
     private SharedPreferences loginInfo;
-    public UserFragment(Button signinButton, BottomNavigationView bottomNavigationView){
+    public UserFragment(NavigationView drawerNavView, Button signinButton, BottomNavigationView bottomNavigationView){
+        this.drawerNavView = drawerNavView;
         this.signinButton = signinButton;
         this.bottomNavigationView = bottomNavigationView;
     }
@@ -205,6 +209,7 @@ public class UserFragment extends Fragment {
         updateLoginUI(false, loginLayout, logoutLayout);
     }
     private void updateLoginUI(boolean loggedIn, LinearLayout loginLayout, LinearLayout logoutLayout){
+        Menu navMenu = drawerNavView.getMenu();
         if(!loggedIn){
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
@@ -212,6 +217,8 @@ public class UserFragment extends Fragment {
             signinButton.setOnClickListener(v2 -> {
                 bottomNavigationView.setSelectedItemId(R.id.nav_user);
             });
+            navMenu.findItem(R.id.nav_login).setVisible(true);
+            navMenu.findItem(R.id.nav_logout).setVisible(false);
         }else{
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
@@ -219,6 +226,9 @@ public class UserFragment extends Fragment {
             signinButton.setOnClickListener(v2 -> {
                 signoutProcedure(loginLayout, logoutLayout);
             });
+            navMenu.findItem(R.id.nav_login).setVisible(false);
+            navMenu.findItem(R.id.nav_logout).setVisible(true);
         }
+        drawerNavView.invalidate();
     }
 }

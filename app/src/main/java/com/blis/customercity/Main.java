@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -37,13 +38,20 @@ public class Main extends AppCompatActivity {
 //        editor.clear();
 //        editor.apply();
 
+        // on navigate
+        NavigationView navigationView = findViewById(R.id.nav_view);
         // Sign in button
         SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
         Button signinButton = findViewById(R.id.account_button);
+        Menu navMenu = navigationView.getMenu();
+        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
+        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
         if(loggedIn && idToken != null) {
             signinButton.setText(R.string.sign_out);
+            navLoginItem.setVisible(false);
+            navLogoutItem.setVisible(true);
             signinButton.setOnClickListener(v -> {
                 // Sign out procedure
                 SharedPreferences.Editor editor = loginInfo.edit();
@@ -54,22 +62,45 @@ public class Main extends AppCompatActivity {
                 signinButton.setOnClickListener(v2 -> {
                     bottomNavigationView.setSelectedItemId(R.id.nav_user);
                 });
+                navLoginItem.setVisible(true);
+                navLogoutItem.setVisible(false);
             });
         }else{
             signinButton.setText(R.string.sign_in);
             signinButton.setOnClickListener(v2 -> {
                 bottomNavigationView.setSelectedItemId(R.id.nav_user);
             });
+            navLoginItem.setVisible(true);
+            navLogoutItem.setVisible(false);
         }
+        navigationView.invalidate();
+        // on navigate
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            int id = menuItem.getItemId();
+            if(id == R.id.nav_about){
+                Intent intent = new Intent(Main.this, AboutActivity.class);
+                startActivity(intent);
+                navDrawer.closeDrawer(GravityCompat.START);
+            }
+            if(id == R.id.nav_help){
+                Intent intent = new Intent(Main.this, HelpActivity.class);
+                startActivity(intent);
+                navDrawer.closeDrawer(GravityCompat.START);
+            }
+            if(id == R.id.nav_logout || id == R.id.nav_login){
+                signinButton.performClick();
+                navDrawer.closeDrawer(GravityCompat.START);
+            }
+            return false;
+        });
 
         bottomNavigationView = findViewById(R.id.navigation_view);
-
         Fragment findFragment = new FindFragment();
         Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
-        Fragment userFragment = new UserFragment(signinButton, bottomNavigationView);
+        Fragment userFragment = new UserFragment(navigationView, signinButton, bottomNavigationView);
         Fragment directoryFragment = new DirectoryFragment();
-        Fragment cloudFragment = new CloudFragment(signinButton, bottomNavigationView);
+        Fragment cloudFragment = new CloudFragment(navigationView, signinButton, bottomNavigationView);
         setCurrentFragment(findFragment);
 
         // navigation view
@@ -109,31 +140,11 @@ public class Main extends AppCompatActivity {
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerToggle.syncState();
         navDrawer.addDrawerListener(drawerToggle);
-
-        // on navigate
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                int id = menuItem.getItemId();
-                if(id == R.id.nav_about){
-                    Intent intent = new Intent(Main.this, AboutActivity.class);
-                    startActivity(intent);
-                    navDrawer.closeDrawer(GravityCompat.START);
-                }
-                if(id == R.id.nav_help){
-                    Intent intent = new Intent(Main.this, HelpActivity.class);
-                    startActivity(intent);
-                    navDrawer.closeDrawer(GravityCompat.START);
-                }
-                return false;
-            }
-        });
     }
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
     }
-    private void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
+    public void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment)
