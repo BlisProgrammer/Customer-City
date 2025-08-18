@@ -93,7 +93,7 @@ public class RecordActivity extends AppCompatActivity {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT, selectedRecord.getShareString());
-            Intent chooser = Intent.createChooser(shareIntent, "Share with...");
+            Intent chooser = Intent.createChooser(shareIntent, "分享给:");
             startActivity(chooser);
         });
 
@@ -105,7 +105,7 @@ public class RecordActivity extends AppCompatActivity {
             saveOnlineButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    showToast("Login to save");
+                    showToast("請先登入");
                 }
             });
         }else{
@@ -114,7 +114,7 @@ public class RecordActivity extends AppCompatActivity {
                 HashMap<String, ArrayList<OnlineRecord>> savedRecords = DataAPI.getSavedRecords(idToken);
                 runOnUiThread(()->{
                     if(savedRecords.containsKey(selectedRecord.getId())){
-                        saveOnlineButton.setText("Saved");
+                        saveOnlineButton.setText("取消儲存");
                         isSavedOnline = true;
                     }
                 });
@@ -127,10 +127,10 @@ public class RecordActivity extends AppCompatActivity {
                             isSavedOnline = !isSavedOnline;
                         }
                         if(isSavedOnline){
-                            saveOnlineButton.setText("Saved");
+                            saveOnlineButton.setText("取消儲存");
                             showToast("Saved Record");
                         }else{
-                            saveOnlineButton.setText("Save");
+                            saveOnlineButton.setText("儲存");
                             showToast("Removed Record");
                         }
                     });

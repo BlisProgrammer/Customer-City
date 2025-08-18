@@ -14,9 +14,9 @@ public class ConfirmationDialog {
         builder.setMessage(message);
         builder.setCancelable(true); // Allows dismissing the dialog by tapping outside or pressing back
 
-        builder.setPositiveButton("Confirm", positiveClickListener);
+        builder.setPositiveButton("確認", positiveClickListener);
 
-        builder.setNegativeButton("Cancel", negativeClickListener);
+        builder.setNegativeButton("取消", negativeClickListener);
 
         AlertDialog dialog = builder.create();
         dialog.show();

@@ -200,8 +200,8 @@ public class CloudFragment extends Fragment {
         onlineListView.setOnItemLongClickListener((parent, view, position, id) -> {
             ConfirmationDialog.showConfirmationDialog(
                     requireContext(),
-                    "Confirm Action",
-                    "Delete saved record? ",
+                    "確認",
+                    "移除記錄?",
                     (dialog, which) -> {
                         OnlineRecord selectedRecord = onlineRecordList.get(position);
 
@@ -221,7 +221,7 @@ public class CloudFragment extends Fragment {
                                 if (savedToast != null) {
                                     savedToast.cancel();
                                 }
-                                savedToast = Toast.makeText(requireContext(), "Error Occurred", Toast.LENGTH_SHORT);
+                                savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
                                 savedToast.show();
                             }
 
@@ -233,7 +233,7 @@ public class CloudFragment extends Fragment {
                                         if (savedToast != null) {
                                             savedToast.cancel();
                                         }
-                                        savedToast = Toast.makeText(requireContext(), "Item removed", Toast.LENGTH_SHORT);
+                                        savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
                                         savedToast.show();
 
                                         onlineRecordList.remove(position);
@@ -245,7 +245,7 @@ public class CloudFragment extends Fragment {
                                     if (savedToast != null) {
                                         savedToast.cancel();
                                     }
-                                    savedToast = Toast.makeText(requireContext(), "Error Occurred", Toast.LENGTH_SHORT);
+                                    savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
                                     savedToast.show();
                                 }
                                 response.body().close();
