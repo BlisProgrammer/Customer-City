@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/logout_layout"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="visible">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -56,12 +56,16 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-            <ListView
-                style="android.R.layout.simple_list_item_2"
-                android:id="@+id/online_saved_view_list"
+<!--            <ListView-->
+<!--                style="android.R.layout.simple_list_item_2"-->
+<!--                android:id="@+id/online_saved_view_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="0dp"-->
+<!--                android:layout_weight="1"/>-->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
+                android:layout_height="match_parent" />
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </LinearLayout>

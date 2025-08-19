@@ -96,7 +96,6 @@ public class Main extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.navigation_view);
         Fragment findFragment = new FindFragment();
-        Fragment savedFragment = new SavedFragment();
         Fragment searchFragment = new SearchFragment();
         Fragment userFragment = new UserFragment(navigationView, signinButton, bottomNavigationView);
         Fragment directoryFragment = new DirectoryFragment();
