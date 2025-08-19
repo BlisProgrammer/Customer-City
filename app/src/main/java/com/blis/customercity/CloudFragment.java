@@ -27,6 +27,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -139,16 +141,18 @@ public class CloudFragment extends Fragment {
         noRecordView = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+        LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_animation_fall_down);
+        recyclerView.setLayoutAnimation(animation);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
                 updateOnlineList(linearLayout, loginLayout, logoutLayout);
             }
         );
-        onlineRecordList.clear();
         if(onlineAdapter == null){
             onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
         }
+        recyclerView.setAdapter(onlineAdapter);
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
@@ -168,9 +172,17 @@ public class CloudFragment extends Fragment {
                     editor.putString("idToken", null);
                     editor.apply();
 
-                    logoutLayout.setVisibility(View.GONE);
-                    loginLayout.setVisibility(View.VISIBLE);
-                    swipeRefreshLayout.setRefreshing(false);
+                    getActivity().runOnUiThread(()->{
+                        logoutLayout.setVisibility(View.GONE);
+                        loginLayout.setVisibility(View.VISIBLE);
+                        swipeRefreshLayout.setRefreshing(false);
+                        signInButton.setText(R.string.sign_in);
+                        updateSignInUI(false, loginLayout, logoutLayout);
+
+                        Menu navMenu = drawerNavView.getMenu();
+                        navMenu.findItem(R.id.nav_login).setVisible(true);
+                        navMenu.findItem(R.id.nav_logout).setVisible(false);
+                    });
                 }
 
                 @Override
@@ -183,6 +195,7 @@ public class CloudFragment extends Fragment {
                         HashMap<String, HashMap<String, List<OnlineRecord>>> hashMap = gson.fromJson(responseBody, type);
                         HashMap<String, List<OnlineRecord>> allData = hashMap.get("data");
                         if(allData == null) return;
+                        onlineRecordList.clear();
                         for (List<OnlineRecord> value : allData.values()) {
                             OnlineRecord thisOnlineRecord = value.get(0);
                             if(!isAdded()) return;
@@ -210,7 +223,6 @@ public class CloudFragment extends Fragment {
 
 //                            onlineListView.setAdapter(onlineAdapter);
                             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                            recyclerView.setAdapter(onlineAdapter);
                             swipeRefreshLayout.setRefreshing(false);
                         });
                     } else {
