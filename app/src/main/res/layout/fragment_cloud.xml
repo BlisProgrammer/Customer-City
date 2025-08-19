@@ -51,21 +51,34 @@
             android:layout_height="wrap_content"
             android:text="我的記錄"
             android:layout_margin="10dp"/>
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swiperefresh"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
-<!--            <ListView-->
-<!--                style="android.R.layout.simple_list_item_2"-->
-<!--                android:id="@+id/online_saved_view_list"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_weight="1"/>-->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerView"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swiperefresh"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:text="暫無紀錄"
+                        android:id="@+id/no_record_text"
+                        android:textAlignment="center"
+                        android:padding="10dp"
+                        android:visibility="gone"/>
+    <!--            <ListView-->
+    <!--                style="android.R.layout.simple_list_item_2"-->
+    <!--                android:id="@+id/online_saved_view_list"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="0dp"-->
+    <!--                android:layout_weight="1"/>-->
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+            </FrameLayout>
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </LinearLayout>
 </LinearLayout>

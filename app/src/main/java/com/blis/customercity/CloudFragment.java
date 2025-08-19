@@ -3,6 +3,11 @@ package com.blis.customercity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResult;
@@ -10,8 +15,10 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -24,6 +31,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blis.customercity.Data.OnlineRecord;
@@ -124,8 +132,11 @@ public class CloudFragment extends Fragment {
     }
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
+    private ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
+    private TextView noRecordView;
 
     private void updateOnlineList(LinearLayout linearLayout, LinearLayout loginLayout, LinearLayout logoutLayout){
+        noRecordView = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
@@ -134,7 +145,10 @@ public class CloudFragment extends Fragment {
                 updateOnlineList(linearLayout, loginLayout, logoutLayout);
             }
         );
-        ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
+        onlineRecordList.clear();
+        if(onlineAdapter == null){
+            onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
+        }
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
@@ -178,7 +192,14 @@ public class CloudFragment extends Fragment {
                         assert getActivity() != null;
                         getActivity().runOnUiThread(() -> {
                             if(!isAdded())return;
-                            onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
+                            onlineAdapter.notifyDataSetChanged();
+                            if(onlineAdapter.getItemCount() == 0){
+                                noRecordView.setVisibility(View.VISIBLE);
+                            }else {
+                                noRecordView.setVisibility(View.GONE);
+                            }
+                            ItemTouchHelper itemTouchHelper = getItemTouchHelper();
+                            itemTouchHelper.attachToRecyclerView(recyclerView);
 
                             onlineAdapter.setOnItemClickListener(position -> {
                                 if(onlineRecordList.isEmpty())return;
@@ -209,68 +230,88 @@ public class CloudFragment extends Fragment {
                     }
                     response.body().close();
                 }
+
+                @NonNull
+                private ItemTouchHelper getItemTouchHelper() {
+                    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                        @Override
+                        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                            return false;
+                        }
+
+                        @Override
+                        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                            //Remove swiped item from list and notify the RecyclerView
+                            int position = viewHolder.getAdapterPosition();
+                            ConfirmationDialog.showConfirmationDialog(
+                                requireContext(),
+                                "確認",
+                                "移除記錄?",
+                                (dialog, which) -> {
+                                    OnlineRecord selectedRecord = onlineRecordList.get(position);
+
+                                    // remove with api call
+                                    HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
+                                    assert originalUrl != null;
+                                    HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
+                                    urlBuilder.addQueryParameter("id", selectedRecord.getId());
+
+                                    Request request = new Request.Builder()
+                                            .url(urlBuilder.build())
+                                            .addHeader("Cookie", "token=" + idToken)
+                                            .build();
+                                    client.newCall(request).enqueue(new Callback() {
+                                        @Override
+                                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                            if (savedToast != null) {
+                                                savedToast.cancel();
+                                            }
+                                            savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                                            savedToast.show();
+                                        }
+
+                                        @Override
+                                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                            if (response.isSuccessful()) {
+                                                assert getActivity() != null;
+                                                getActivity().runOnUiThread(() -> {
+                                                    if (savedToast != null) {
+                                                        savedToast.cancel();
+                                                    }
+                                                    savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
+                                                    savedToast.show();
+
+                                                    onlineRecordList.remove(position);
+                                                    onlineAdapter.notifyItemRemoved(position);
+                                                    if(onlineAdapter.getItemCount() == 0){
+                                                        noRecordView.setVisibility(View.VISIBLE);
+                                                    }else {
+                                                        noRecordView.setVisibility(View.GONE);
+                                                    }
+                                                    dialog.dismiss();
+                                                });
+                                            } else {
+                                                if (savedToast != null) {
+                                                    savedToast.cancel();
+                                                }
+                                                savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                                                savedToast.show();
+                                            }
+                                            response.body().close();
+                                        }
+                                    });
+                                },
+                                (dialog, which) -> {
+                                    onlineAdapter.notifyItemChanged(position);
+                                    dialog.dismiss();
+                                }
+
+                        );
+                        }
+                    };
+                    return new ItemTouchHelper(simpleItemTouchCallback);
+                }
             });
         }
-
-//        onlineAdapter.setOnItemLongClickListener((parent, view, position, id) -> {
-//            ConfirmationDialog.showConfirmationDialog(
-//                    requireContext(),
-//                    "確認",
-//                    "移除記錄?",
-//                    (dialog, which) -> {
-//                        OnlineRecord selectedRecord = onlineRecordList.get(position);
-//
-//                        // remove with api call
-//                        HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
-//                        assert originalUrl != null;
-//                        HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
-//                        urlBuilder.addQueryParameter("id", selectedRecord.getId());
-//
-//                        Request request = new Request.Builder()
-//                                .url(urlBuilder.build())
-//                                .addHeader("Cookie", "token=" + idToken)
-//                                .build();
-//                        client.newCall(request).enqueue(new Callback() {
-//                            @Override
-//                            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-//                                if (savedToast != null) {
-//                                    savedToast.cancel();
-//                                }
-//                                savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-//                                savedToast.show();
-//                            }
-//
-//                            @Override
-//                            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-//                                if (response.isSuccessful()) {
-//                                    assert getActivity() != null;
-//                                    getActivity().runOnUiThread(() -> {
-//                                        if (savedToast != null) {
-//                                            savedToast.cancel();
-//                                        }
-//                                        savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
-//                                        savedToast.show();
-//
-//                                        onlineRecordList.remove(position);
-//                                        TwoLineAdapter onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
-//                                        onlineListView.setAdapter(onlineAdapter);
-//                                        dialog.dismiss();
-//                                    });
-//                                } else {
-//                                    if (savedToast != null) {
-//                                        savedToast.cancel();
-//                                    }
-//                                    savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-//                                    savedToast.show();
-//                                }
-//                                response.body().close();
-//                            }
-//                        });
-//                    },
-//                    (dialog, which) -> dialog.dismiss()
-//
-//            );
-//            return true;
-//        });
     }
 }
