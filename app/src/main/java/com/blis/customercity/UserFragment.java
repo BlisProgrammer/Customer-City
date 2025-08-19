@@ -20,15 +20,8 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UserFragment extends Fragment {
-    private final Button signinButton;
-    private final BottomNavigationView bottomNavigationView;
-    private final NavigationView drawerNavView;
     private SharedPreferences loginInfo;
-    public UserFragment(NavigationView drawerNavView, Button signinButton, BottomNavigationView bottomNavigationView){
-        this.drawerNavView = drawerNavView;
-        this.signinButton = signinButton;
-        this.bottomNavigationView = bottomNavigationView;
-    }
+    LinearLayout loginLayout, logoutLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,13 +36,9 @@ public class UserFragment extends Fragment {
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
 
-        LinearLayout loginLayout = linearLayout.findViewById(R.id.login_layout);
-        LinearLayout logoutLayout = linearLayout.findViewById(R.id.logout_layout);
-        if(loggedIn && idToken != null){
-            loginLayout.setVisibility(View.GONE);
-            logoutLayout.setVisibility(View.VISIBLE);
-        }
-        updateLoginUI(loggedIn, loginLayout, logoutLayout);
+        loginLayout = linearLayout.findViewById(R.id.login_layout);
+        logoutLayout = linearLayout.findViewById(R.id.logout_layout);
+        updateLoginUI(loggedIn && idToken != null);
 
         // Handle login
         Button loginButton = linearLayout.findViewById(R.id.login_button);
@@ -70,18 +59,15 @@ public class UserFragment extends Fragment {
             }
             errorTextView.setText("");
             new Thread(()->{
-                String idToken1 = DataAPI.getToken(emailInputString, passwordInputString);
-                getActivity().runOnUiThread(() -> {
-                    if(idToken1 == null){
+                String newIdToken = DataAPI.getToken(emailInputString, passwordInputString);
+                Main main = (Main) getActivity();
+                if(main == null || !isAdded()) return;
+                main.runOnUiThread(() -> {
+                    if(newIdToken == null){
                         errorTextView.setText("發生錯誤");
                         return;
                     }
-                    SharedPreferences.Editor editor = loginInfo.edit();
-                    editor.putString("idToken", idToken1);
-                    editor.putBoolean("loggedIn", true);
-                    editor.putString("email", emailInputString);
-                    editor.apply();
-                    updateLoginUI(true, loginLayout, logoutLayout);
+                    main.performLogin(newIdToken, emailInputString);
                 });
             }).start();
         });
@@ -89,8 +75,10 @@ public class UserFragment extends Fragment {
         // Handle Logout
         Button logoutButton = linearLayout.findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(v -> {
-            // Sign out procedure
-            signoutProcedure(loginLayout, logoutLayout);
+            Main main = (Main) getActivity();
+            if(isAdded() && main != null){
+                main.performLogout();
+            }
         });
 
         // Handle register
@@ -200,35 +188,13 @@ public class UserFragment extends Fragment {
         savedToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
         savedToast.show();
     }
-
-    private void signoutProcedure(LinearLayout loginLayout, LinearLayout logoutLayout) {
-        SharedPreferences.Editor editor = loginInfo.edit();
-        editor.putString("idToken", null);
-        editor.putBoolean("loggedIn", false);
-        editor.apply();
-        updateLoginUI(false, loginLayout, logoutLayout);
-    }
-    private void updateLoginUI(boolean loggedIn, LinearLayout loginLayout, LinearLayout logoutLayout){
-        Menu navMenu = drawerNavView.getMenu();
+    public void updateLoginUI(boolean loggedIn){
         if(!loggedIn){
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
-            signinButton.setText(R.string.sign_in);
-            signinButton.setOnClickListener(v2 -> {
-                bottomNavigationView.setSelectedItemId(R.id.nav_user);
-            });
-            navMenu.findItem(R.id.nav_login).setVisible(true);
-            navMenu.findItem(R.id.nav_logout).setVisible(false);
         }else{
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
-            signinButton.setText(R.string.sign_out);
-            signinButton.setOnClickListener(v2 -> {
-                signoutProcedure(loginLayout, logoutLayout);
-            });
-            navMenu.findItem(R.id.nav_login).setVisible(false);
-            navMenu.findItem(R.id.nav_logout).setVisible(true);
         }
-        drawerNavView.invalidate();
     }
 }

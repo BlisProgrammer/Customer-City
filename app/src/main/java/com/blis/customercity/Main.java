@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +27,9 @@ public class Main extends AppCompatActivity {
     private Toolbar toolbar;
     public BottomNavigationView bottomNavigationView;
 
+    private Button signinButton;
+    private SharedPreferences loginInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -41,65 +45,44 @@ public class Main extends AppCompatActivity {
         // on navigate
         NavigationView navigationView = findViewById(R.id.nav_view);
         // Sign in button
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
-        Button signinButton = findViewById(R.id.account_button);
-        Menu navMenu = navigationView.getMenu();
-        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
-        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
+        String email = loginInfo.getString("email", null);
+        signinButton = findViewById(R.id.account_button);
+
         if(loggedIn && idToken != null) {
-            signinButton.setText(R.string.sign_out);
-            navLoginItem.setVisible(false);
-            navLogoutItem.setVisible(true);
-            signinButton.setOnClickListener(v -> {
-                // Sign out procedure
-                SharedPreferences.Editor editor = loginInfo.edit();
-                editor.putString("idToken", null);
-                editor.putBoolean("loggedIn", false);
-                editor.apply();
-                signinButton.setText(R.string.sign_in);
-                signinButton.setOnClickListener(v2 -> {
-                    bottomNavigationView.setSelectedItemId(R.id.nav_user);
-                });
-                navLoginItem.setVisible(true);
-                navLogoutItem.setVisible(false);
-            });
+            performLogin(idToken, email);
         }else{
-            signinButton.setText(R.string.sign_in);
-            signinButton.setOnClickListener(v2 -> {
-                bottomNavigationView.setSelectedItemId(R.id.nav_user);
-            });
-            navLoginItem.setVisible(true);
-            navLogoutItem.setVisible(false);
+            performLogout();
         }
-        navigationView.invalidate();
         // on navigate
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
             if(id == R.id.nav_about){
                 Intent intent = new Intent(Main.this, AboutActivity.class);
                 startActivity(intent);
-                navDrawer.closeDrawer(GravityCompat.START);
             }
             if(id == R.id.nav_help){
                 Intent intent = new Intent(Main.this, HelpActivity.class);
                 startActivity(intent);
-                navDrawer.closeDrawer(GravityCompat.START);
             }
-            if(id == R.id.nav_logout || id == R.id.nav_login){
-                signinButton.performClick();
-                navDrawer.closeDrawer(GravityCompat.START);
+            if(id == R.id.nav_logout){
+                performLogout();
             }
-            return false;
+            if(id == R.id.nav_login){
+                bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            }
+            navDrawer.closeDrawer(GravityCompat.START);
+            return true;
         });
 
         bottomNavigationView = findViewById(R.id.navigation_view);
         Fragment findFragment = new FindFragment();
         Fragment searchFragment = new SearchFragment();
-        Fragment userFragment = new UserFragment(navigationView, signinButton, bottomNavigationView);
+        Fragment userFragment = new UserFragment();
         Fragment directoryFragment = new DirectoryFragment();
-        Fragment cloudFragment = new CloudFragment(navigationView, signinButton, bottomNavigationView);
+        Fragment cloudFragment = new CloudFragment();
         setCurrentFragment(findFragment);
 
         // navigation view
@@ -140,13 +123,69 @@ public class Main extends AppCompatActivity {
         drawerToggle.syncState();
         navDrawer.addDrawerListener(drawerToggle);
     }
+
+    public void performLogin(String idToken, String emailInputString){
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("idToken", idToken);
+        editor.putBoolean("loggedIn", true);
+        editor.putString("email", emailInputString);
+        editor.apply();
+        signinButton.setText(R.string.sign_out);
+        signinButton.setOnClickListener(v2 -> {
+            performLogout();
+        });
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu navMenu = navigationView.getMenu();
+        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
+        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
+        navLogoutItem.setVisible(true);
+        navLoginItem.setVisible(false);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
+        if(currentFragment instanceof UserFragment){
+            UserFragment findFragment = (UserFragment) currentFragment;
+            findFragment.updateLoginUI(true);
+        }else if(currentFragment instanceof CloudFragment){
+            CloudFragment cloudFragment = (CloudFragment) currentFragment;
+            cloudFragment.updateUI(true);
+        }
+    }
+    public void performLogout(){
+        SharedPreferences.Editor editor = loginInfo.edit();
+        editor.putString("idToken", null);
+        editor.putBoolean("loggedIn", false);
+        editor.apply();
+        signinButton.setText(R.string.sign_in);
+        signinButton.setOnClickListener(v2 -> {
+            bottomNavigationView.setSelectedItemId(R.id.nav_user);
+        });
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu navMenu = navigationView.getMenu();
+        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
+        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
+        navLoginItem.setVisible(true);
+        navLogoutItem.setVisible(false);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
+        if(currentFragment instanceof UserFragment){
+            UserFragment findFragment = (UserFragment) currentFragment;
+            findFragment.updateLoginUI(false);
+        }else if(currentFragment instanceof CloudFragment){
+            CloudFragment cloudFragment = (CloudFragment) currentFragment;
+            cloudFragment.updateUI(false);
+        }
+    }
+    public void goToSignIn(){
+        bottomNavigationView.setSelectedItemId(R.id.nav_user);
+    }
+
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
     }
     public void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.flFragment, fragment)
+                .replace(R.id.flFragment, fragment, "main_fragment")
                 .commit();
     }
     @Override

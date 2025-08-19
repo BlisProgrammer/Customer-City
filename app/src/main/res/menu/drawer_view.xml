@@ -1,16 +1,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <group android:checkableBehavior="none">
         <item
             android:id="@+id/nav_login"
-            android:title="立即登入" />
+            android:title="立即登入"/>
         <item
             android:id="@+id/nav_about"
-            android:title="關於我們" />
+            android:title="關於我們"/>
         <item
             android:id="@+id/nav_help"
-            android:title="支援" />
+            android:title="支援"/>
         <item
             android:id="@+id/nav_logout"
-            android:title="登出" />
+            android:title="登出"/>
     </group>
 </menu>

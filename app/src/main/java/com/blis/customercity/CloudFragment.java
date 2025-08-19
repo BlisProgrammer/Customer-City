@@ -59,16 +59,9 @@ import com.google.gson.reflect.TypeToken;
 
 
 public class CloudFragment extends Fragment {
-    private final BottomNavigationView bottomNavigationView;
-    private final Button signInButton;
     private TwoLineAdapter onlineAdapter;
     private SharedPreferences loginInfo;
-    private NavigationView drawerNavView;
-    public CloudFragment(NavigationView drawerNavView, Button signInButton, BottomNavigationView bottomNavigationView) {
-        this.bottomNavigationView = bottomNavigationView;
-        this.signInButton = signInButton;
-        this.drawerNavView = drawerNavView;
-    }
+    private LinearLayout loginLayout, logoutLayout;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -83,61 +76,47 @@ public class CloudFragment extends Fragment {
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
 
-        LinearLayout loginLayout = linearLayout.findViewById(R.id.login_layout);
-        LinearLayout logoutLayout = linearLayout.findViewById(R.id.logout_layout);
+        loginLayout = linearLayout.findViewById(R.id.login_layout);
+        logoutLayout = linearLayout.findViewById(R.id.logout_layout);
 
-        updateSignInUI(loggedIn, loginLayout, logoutLayout);
+        updateUI(loggedIn);
         if(loggedIn && idToken != null){
-            updateOnlineList(linearLayout, loginLayout, logoutLayout);
+            updateOnlineList(linearLayout);
         }
         recordActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
                     @Override
                     public void onActivityResult(ActivityResult result) {
-                        updateOnlineList(linearLayout, loginLayout, logoutLayout);
+                        updateOnlineList(linearLayout);
                     }
                 });
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
-            bottomNavigationView.setSelectedItemId(R.id.nav_user);
+            Main main = (Main) getActivity();
+            if(main == null) return;
+            main.goToSignIn();
         });
 
         return linearLayout;
     }
 
-    private void updateSignInUI(boolean signedIn, LinearLayout loginLayout, LinearLayout logoutLayout) {
+    public void updateUI(boolean signedIn) {
         if(signedIn){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
-            Menu navMenu = drawerNavView.getMenu();
-            signInButton.setOnClickListener(v -> {
-                // Sign out procedure
-                SharedPreferences.Editor editor = loginInfo.edit();
-                editor.putString("idToken", null);
-                editor.putBoolean("loggedIn", false);
-                editor.apply();
-                signInButton.setText(R.string.sign_in);
-                updateSignInUI(false, loginLayout, logoutLayout);
-                navMenu.findItem(R.id.nav_login).setVisible(true);
-                navMenu.findItem(R.id.nav_logout).setVisible(false);
-            });
         }else{
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
-            signInButton.setOnClickListener(v -> {
-                bottomNavigationView.setSelectedItemId(R.id.nav_user);
-            });
         }
-        drawerNavView.invalidate();
     }
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
     private ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
     private TextView noRecordView;
 
-    private void updateOnlineList(LinearLayout linearLayout, LinearLayout loginLayout, LinearLayout logoutLayout){
+    private void updateOnlineList(LinearLayout linearLayout){
         noRecordView = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
@@ -146,7 +125,7 @@ public class CloudFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> {
-                updateOnlineList(linearLayout, loginLayout, logoutLayout);
+                updateOnlineList(linearLayout);
             }
         );
         if(onlineAdapter == null){
@@ -167,21 +146,11 @@ public class CloudFragment extends Fragment {
             client.newCall(request).enqueue(new Callback() {
                 @Override
                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    SharedPreferences.Editor editor = loginInfo.edit();
-                    editor.putBoolean("loggedIn", false);
-                    editor.putString("idToken", null);
-                    editor.apply();
-
-                    getActivity().runOnUiThread(()->{
-                        logoutLayout.setVisibility(View.GONE);
-                        loginLayout.setVisibility(View.VISIBLE);
+                    Main main = (Main) getActivity();
+                    if(main == null || !isAdded())return;
+                    main.runOnUiThread(()->{
                         swipeRefreshLayout.setRefreshing(false);
-                        signInButton.setText(R.string.sign_in);
-                        updateSignInUI(false, loginLayout, logoutLayout);
-
-                        Menu navMenu = drawerNavView.getMenu();
-                        navMenu.findItem(R.id.nav_login).setVisible(true);
-                        navMenu.findItem(R.id.nav_logout).setVisible(false);
+                        main.performLogout();
                     });
                 }
 
@@ -227,14 +196,10 @@ public class CloudFragment extends Fragment {
                         });
                     } else {
                         if(response.code() == 401){
-                            SharedPreferences.Editor editor = loginInfo.edit();
-                            editor.putBoolean("loggedIn", false);
-                            editor.putString("idToken", null);
-                            editor.apply();
-
+                            Main main = (Main) getActivity();
+                            if(!isAdded() || main == null) return;
                             getActivity().runOnUiThread(() -> {
-                                logoutLayout.setVisibility(View.GONE);
-                                loginLayout.setVisibility(View.VISIBLE);
+                                main.performLogout();
                                 swipeRefreshLayout.setRefreshing(false);
                             });
                         }
