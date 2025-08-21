@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:focusable="true"
     android:clickable="true"
     android:foreground="?android:attr/selectableItemBackground"
@@ -11,20 +11,38 @@
     android:paddingBottom="15dp"
     >
 
-    <TextView
-        android:id="@+id/itemTitle"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textSize="23sp"
-        android:textColor="@color/black"
-        android:paddingBottom="10dp"/>
+        android:orientation="vertical"
+        android:layout_weight="1">
+        <TextView
+            android:id="@+id/itemTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textStyle="bold"
+            android:textSize="23sp"
+            android:textColor="@color/black"
+            android:paddingBottom="10dp"
+            android:text="Company"/>
 
-    <TextView
-        android:id="@+id/itemDescription"
-        android:layout_width="wrap_content"
+        <TextView
+            android:id="@+id/itemDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:text="Description" />
+    </LinearLayout>
+    <ImageButton
+        android:layout_width="20dp"
+        android:id="@+id/delete_button"
+        android:scaleType="fitStart"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        />
+        android:layout_gravity="center_vertical"
+        android:adjustViewBounds="true"
+        android:src="@drawable/bin_icon"
+        android:alpha="0.5"
+        android:layout_marginLeft="10dp"
+        android:background="#00000000"/>
 
 </LinearLayout>

@@ -163,11 +163,22 @@ public class CloudFragment extends Fragment {
                             ItemTouchHelper itemTouchHelper = getItemTouchHelper();
                             itemTouchHelper.attachToRecyclerView(recyclerView);
 
-                            onlineAdapter.setOnItemClickListener(position -> {
-                                if(onlineRecordList.isEmpty())return;
-                                Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                                recordIntent.putExtra("selected_record", onlineRecordList.get(position));
-                                recordActivityResultLauncher.launch(recordIntent);
+                            onlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
+                                @Override
+                                public void onItemClick(int position) {
+                                    if (onlineRecordList.isEmpty()) return;
+                                    Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+                                    recordIntent.putExtra("selected_record", onlineRecordList.get(position));
+                                    recordActivityResultLauncher.launch(recordIntent);
+                                }
+
+                                @Override
+                                public void onDeleteClick(int position) {
+                                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                                    if (viewHolder != null) {
+                                        removeItem(viewHolder);
+                                    }
+                                }
                             });
 
 //                            onlineListView.setAdapter(onlineAdapter);
@@ -195,78 +206,79 @@ public class CloudFragment extends Fragment {
                         public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                             return false;
                         }
-
                         @Override
                         public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                            //Remove swiped item from list and notify the RecyclerView
-                            int position = viewHolder.getAdapterPosition();
-                            ConfirmationDialog.showConfirmationDialog(
-                                requireContext(),
-                                "確認",
-                                "移除記錄?",
-                                (dialog, which) -> {
-                                    OnlineRecord selectedRecord = onlineRecordList.get(position);
-
-                                    // remove with api call
-                                    HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
-                                    assert originalUrl != null;
-                                    HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
-                                    urlBuilder.addQueryParameter("id", selectedRecord.getId());
-
-                                    Request request = new Request.Builder()
-                                            .url(urlBuilder.build())
-                                            .addHeader("Cookie", "token=" + idToken)
-                                            .build();
-                                    client.newCall(request).enqueue(new Callback() {
-                                        @Override
-                                        public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                            if (savedToast != null) {
-                                                savedToast.cancel();
-                                            }
-                                            savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-                                            savedToast.show();
-                                        }
-
-                                        @Override
-                                        public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                            if (response.isSuccessful()) {
-                                                assert getActivity() != null;
-                                                getActivity().runOnUiThread(() -> {
-                                                    if (savedToast != null) {
-                                                        savedToast.cancel();
-                                                    }
-                                                    savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
-                                                    savedToast.show();
-
-                                                    onlineRecordList.remove(position);
-                                                    onlineAdapter.notifyItemRemoved(position);
-                                                    if(onlineAdapter.getItemCount() == 0){
-                                                        noRecordView.setVisibility(View.VISIBLE);
-                                                    }else {
-                                                        noRecordView.setVisibility(View.GONE);
-                                                    }
-                                                    dialog.dismiss();
-                                                });
-                                            } else {
-                                                if (savedToast != null) {
-                                                    savedToast.cancel();
-                                                }
-                                                savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-                                                savedToast.show();
-                                            }
-                                            response.body().close();
-                                        }
-                                    });
-                                },
-                                (dialog, which) -> {
-                                    onlineAdapter.notifyItemChanged(position);
-                                    dialog.dismiss();
-                                }
-
-                        );
+                            removeItem(viewHolder);
                         }
                     };
                     return new ItemTouchHelper(simpleItemTouchCallback);
+                }
+
+                private void removeItem(RecyclerView.ViewHolder viewHolder) {
+                    //Remove swiped item from list and notify the RecyclerView
+                    int position = viewHolder.getAdapterPosition();
+                    ConfirmationDialog.showConfirmationDialog(
+                        requireContext(),
+                        "確認",
+                        "移除記錄?",
+                        (dialog, which) -> {
+                            OnlineRecord selectedRecord = onlineRecordList.get(position);
+
+                            // remove with api call
+                            HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
+                            assert originalUrl != null;
+                            HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
+                            urlBuilder.addQueryParameter("id", selectedRecord.getId());
+
+                            Request request = new Request.Builder()
+                                    .url(urlBuilder.build())
+                                    .addHeader("Cookie", "token=" + idToken)
+                                    .build();
+                            client.newCall(request).enqueue(new Callback() {
+                                @Override
+                                public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                                    if (savedToast != null) {
+                                        savedToast.cancel();
+                                    }
+                                    savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                                    savedToast.show();
+                                }
+
+                                @Override
+                                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                                    if (response.isSuccessful()) {
+                                        assert getActivity() != null;
+                                        getActivity().runOnUiThread(() -> {
+                                            if (savedToast != null) {
+                                                savedToast.cancel();
+                                            }
+                                            savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
+                                            savedToast.show();
+
+                                            onlineRecordList.remove(position);
+                                            onlineAdapter.notifyItemRemoved(position);
+                                            if(onlineAdapter.getItemCount() == 0){
+                                                noRecordView.setVisibility(View.VISIBLE);
+                                            }else {
+                                                noRecordView.setVisibility(View.GONE);
+                                            }
+                                            dialog.dismiss();
+                                        });
+                                    } else {
+                                        if (savedToast != null) {
+                                            savedToast.cancel();
+                                        }
+                                        savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                                        savedToast.show();
+                                    }
+                                    response.body().close();
+                                }
+                            });
+                        },
+                        (dialog, which) -> {
+                            onlineAdapter.notifyItemChanged(position);
+                            dialog.dismiss();
+                        });
                 }
             });
         }
