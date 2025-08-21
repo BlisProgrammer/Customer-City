@@ -246,6 +246,7 @@ public class CloudFragment extends Fragment {
                                         }
                                         savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
                                         savedToast.show();
+                                        onlineAdapter.notifyItemChanged(position);
                                     });
                                 }
 
