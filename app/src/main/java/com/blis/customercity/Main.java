@@ -29,6 +29,7 @@ public class Main extends AppCompatActivity {
 
     private Button signinButton;
     private SharedPreferences loginInfo;
+    private int clickedNavigationItemID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -58,21 +59,7 @@ public class Main extends AppCompatActivity {
         }
         // on navigate
         navigationView.setNavigationItemSelectedListener(menuItem -> {
-            int id = menuItem.getItemId();
-            if(id == R.id.nav_about){
-                Intent intent = new Intent(Main.this, AboutActivity.class);
-                startActivity(intent);
-            }
-            if(id == R.id.nav_help){
-                Intent intent = new Intent(Main.this, HelpActivity.class);
-                startActivity(intent);
-            }
-            if(id == R.id.nav_logout){
-                performLogout();
-            }
-            if(id == R.id.nav_login){
-                bottomNavigationView.setSelectedItemId(R.id.nav_user);
-            }
+            clickedNavigationItemID = menuItem.getItemId();
             navDrawer.closeDrawer(GravityCompat.START);
             return true;
         });
@@ -122,6 +109,42 @@ public class Main extends AppCompatActivity {
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerToggle.syncState();
         navDrawer.addDrawerListener(drawerToggle);
+        navDrawer.addDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override
+            public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
+
+            }
+
+            @Override
+            public void onDrawerOpened(@NonNull View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(@NonNull View drawerView) {
+                int id = clickedNavigationItemID;
+                if(id == R.id.nav_about){
+                    Intent intent = new Intent(Main.this, AboutActivity.class);
+                    startActivity(intent);
+                }
+                if(id == R.id.nav_help){
+                    Intent intent = new Intent(Main.this, HelpActivity.class);
+                    startActivity(intent);
+                }
+                if(id == R.id.nav_logout){
+                    performLogout();
+                }
+                if(id == R.id.nav_login){
+                    bottomNavigationView.setSelectedItemId(R.id.nav_user);
+                }
+                clickedNavigationItemID = 0;
+            }
+
+            @Override
+            public void onDrawerStateChanged(int newState) {
+
+            }
+        });
     }
 
     public void performLogin(String idToken, String emailInputString){

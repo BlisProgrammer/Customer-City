@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView android:layout_width="match_parent"
+<ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
     xmlns:android="http://schemas.android.com/apk/res/android">
     <LinearLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         tools:context=".FindFragment"
         android:orientation="vertical"
         android:padding="10dp"
@@ -18,11 +18,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
+
         <SearchView
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="請輸入關鍵字"/>
+            android:queryHint="請輸入關鍵字" />
+
         <ListView
             android:id="@+id/search_list_view"
             android:layout_width="match_parent"
