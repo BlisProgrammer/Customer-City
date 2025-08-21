@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
@@ -174,6 +175,7 @@ public class Main extends AppCompatActivity {
         }
     }
     public void performLogout(){
+        boolean wasLoggedIn = loginInfo.getBoolean("loggedIn", false);
         SharedPreferences.Editor editor = loginInfo.edit();
         editor.putString("idToken", null);
         editor.putBoolean("loggedIn", false);
@@ -196,6 +198,11 @@ public class Main extends AppCompatActivity {
         }else if(currentFragment instanceof CloudFragment){
             CloudFragment cloudFragment = (CloudFragment) currentFragment;
             cloudFragment.updateUI(false);
+        }
+        if(wasLoggedIn){
+            Toast toast = new Toast(this);
+            toast.setText("登出成功");
+            toast.show();
         }
     }
     public void goToSignIn(){
