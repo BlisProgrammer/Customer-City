@@ -1,4 +1,4 @@
-package com.blis.customercity.Data;
+package com.blis.customercity.data;
 
 import java.io.Serializable;
 

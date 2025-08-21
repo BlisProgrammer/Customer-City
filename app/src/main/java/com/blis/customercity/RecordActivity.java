@@ -7,35 +7,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blis.customercity.Data.DataAPI;
-import com.blis.customercity.Data.OnlineRecord;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.blis.customercity.data.DataAPI;
+import com.blis.customercity.data.OnlineRecord;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class RecordActivity extends AppCompatActivity {
     private Toast savedToast;
-    private final OkHttpClient client = new OkHttpClient();
     private boolean isSavedOnline = false;
 
     private void showToast(String text){
@@ -102,12 +87,7 @@ public class RecordActivity extends AppCompatActivity {
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         Button saveOnlineButton = findViewById(R.id.save_button);
         if(!loggedIn) {
-            saveOnlineButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    showToast("請先登入");
-                }
-            });
+            saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
         }else{
             String idToken = loginInfo.getString("idToken", null);
             new Thread(()->{
@@ -119,23 +99,21 @@ public class RecordActivity extends AppCompatActivity {
                     }
                 });
             }).start();
-            saveOnlineButton.setOnClickListener(v -> {
-                new Thread(()->{
-                    boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
-                    runOnUiThread(()->{
-                        if (result){
-                            isSavedOnline = !isSavedOnline;
-                        }
-                        if(isSavedOnline){
-                            saveOnlineButton.setText("取消儲存");
-                            showToast("儲存成功");
-                        }else{
-                            saveOnlineButton.setText("儲存");
-                            showToast("成功移除記錄");
-                        }
-                    });
-                }).start();
-            });
+            saveOnlineButton.setOnClickListener(v -> new Thread(()->{
+                boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
+                runOnUiThread(()->{
+                    if (result){
+                        isSavedOnline = !isSavedOnline;
+                    }
+                    if(isSavedOnline){
+                        saveOnlineButton.setText("取消儲存");
+                        showToast("儲存成功");
+                    }else{
+                        saveOnlineButton.setText("儲存");
+                        showToast("成功移除記錄");
+                    }
+                });
+            }).start());
         }
     }
 }

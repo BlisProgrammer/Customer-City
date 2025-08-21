@@ -25,20 +25,21 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:src="@drawable/saved_star"
-            android:layout_margin="20dp"/>
+            android:layout_margin="20dp"
+            android:contentDescription="@string/saved_star_icon"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
             android:textSize="30sp"
-            android:text="登入儲存你的常用熱線聯絡，\n下次唔使左搵右搵！"/>
+            android:text="@string/登入儲存你的常用熱線聯絡"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:id="@+id/switch_to_user_button"
             android:layout_marginTop="20dp"
-            android:text="立即登入"/>
+            android:text="@string/立即登入"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -49,7 +50,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="我的記錄"
+            android:text="@string/我的記錄"
             android:layout_margin="10dp"/>
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:id="@+id/swiperefresh"
@@ -63,7 +64,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="30sp"
-                        android:text="暫無紀錄"
+                        android:text="@string/暫無紀錄"
                         android:id="@+id/no_record_text"
                         android:textAlignment="center"
                         android:padding="10dp"

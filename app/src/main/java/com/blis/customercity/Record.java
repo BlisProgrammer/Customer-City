@@ -4,8 +4,16 @@ import java.io.Serializable;
 import java.util.Objects;
 
 public class Record implements Serializable{
-    public String id, services_scope_cn, service_hotline, email, address_cn, added_detail_cn, tips_cn;
-    public String category, sub_category, company;
+    public final String id;
+    public final String services_scope_cn;
+    public final String service_hotline;
+    public final String email;
+    public final String address_cn;
+    public final String added_detail_cn;
+    public final String tips_cn;
+    public final String category;
+    public final String sub_category;
+    public final String company;
     public Record(String id, String category, String sub_category, String company, String services_scope_cn, String service_hotline, String email, String address_cn, String added_detail_cn, String tips_cn){
         this.id = id;
         this.category = category;

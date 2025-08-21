@@ -3,19 +3,11 @@ package com.blis.customercity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -24,21 +16,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blis.customercity.Data.OnlineRecord;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
+import com.blis.customercity.data.OnlineRecord;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -60,7 +47,6 @@ import com.google.gson.reflect.TypeToken;
 
 public class CloudFragment extends Fragment {
     private TwoLineAdapter onlineAdapter;
-    private SharedPreferences loginInfo;
     private LinearLayout loginLayout, logoutLayout;
 
     @Override
@@ -72,7 +58,7 @@ public class CloudFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_cloud, container, false);
         assert getContext() != null;
-        loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
 
@@ -85,12 +71,7 @@ public class CloudFragment extends Fragment {
         }
         recordActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        updateOnlineList(linearLayout);
-                    }
-                });
+                result -> updateOnlineList(linearLayout));
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
@@ -113,7 +94,7 @@ public class CloudFragment extends Fragment {
     }
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
-    private ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
+    private final ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
     private TextView noRecordView;
 
     private void updateOnlineList(LinearLayout linearLayout){
@@ -124,14 +105,13 @@ public class CloudFragment extends Fragment {
         recyclerView.setLayoutAnimation(animation);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
-        swipeRefreshLayout.setOnRefreshListener(() -> {
-                updateOnlineList(linearLayout);
-            }
+        swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
         );
         if(onlineAdapter == null){
             onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
         }
         recyclerView.setAdapter(onlineAdapter);
+        if(getContext() == null) return;
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
@@ -212,7 +192,7 @@ public class CloudFragment extends Fragment {
                 private ItemTouchHelper getItemTouchHelper() {
                     ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
                         @Override
-                        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                             return false;
                         }
 

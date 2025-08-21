@@ -25,7 +25,7 @@
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
-                    android:contentDescription="Banner of Customer City"
+                    android:contentDescription="@string/customer_city_banner"
                     android:scaleType="fitStart"
                     android:src="@drawable/banner"
                     app:layout_constraintLeft_toLeftOf="parent"

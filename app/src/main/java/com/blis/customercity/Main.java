@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,9 +66,7 @@ public class Main extends AppCompatActivity {
 
         bottomNavigationView = findViewById(R.id.navigation_view);
         Fragment findFragment = new FindFragment();
-        Fragment searchFragment = new SearchFragment();
         Fragment userFragment = new UserFragment();
-        Fragment directoryFragment = new DirectoryFragment();
         Fragment cloudFragment = new CloudFragment();
         setCurrentFragment(findFragment);
 
@@ -155,9 +152,7 @@ public class Main extends AppCompatActivity {
         editor.putString("email", emailInputString);
         editor.apply();
         signinButton.setText(R.string.sign_out);
-        signinButton.setOnClickListener(v2 -> {
-            performLogout();
-        });
+        signinButton.setOnClickListener(v2 -> performLogout());
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu navMenu = navigationView.getMenu();
@@ -181,9 +176,7 @@ public class Main extends AppCompatActivity {
         editor.putBoolean("loggedIn", false);
         editor.apply();
         signinButton.setText(R.string.sign_in);
-        signinButton.setOnClickListener(v2 -> {
-            bottomNavigationView.setSelectedItemId(R.id.nav_user);
-        });
+        signinButton.setOnClickListener(v2 -> bottomNavigationView.setSelectedItemId(R.id.nav_user));
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu navMenu = navigationView.getMenu();
@@ -220,10 +213,9 @@ public class Main extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                navDrawer.openDrawer(GravityCompat.START);
-                return true;
+        if (item.getItemId() == android.R.id.home) {
+            navDrawer.openDrawer(GravityCompat.START);
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="fitEnd"
-        app:srcCompat="@drawable/background_four" />
+        app:srcCompat="@drawable/background_four"
+        android:contentDescription="@string/customer_city_background4"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,7 +21,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="常見問題"
+            android:text="@string/常見問題"
             android:textSize="40sp"
             android:layout_gravity="center"
             android:textAlignment="center"
@@ -50,5 +51,5 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/back_button"
-        android:text="開始搜尋"/>
-</FrameLayout>
+        android:text="@string/開始搜尋"/>
+</merge>

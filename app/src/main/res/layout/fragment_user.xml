@@ -19,7 +19,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="登入"
+                android:text="@string/登入"
                 android:textAlignment="center"
                 android:textSize="40sp"/>
             <com.google.android.material.textfield.TextInputLayout
@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:hint="電郵地址" />
+                    android:hint="@string/電郵地址" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -47,7 +47,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:hint="密碼" />
+                    android:hint="@string/密碼" />
             </com.google.android.material.textfield.TextInputLayout>
             <TextView
                 android:layout_width="match_parent"
@@ -59,12 +59,12 @@
                 android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="登入"
+                android:text="@string/登入"
                 android:layout_margin="10dp" />
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="立即登記"
+                android:text="@string/立即登記"
                 android:layout_marginHorizontal="10dp"
                 android:id="@+id/switch_to_register_button"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"/>
@@ -74,7 +74,7 @@
                 android:layout_marginHorizontal="10dp"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:id="@+id/login_reset_password_button"
-                android:text="重設密碼"/>
+                android:text="@string/重設密碼"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                android:text="立即登記"
+                android:text="@string/立即登記"
                 android:textAlignment="center"
                 android:textSize="40sp"/>
             <com.google.android.material.textfield.TextInputLayout
@@ -101,7 +101,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textEmailAddress"
-                    android:hint="電郵地址" />
+                    android:hint="@string/電郵地址" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -115,7 +115,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:hint="密碼" />
+                    android:hint="@string/密碼" />
             </com.google.android.material.textfield.TextInputLayout>
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -127,7 +127,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textPassword"
-                    android:hint="確認密碼" />
+                    android:hint="@string/確認密碼" />
             </com.google.android.material.textfield.TextInputLayout>
             <TextView
                 android:layout_width="match_parent"
@@ -139,12 +139,12 @@
                 android:id="@+id/register_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="登記"
+                android:text="@string/登記"
                 android:layout_margin="10dp" />
             <Button
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="登入"
+                android:text="@string/登入"
                 android:id="@+id/switch_to_login_button"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_marginHorizontal="10dp"/>
@@ -165,12 +165,12 @@
             android:layout_marginHorizontal="10dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:id="@+id/reset_password_button"
-            android:text="更改密碼"/>
+            android:text="@string/更改密碼"/>
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="10dp"
             android:id="@+id/logout_button"
-            android:text="登出"/>
+            android:text="@string/登出"/>
     </LinearLayout>
 </LinearLayout>

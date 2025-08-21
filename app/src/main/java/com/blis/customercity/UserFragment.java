@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -14,9 +13,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.blis.customercity.Data.DataAPI;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationView;
+import com.blis.customercity.data.DataAPI;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UserFragment extends Fragment {
@@ -139,6 +136,9 @@ public class UserFragment extends Fragment {
                             errorRegisterTextView.setText("電郵地址錯誤");
                             showToast(getActivity(), "登記失敗");
                             return;
+                        default:
+                            errorRegisterTextView.setText("登記失敗");
+                            showToast(getActivity(), "登記失敗");
                     }
                 });
             }).start();

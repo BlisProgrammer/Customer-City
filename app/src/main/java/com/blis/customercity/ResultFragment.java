@@ -16,8 +16,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.blis.customercity.Data.DataAPI;
-import com.blis.customercity.Data.OnlineRecord;
+import com.blis.customercity.data.DataAPI;
+import com.blis.customercity.data.OnlineRecord;
 
 import java.util.ArrayList;
 
@@ -44,9 +44,7 @@ public class ResultFragment extends Fragment{
         // get company name
         new Thread(()->{
             String companyName = DataConverter.companyIDToCompany(companyIDs.get(0), getResources().openRawResource(R.raw.companies));
-            getActivity().runOnUiThread(()->{
-                companyNameView.setText(companyName);
-            });
+            getActivity().runOnUiThread(()-> companyNameView.setText(companyName));
         }).start();
         new Thread(()->{
             ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyIDs);
@@ -75,8 +73,6 @@ public class ResultFragment extends Fragment{
         }).start();
         Button backButton = linearLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> {
-            Fragment findFragment = new FindFragment();
-
             FragmentManager fragmentManager = getParentFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.remove(this);

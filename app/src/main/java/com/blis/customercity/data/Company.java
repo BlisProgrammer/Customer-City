@@ -1,4 +1,4 @@
-package com.blis.customercity.Data;
+package com.blis.customercity.data;
 
 public class Company {
     private String company_name_cn, company_name_en, distributor_cn, distributor_en, id, meta_desc_cn, meta_desc_en, meta_keywords_cn, meta_keywords_en, sub_cat_id;

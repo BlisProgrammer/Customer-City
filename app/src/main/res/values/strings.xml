@@ -1,8 +1,5 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Customer City</string>
-    <string name="click_me">CLICK ME!!!!</string>
-    <string name="channel_name">Blis Test</string>
-    <string name="channel_description">This is a channel for testing the notification system.</string>
     <string-array name="default_categories">
         <item>私家車相關</item>
         <item>金融</item>
@@ -17,8 +14,6 @@
         <item>公共服務</item>
         <item>娛樂</item>
     </string-array>
-    <string name="hello_blank_fragment">Hello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\nHello blank fragment\n</string>
-    <string name="long_click_item_to_remove">Long click item to remove</string>
 
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -27,4 +22,34 @@
     <string name="請選擇類別">請選擇類別</string>
     <string name="請選擇分類">請選擇分類</string>
     <string name="請選擇公司機構">請選擇公司/機構</string>
+    <string name="customer_city_banner">Customer City banner</string>
+    <string name="customer_city_background1" tools:ignore="Typos">Customer City Background1</string>
+    <string name="saved_star_icon">Saved Star Icon</string>
+    <string name="customer_city_background4">Customer City Background4</string>
+    <string name="customer_city_icon">Customer City Icon</string>
+    <string name="全港最齊全客服資訊平台">全港最齊全客服資訊平台</string>
+    <string name="支援全港消費者">支援全港消費者，集合生活上每一範疇各品牌、各部門客戶服務聯絡資訊，電話、電郵、地址一search即有，從此維護自身消費者權益無需左搵右搵。你更可以儲存起常用聯絡，下次要搵就更方便！</string>
+    <string name="開始搜尋">開始搜尋</string>
+    <string name="立即登入">立即登入</string>
+    <string name="關於我們">關於我們</string>
+    <string name="支援">支援</string>
+    <string name="登出">登出</string>
+    <string name="登入儲存你的常用熱線聯絡">登入儲存你的常用熱線聯絡，\n下次唔使左搵右搵！</string>
+    <string name="我的記錄">我的記錄</string>
+    <string name="暫無紀錄">暫無紀錄</string>
+    <string name="返回">返回</string>
+    <string name="電郵地址">電郵地址</string>
+    <string name="密碼">密碼</string>
+    <string name="立即登記">立即登記</string>
+    <string name="重設密碼">重設密碼</string>
+    <string name="確認密碼">確認密碼</string>
+    <string name="登記">登記</string>
+    <string name="登入">登入</string>
+    <string name="更改密碼">更改密碼</string>
+    <string name="常見問題">常見問題</string>
+    <string name="分享">分享</string>
+    <string name="儲存">儲存</string>
+    <string name="搜尋">搜尋</string>
+    <string name="記錄">記錄</string>
+    <string name="帳號">帳號</string>
 </resources>

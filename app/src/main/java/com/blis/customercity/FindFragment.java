@@ -4,7 +4,6 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -16,16 +15,14 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 
-import com.blis.customercity.Data.Company;
-import com.blis.customercity.Data.DataAPI;
+import com.blis.customercity.data.Company;
+import com.blis.customercity.data.DataAPI;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class FindFragment extends Fragment {
     private static String selectedCategory, selectedSubCategory, selectedCompany;
@@ -39,7 +36,7 @@ public class FindFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        ScrollView scrollView = (ScrollView) inflater.inflate(R.layout.fragment_find, container, false);
+        LinearLayout scrollView = (LinearLayout) inflater.inflate(R.layout.fragment_find, container, false);
 
         LinearLayout subCategoryLayout = scrollView.findViewById(R.id.sub_category_layout);
         LinearLayout resultLayout = scrollView.findViewById(R.id.result_layout);
@@ -67,66 +64,60 @@ public class FindFragment extends Fragment {
             newChip.setTextSize(15);
             categoryChipGroup.addView(newChip);
         }
-        categoryChipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
-            @Override
-            public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
-                if(list.isEmpty())return;
-                resultLayout.setVisibility(View.GONE);
-                progressBar.setVisibility(View.GONE);
-                subCategoryChipGroup.removeAllViews();
-                Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
-                selectedCategory = (String) selectedChip.getText();
+        categoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
+            if(list.isEmpty())return;
+            resultLayout.setVisibility(View.GONE);
+            progressBar.setVisibility(View.GONE);
+            subCategoryChipGroup.removeAllViews();
+            Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
+            selectedCategory = (String) selectedChip.getText();
 
-                // get list of subcategories
-                String categoryID = DataConverter.categoryNameToID(selectedCategory, getResources().openRawResource(R.raw.categories));
-                ArrayList<String> subCategories = DataConverter.getSubCategories(categoryID, getResources().openRawResource(R.raw.sub_categories));
+            // get list of subcategories
+            String categoryID = DataConverter.categoryNameToID(selectedCategory, getResources().openRawResource(R.raw.categories));
+            ArrayList<String> subCategories = DataConverter.getSubCategories(categoryID, getResources().openRawResource(R.raw.sub_categories));
 
-                // create next chip group
-                for(String category : subCategories){
-                    Chip newChip = new Chip(requireContext());
-                    newChip.setText(category);
-                    newChip.setLayoutParams(params);
-                    newChip.setCheckable(true);
-                    newChip.setCheckedIconVisible(false);
-                    newChip.setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
-                    newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
-                    newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
-                    newChip.setChipStrokeWidth(2);
-                    newChip.setTextSize(15);
-                    subCategoryChipGroup.addView(newChip);
-                    subCategoryLayout.setVisibility(View.VISIBLE);
-                }
+            // create next chip group
+            for(String category : subCategories){
+                Chip newChip = new Chip(requireContext());
+                newChip.setText(category);
+                newChip.setLayoutParams(params);
+                newChip.setCheckable(true);
+                newChip.setCheckedIconVisible(false);
+                newChip.setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
+                newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
+                newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
+                newChip.setChipStrokeWidth(2);
+                newChip.setTextSize(15);
+                subCategoryChipGroup.addView(newChip);
+                subCategoryLayout.setVisibility(View.VISIBLE);
             }
         });
-        subCategoryChipGroup.setOnCheckedStateChangeListener(new ChipGroup.OnCheckedStateChangeListener() {
-            @Override
-            public void onCheckedChanged(@NonNull ChipGroup chipGroup, @NonNull List<Integer> list) {
-                if(list.isEmpty())return;
-                resultLayout.setVisibility(View.GONE);
-                progressBar.setVisibility(View.VISIBLE);
+        subCategoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
+            if(list.isEmpty())return;
+            resultLayout.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
 
-                Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
-                selectedSubCategory = (String) selectedChip.getText();
+            Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
+            selectedSubCategory = (String) selectedChip.getText();
 
-                // get list of companies
-                String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
+            // get list of companies
+            String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
 //                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
 
-                new Thread(()->{
-                    companies = DataAPI.subCatIDToCompanies(sub_categoryID);
-                    ArrayList<String> companyNames = new ArrayList<>();
-                    for(Company company : companies){
-                        companyNames.add(company.getCompany_name_cn());
-                    }
-                    ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
-                    if(getActivity() == null) return;
-                    getActivity().runOnUiThread(() -> {
-                        resultLayout.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
-                        resultView.setAdapter(adapter1);
-                    });
-                }).start();
-            }
+            new Thread(()->{
+                companies = DataAPI.subCatIDToCompanies(sub_categoryID);
+                ArrayList<String> companyNames = new ArrayList<>();
+                for(Company company : companies){
+                    companyNames.add(company.getCompany_name_cn());
+                }
+                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
+                if(getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    resultLayout.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
+                    resultView.setAdapter(adapter1);
+                });
+            }).start();
         });
         // List view on click
         resultView.setOnItemClickListener((parent, view, position, id) -> {

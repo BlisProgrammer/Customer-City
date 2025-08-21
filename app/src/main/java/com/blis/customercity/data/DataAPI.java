@@ -1,9 +1,4 @@
-package com.blis.customercity.Data;
-
-import android.content.SharedPreferences;
-import android.view.View;
-
-import androidx.annotation.NonNull;
+package com.blis.customercity.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -14,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;

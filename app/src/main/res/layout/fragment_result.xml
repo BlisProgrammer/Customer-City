@@ -27,5 +27,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/back_button"
-        android:text="返回"/>
+        android:text="@string/返回"/>
 </LinearLayout>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,15 +9,17 @@
         android:layout_height="wrap_content"
         android:scaleType="fitStart"
         app:srcCompat="@drawable/banner"
+        android:contentDescription="@string/customer_city_banner"
         android:layout_margin="20dp"/>
     <ImageView
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scaleType="fitEnd"
+        android:contentDescription="@string/customer_city_background1"
         app:srcCompat="@drawable/background_one" />
+
     <LinearLayout
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -26,14 +28,14 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="全港最齊全客服資訊平台"
+            android:text="@string/全港最齊全客服資訊平台"
             android:textSize="30sp"
             android:textAlignment="center"
             android:layout_margin="10dp"/>
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="支援全港消費者，集合生活上每一範疇各品牌、各部門客戶服務聯絡資訊，電話、電郵、地址一search即有，從此維護自身消費者權益無需左搵右搵。你更可以儲存起常用聯絡，下次要搵就更方便！"
+            android:text="@string/支援全港消費者"
             android:textSize="20sp"
             android:textAlignment="center"
             android:layout_margin="10dp"/>
@@ -41,6 +43,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/back_button"
-            android:text="開始搜尋"/>
+            android:text="@string/開始搜尋"/>
     </LinearLayout>
-</FrameLayout>
+</merge>

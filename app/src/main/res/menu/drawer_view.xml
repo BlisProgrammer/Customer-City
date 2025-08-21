@@ -2,15 +2,15 @@
     <group android:checkableBehavior="none">
         <item
             android:id="@+id/nav_login"
-            android:title="立即登入"/>
+            android:title="@string/立即登入"/>
         <item
             android:id="@+id/nav_about"
-            android:title="關於我們"/>
+            android:title="@string/關於我們"/>
         <item
             android:id="@+id/nav_help"
-            android:title="支援"/>
+            android:title="@string/支援"/>
         <item
             android:id="@+id/nav_logout"
-            android:title="登出"/>
+            android:title="@string/登出"/>
     </group>
 </menu>

@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="搜尋"
+        android:title="@string/搜尋"
         android:icon="@drawable/search_icon"
         android:id="@+id/nav_search"/>
     <item
-        android:title="記錄"
+        android:title="@string/記錄"
         android:icon="@drawable/saved_icon"
         android:id="@+id/nav_save"/>
     <item
-        android:title="帳號"
+        android:title="@string/帳號"
         android:icon="@drawable/user_icon"
         android:id="@+id/nav_user"/>
 </menu>
