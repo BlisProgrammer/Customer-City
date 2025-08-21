@@ -25,10 +25,8 @@ import com.google.android.material.chip.ChipGroup;
 import java.util.ArrayList;
 
 public class FindFragment extends Fragment {
-    private static String selectedCategory, selectedSubCategory, selectedCompany;
-    public static ArrayList<Record> selectedRecords;
+    private static String selectedCategory, selectedSubCategory;
     private static ArrayList<Company> companies;
-    private static ArrayList<String> resultList;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

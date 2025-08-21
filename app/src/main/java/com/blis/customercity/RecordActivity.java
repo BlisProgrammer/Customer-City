@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +46,7 @@ public class RecordActivity extends AppCompatActivity {
         if(selectedRecord == null){
             return;
         }
+        LinearLayout recordView = findViewById(R.id.record_view);
         TextView recordViewCompany = findViewById(R.id.record_view_company);
         TextView recordViewCategory = findViewById(R.id.record_view_category);
         TextView recordViewDetails = findViewById(R.id.record_view_details);
@@ -53,6 +55,8 @@ public class RecordActivity extends AppCompatActivity {
             String subCategory = DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories));
             String category = DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories));
 
+            ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(this);
+
             runOnUiThread(()->{
                 recordViewCompany.setText(selectedRecord.getCompany_name_cn());
                 recordViewCategory.setText(String.format(
@@ -60,7 +64,10 @@ public class RecordActivity extends AppCompatActivity {
                         subCategory,
                         category
                 ));
-                recordViewDetails.setText(selectedRecord.formatToString());
+                recordViewDetails.setText(selectedRecord.getServices_scope_cn());
+                for(LinearLayout item : recordItems){
+                    recordView.addView(item);
+                }
             });
         }).start();
 

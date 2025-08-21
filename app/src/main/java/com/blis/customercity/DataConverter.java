@@ -38,7 +38,6 @@ public class DataConverter {
     public static String categoryNameToID(String categoryName, InputStream inputStream){
         return searchInCSV("category_cn", categoryName, "id", inputStream);
     }
-
     public static ArrayList<String> getSubCategories(String categoryId, InputStream inputStream) {
         try{
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -105,39 +104,6 @@ public class DataConverter {
     public static ArrayList<String> getAllCompanies(InputStream inputStream){
         return searchCompanies("", inputStream);
     }
-
-    public static ArrayList<String> getCompanies(String subCategoryID, InputStream inputStream) {
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-
-            // get first line
-            String[] firstLine =reader.readLine().split("\\|");
-            int sub_cat_idColumn = 1;
-            int company_name_cnColumn = 2;
-            for (int i = 0; i < firstLine.length; i++) {
-                if(firstLine[i].equals("sub_cat_id")){
-                    sub_cat_idColumn = i;
-                    continue;
-                }
-                if(firstLine[i].equals("company_name_cn")){
-                    company_name_cnColumn = i;
-                }
-            }
-            ArrayList<String> allCompanies = new ArrayList<>();
-            while((line=reader.readLine())!= null){
-                String[] data = line.split("\\|");
-                if(!data[sub_cat_idColumn].equals(subCategoryID))continue;
-                if(allCompanies.contains(data[company_name_cnColumn]))continue;
-                allCompanies.add(data[company_name_cnColumn]);
-            }
-            reader.close();
-            return allCompanies;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     public static String companyIDToCompany(String companyID, InputStream inputStream) {
         return searchInCSV("id", companyID, "company_name_cn", inputStream);
     }
@@ -176,47 +142,6 @@ public class DataConverter {
             }
             reader.close();
             return allIDs;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static ArrayList<Record> companyToRecords(String companyId, InputStream inputStream, String selectedCategory, String selectedType, String selectedCompany) {
-        try{
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-
-            // get first line
-            String[] firstLine =reader.readLine().split("\\|");
-            int companyIdColumn = 1;
-            for (int i = 0; i < firstLine.length; i++) {
-                if(firstLine[i].equals("company_id")){
-                    companyIdColumn = i;
-                }
-            }
-            ArrayList<Record> allRecords = new ArrayList<>();
-            while((line=reader.readLine())!= null){
-                String[] data = line.split("\\|", -1);
-                if(data[companyIdColumn].equals(companyId)){
-                    allRecords.add(new Record(
-                            data[0],
-                            selectedCategory,
-                            selectedType,
-                            selectedCompany,
-                            data[2],
-                            data[3],
-                            data[4],
-                            data[5],
-                            data[6],
-                            data[7]
-                    ));
-                }
-            }
-            reader.close();
-            if(allRecords.isEmpty()){
-                allRecords.add(new Record("", "" , "", "", "未能找到相關資料", "", "", "", "", ""));
-            }
-            return allRecords;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

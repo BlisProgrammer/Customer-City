@@ -1,6 +1,19 @@
 package com.blis.customercity.data;
 
+import android.content.Context;
+import android.text.util.Linkify;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import com.blis.customercity.R;
+
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class OnlineRecord implements Serializable {
     private String id;
@@ -230,6 +243,67 @@ public class OnlineRecord implements Serializable {
         if(!this.tips_cn.isEmpty()) stringBuilder.append("").append(this.tips_cn).append("\n");
         return stringBuilder.toString();
     }
+    public ArrayList<LinearLayout> formatToLayouts(Context context){
+        ArrayList<LinearLayout> layoutList = new ArrayList<>();
+        if(!this.service_hotline.isEmpty()){
+            layoutList.add(generateItemLayout(context, R.drawable.phone_icon, this.service_hotline));
+        }
+        if(!this.email.isEmpty()){
+            layoutList.add(generateItemLayout(context, R.drawable.email_icon, this.email));
+        }
+        if(!this.address_cn.isEmpty()){
+            layoutList.add(generateItemLayout(context, R.drawable.address_icon, this.address_cn));
+        }
+        if(!this.added_detail_cn.isEmpty()){
+            layoutList.add(generateItemLayout(context, R.drawable.details_icon, this.added_detail_cn));
+        }
+        if(!this.tips_cn.isEmpty()){
+            layoutList.add(generateItemLayout(context, R.drawable.tips_icon, this.tips_cn));
+        }
+        return layoutList;
+    }
+    private LinearLayout generateItemLayout(Context context, int iconDrawableID, String text){
+        float scale = context.getResources().getDisplayMetrics().density;
+        // Setup linear layout
+        LinearLayout linearLayout = new LinearLayout(context);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, // Width
+                LinearLayout.LayoutParams.WRAP_CONTENT  // Height
+        );
+        linearLayout.setLayoutParams(layoutParams);
+        linearLayout.setOrientation(LinearLayout.HORIZONTAL);
+        linearLayout.setPadding(0, (int) (10 * scale + 0.5f), 0, 0);
+
+        // Setup Icon image
+        ImageView imageView = new ImageView(context);
+        imageView.setImageResource(iconDrawableID);
+        LinearLayout.LayoutParams imgParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        imgParams.width = (int) (16 * scale + 0.5f);
+        imgParams.gravity = Gravity.CENTER_VERTICAL;
+        imgParams.rightMargin = (int) (10 * scale + 0.5f);
+        imgParams.leftMargin = (int) (10 * scale + 0.5f);
+        imageView.setLayoutParams(imgParams);
+        imageView.setAdjustViewBounds(true);
+        linearLayout.addView(imageView);
+
+        // Setup TextView
+        TextView textView = new TextView(context);
+        textView.setText(text);
+        LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        textView.setLayoutParams(textParams);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        textView.setMinimumHeight((int) (16 * scale + 0.5f));
+        linearLayout.addView(textView);
+        Linkify.addLinks(textView, Linkify.ALL);
+        return linearLayout;
+    }
+
     public String getShareString(){
         return "Contact information for " + getCompany_name_cn() + ": \n" + formatToString();
     }

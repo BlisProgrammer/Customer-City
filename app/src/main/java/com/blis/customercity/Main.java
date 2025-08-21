@@ -45,6 +45,7 @@ public class Main extends AppCompatActivity {
 
         // on navigate
         NavigationView navigationView = findViewById(R.id.nav_view);
+
         // Sign in button
         loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
