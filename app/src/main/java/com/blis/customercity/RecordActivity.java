@@ -65,6 +65,11 @@ public class RecordActivity extends AppCompatActivity {
                         category
                 ));
                 recordViewDetails.setText(selectedRecord.getServices_scope_cn());
+                if(!selectedRecord.getServices_scope_cn().isEmpty()){
+                    recordViewDetails.setVisibility(TextView.VISIBLE);
+                }else{
+                    recordViewDetails.setVisibility(TextView.GONE);
+                }
                 for(LinearLayout item : recordItems){
                     recordView.addView(item);
                 }

@@ -8,8 +8,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.constraintlayout.widget.ConstraintLayout;
-
 import com.blis.customercity.R;
 
 import java.io.Serializable;
@@ -241,7 +239,7 @@ public class OnlineRecord implements Serializable {
         if(!this.address_cn.isEmpty()) stringBuilder.append("Address: ").append(this.address_cn).append("\n");
         if(!this.added_detail_cn.isEmpty()) stringBuilder.append("Details: ").append(this.added_detail_cn).append("\n");
         if(!this.tips_cn.isEmpty()) stringBuilder.append("").append(this.tips_cn).append("\n");
-        return stringBuilder.toString();
+        return stringBuilder.toString().trim();
     }
     public ArrayList<LinearLayout> formatToLayouts(Context context){
         ArrayList<LinearLayout> layoutList = new ArrayList<>();

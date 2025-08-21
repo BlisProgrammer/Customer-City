@@ -55,7 +55,7 @@ public class ResultFragment extends Fragment{
             for (OnlineRecord record : selectedRecords) {
                 resultList.add(record.formatToString());
             }
-            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, resultList);
+            ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), R.layout.result_item, resultList);
 
             if(getActivity() == null) return;
 
