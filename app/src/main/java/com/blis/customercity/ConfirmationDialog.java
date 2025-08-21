@@ -1,6 +1,9 @@
 package com.blis.customercity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
+import android.widget.Button;
+
 import androidx.appcompat.app.AlertDialog;
 
 public class ConfirmationDialog {
@@ -20,5 +23,9 @@ public class ConfirmationDialog {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+        Button negativeButton = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+        if (negativeButton != null) {
+            negativeButton.setTypeface(null, Typeface.BOLD);
+        }
     }
 }

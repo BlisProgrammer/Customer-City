@@ -1,6 +1,11 @@
 package com.blis.customercity.data;
 
 public class Company {
+    public static Company getErrorCompany(){
+        Company errorCompany = new Company();
+        errorCompany.setCompany_name_cn("發生錯誤,請稍後嘗試");
+        return errorCompany;
+    }
     private String company_name_cn, company_name_en, distributor_cn, distributor_en, id, meta_desc_cn, meta_desc_en, meta_keywords_cn, meta_keywords_en, sub_cat_id;
 
     public String getCompany_name_cn() {

@@ -130,6 +130,7 @@ public class CloudFragment extends Fragment {
                     if(main == null || !isAdded())return;
                     main.runOnUiThread(()->{
                         swipeRefreshLayout.setRefreshing(false);
+                        Toast.makeText(requireContext(), "網路發生錯誤，正在登出", Toast.LENGTH_LONG).show();
                         main.performLogout();
                     });
                 }
@@ -190,6 +191,7 @@ public class CloudFragment extends Fragment {
                             Main main = (Main) getActivity();
                             if(!isAdded() || main == null) return;
                             getActivity().runOnUiThread(() -> {
+                                Toast.makeText(requireContext(), "發生錯誤，正在登出", Toast.LENGTH_LONG).show();
                                 main.performLogout();
                                 swipeRefreshLayout.setRefreshing(false);
                             });
@@ -237,11 +239,14 @@ public class CloudFragment extends Fragment {
                             client.newCall(request).enqueue(new Callback() {
                                 @Override
                                 public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                    if (savedToast != null) {
-                                        savedToast.cancel();
-                                    }
-                                    savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-                                    savedToast.show();
+                                    assert getActivity() != null;
+                                    getActivity().runOnUiThread(()->{
+                                        if (savedToast != null) {
+                                            savedToast.cancel();
+                                        }
+                                        savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                                        savedToast.show();
+                                    });
                                 }
 
                                 @Override

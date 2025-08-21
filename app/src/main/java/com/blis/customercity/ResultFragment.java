@@ -48,7 +48,18 @@ public class ResultFragment extends Fragment{
         }).start();
         new Thread(()->{
             ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyIDs);
-            if(selectedRecords.isEmpty()) return;
+            if(selectedRecords.isEmpty()) {
+                ArrayList<String> resultList = new ArrayList<>();
+                resultList.add("發生錯誤，請稍後嘗試");
+                ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), R.layout.result_item, resultList);
+                if(getActivity() == null) return;
+                getActivity().runOnUiThread(()->{
+                    mainListView.setAdapter(adapter1);
+                    progressBar.setVisibility(View.GONE);
+                    mainListView.setOnItemClickListener(null);
+                });
+                return;
+            }
 
             // set list view
             ArrayList<String> resultList = new ArrayList<>();
@@ -58,7 +69,6 @@ public class ResultFragment extends Fragment{
             ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), R.layout.result_item, resultList);
 
             if(getActivity() == null) return;
-
             getActivity().runOnUiThread(()->{
 
                 mainListView.setAdapter(adapter1);

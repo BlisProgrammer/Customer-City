@@ -16,9 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.blis.customercity.data.Company;
 import com.blis.customercity.data.DataAPI;
+import com.blis.customercity.data.OnlineRecord;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
@@ -104,6 +106,30 @@ public class FindFragment extends Fragment {
 
             new Thread(()->{
                 companies = DataAPI.subCatIDToCompanies(sub_categoryID);
+                if(companies == null){
+                    companies = new ArrayList<>();
+                    companies.add(Company.getErrorCompany());
+                    resultView.setOnItemClickListener((parent, view, position, id) -> {
+                        Toast.makeText(requireContext(), "發生錯誤，請稍後嘗試", Toast.LENGTH_SHORT).show();
+                    });
+                }else{
+                    // List view on click
+                    resultView.setOnItemClickListener((parent, view, position, id) -> {
+                        Bundle args = new Bundle();
+                        ArrayList<String> companyIDs = new ArrayList<>();
+                        companyIDs.add(companies.get(position).getId());
+                        args.putStringArrayList("company_ids", companyIDs);
+
+                        Fragment resultFragment = new ResultFragment();
+                        resultFragment.setArguments(args);
+
+                        FragmentManager fragmentManager = getParentFragmentManager();
+                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                        fragmentTransaction.add(R.id.flFragment, resultFragment);
+                        fragmentTransaction.addToBackStack(null);
+                        fragmentTransaction.commit();
+                    });
+                }
                 ArrayList<String> companyNames = new ArrayList<>();
                 for(Company company : companies){
                     companyNames.add(company.getCompany_name_cn());
@@ -116,22 +142,6 @@ public class FindFragment extends Fragment {
                     resultView.setAdapter(adapter1);
                 });
             }).start();
-        });
-        // List view on click
-        resultView.setOnItemClickListener((parent, view, position, id) -> {
-            Bundle args = new Bundle();
-            ArrayList<String> companyIDs = new ArrayList<>();
-            companyIDs.add(companies.get(position).getId());
-            args.putStringArrayList("company_ids", companyIDs);
-
-            Fragment resultFragment = new ResultFragment();
-            resultFragment.setArguments(args);
-
-            FragmentManager fragmentManager = getParentFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.flFragment, resultFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
         });
 
         LinearLayout filterSection = scrollView.findViewById(R.id.filter_section);

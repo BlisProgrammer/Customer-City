@@ -114,9 +114,11 @@ public class RecordActivity extends AppCompatActivity {
             saveOnlineButton.setOnClickListener(v -> new Thread(()->{
                 boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
                 runOnUiThread(()->{
-                    if (result){
-                        isSavedOnline = !isSavedOnline;
+                    if (!result){
+                        showToast("發生錯誤，請稍後嘗試");
+                        return;
                     }
+                    isSavedOnline = !isSavedOnline;
                     if(isSavedOnline){
                         saveOnlineButton.setText("取消儲存");
                         showToast("儲存成功");

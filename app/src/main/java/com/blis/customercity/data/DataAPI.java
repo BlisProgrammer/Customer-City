@@ -81,7 +81,7 @@ public class DataAPI {
         } catch (IOException e) {
             System.err.println("Error during request: " + e.getMessage());
         }
-        return new ArrayList<>();
+        return null;
     }
     public static ArrayList<OnlineRecord> companyIDtoRecords(ArrayList<String> companyIDs){
         // https://www.customer.city/api/search/?ids={companyID}
