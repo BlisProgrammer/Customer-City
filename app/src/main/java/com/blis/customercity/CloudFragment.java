@@ -103,7 +103,6 @@ public class CloudFragment extends Fragment {
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        LayoutAnimationController animation = AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_animation_fall_down);
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
         );
@@ -155,8 +154,8 @@ public class CloudFragment extends Fragment {
                         assert getActivity() != null;
                         getActivity().runOnUiThread(() -> {
                             if(!isAdded())return;
-                            recyclerView.setLayoutAnimation(animation);
                             onlineAdapter.notifyDataSetChanged();
+                            recyclerView.scheduleLayoutAnimation();
                             if(onlineAdapter.getItemCount() == 0){
                                 noRecordView.setVisibility(View.VISIBLE);
                             }else {
