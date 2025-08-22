@@ -84,6 +84,7 @@ public class CloudFragment extends Fragment {
     }
 
     public void updateUI(boolean signedIn) {
+        if(loginLayout == null || logoutLayout == null) return;
         if(signedIn){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);

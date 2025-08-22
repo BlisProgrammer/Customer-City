@@ -52,12 +52,12 @@ public class Main extends AppCompatActivity {
         String idToken = loginInfo.getString("idToken", null);
         String email = loginInfo.getString("email", null);
         signinButton = findViewById(R.id.account_button);
-
         if(loggedIn && idToken != null) {
             performLogin(idToken, email);
         }else{
             performLogout();
         }
+
         // on navigate
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             clickedNavigationItemID = menuItem.getItemId();
@@ -69,7 +69,12 @@ public class Main extends AppCompatActivity {
         Fragment findFragment = new FindFragment();
         Fragment userFragment = new UserFragment();
         Fragment cloudFragment = new CloudFragment();
-        setCurrentFragment(findFragment);
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
+        if(currentFragment != null) {
+            setCurrentFragment(currentFragment);
+        }else{
+            setCurrentFragment(findFragment);
+        }
 
         // navigation view
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {

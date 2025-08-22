@@ -189,6 +189,9 @@ public class UserFragment extends Fragment {
         savedToast.show();
     }
     public void updateLoginUI(boolean loggedIn){
+        if(loginLayout == null || logoutLayout == null){
+            return;
+        }
         if(!loggedIn){
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);

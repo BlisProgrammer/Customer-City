@@ -4,6 +4,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -15,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -36,7 +38,7 @@ public class FindFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        LinearLayout scrollView = (LinearLayout) inflater.inflate(R.layout.fragment_find, container, false);
+        NestedScrollView scrollView = (NestedScrollView) inflater.inflate(R.layout.fragment_find, container, false);
 
         LinearLayout subCategoryLayout = scrollView.findViewById(R.id.sub_category_layout);
         LinearLayout resultLayout = scrollView.findViewById(R.id.result_layout);
@@ -66,7 +68,7 @@ public class FindFragment extends Fragment {
         }
         categoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
             if(list.isEmpty())return;
-            resultLayout.setVisibility(View.GONE);
+            resultLayout.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.GONE);
             subCategoryChipGroup.removeAllViews();
             Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
@@ -134,6 +136,7 @@ public class FindFragment extends Fragment {
                 for(Company company : companies){
                     companyNames.add(company.getCompany_name_cn());
                 }
+                if(!isAdded())return;
                 ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                 if(getActivity() == null) return;
                 getActivity().runOnUiThread(() -> {

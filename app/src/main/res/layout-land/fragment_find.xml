@@ -9,12 +9,12 @@
     tools:context=".FindFragment"
     >
     <LinearLayout
+        android:baselineAligned="false"
         android:orientation="vertical"
         android:padding="10dp"
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintVertical_bias="0.0">
+        android:layout_height="wrap_content">
 
         <SearchView
             android:id="@+id/search_view"
@@ -28,16 +28,18 @@
             android:layout_height="0dp"
             android:visibility="gone"
             android:layout_weight="1"
-            android:nestedScrollingEnabled="true"/>
+            android:nestedScrollingEnabled="true" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:id="@+id/filter_section">
+            android:orientation="horizontal"
+            android:id="@+id/filter_section"
+            android:layout_weight="1">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:orientation="vertical">
@@ -56,12 +58,13 @@
                     app:singleSelection="true" />
             </LinearLayout>
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:orientation="vertical"
                 android:id="@+id/sub_category_layout"
-                android:visibility="gone">
+                android:visibility="invisible">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -76,16 +79,18 @@
             </LinearLayout>
             <ProgressBar
                 android:id="@+id/progressBar"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:indeterminate="true"
                 android:visibility="gone"/>
             <LinearLayout
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:orientation="vertical"
-                android:visibility="gone"
+                android:visibility="invisible"
                 android:id="@+id/result_layout">
                 <TextView
                     android:layout_width="match_parent"
@@ -95,7 +100,7 @@
                     android:id="@+id/resultView"
                     android:layout_width="match_parent"
                     android:layout_margin="10dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:divider="@android:color/transparent"
                     android:dividerHeight="10dp"
                     android:nestedScrollingEnabled="true" />
