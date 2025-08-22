@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-
     <ImageView
-        android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="0dp"
+        android:contentDescription="@string/customer_city_background4"
         android:scaleType="fitEnd"
-        app:srcCompat="@drawable/background_four"
-        android:contentDescription="@string/customer_city_background4"/>
+        app:srcCompat="@drawable/background_four"/>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:contextClickable="false"
         android:padding="20dp">
@@ -26,30 +28,42 @@
             android:layout_gravity="center"
             android:textAlignment="center"
             android:layout_margin="20dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:padding="10dp"
-            android:text="請問網站是什麼? \n https://www.customer.city/"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:padding="10dp"
-            android:text="可唔可以喺其他裝置開返我儲存咗嘅記錄？\n只要你登入同一個帳戶，就可以開返所有儲存咗嘅記錄。"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:padding="10dp"
-            android:text="請問有咩分類? \n 私家車相關，金融，科技，地產，零售，消費用品，保健美容，鐘錶珠寶，旅遊，教育，公共服務，娛樂"/>
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:contextClickable="false">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:background="#60FFFFFF">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:padding="10dp"
+                    android:text="請問網站是什麼? \n https://www.customer.city/"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:padding="10dp"
+                    android:text="可唔可以喺其他裝置開返我儲存咗嘅記錄？\n只要你登入同一個帳戶，就可以開返所有儲存咗嘅記錄。"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:padding="10dp"
+                    android:text="請問有咩分類? \n 私家車相關，金融，科技，地產，零售，消費用品，保健美容，鐘錶珠寶，旅遊，教育，公共服務，娛樂"/>
+                <Button
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/back_button"
+                    android:layout_margin="10dp"
+                    android:text="@string/開始搜尋"/>
+            </LinearLayout>
+        </ScrollView>
     </LinearLayout>
-    <Button
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/back_button"
-        android:text="@string/開始搜尋"/>
-</merge>
+</RelativeLayout>

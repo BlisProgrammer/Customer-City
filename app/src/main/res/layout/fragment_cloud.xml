@@ -34,7 +34,8 @@
             android:textSize="30sp"
             android:text="@string/登入儲存你的常用熱線聯絡"/>
         <Button
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_gravity="center"
             android:layout_height="wrap_content"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:id="@+id/switch_to_user_button"
