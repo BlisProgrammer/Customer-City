@@ -161,23 +161,21 @@ public class CloudFragment extends Fragment {
             swipeRefreshLayout.setOnRefreshListener(() -> updateOfflineList(linearLayout)
         );
 
-        if(offlineAdapter == null){
-            offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
-            addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-            addedRecyclerView.setAdapter(offlineAdapter);
-            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-                @Override
-                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                    return false;
-                }
+        offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+        addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        addedRecyclerView.setAdapter(offlineAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
 
-                @Override
-                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    removeLocalItem(viewHolder, linearLayout);
-                }
-            });
-            itemTouchHelper.attachToRecyclerView(addedRecyclerView);
-        }
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                removeLocalItem(viewHolder, linearLayout);
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(addedRecyclerView);
 
         String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
         if(!addedRecords.isEmpty()){
@@ -263,9 +261,7 @@ public class CloudFragment extends Fragment {
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
-        swipeRefreshLayout.setRefreshing(true);
         if(loggedIn && idToken != null){
-
             // get records from online
             Request request = new Request.Builder()
                     .url("https://www.customer.city/api/getHistory/")
@@ -299,7 +295,6 @@ public class CloudFragment extends Fragment {
                             if(!isAdded()) return;
                             onlineRecordList.add(thisOnlineRecord);
                         }
-
                         assert getActivity() != null;
                         getActivity().runOnUiThread(() -> {
                             if(!isAdded())return;
