@@ -152,8 +152,9 @@ public class CloudFragment extends Fragment {
     }
     private TwoLineAdapter offlineAdapter;
     private void updateOfflineList(CoordinatorLayout linearLayout){
-        noRecordView = linearLayout.findViewById(R.id.no_record_text);
-        noRecordView.setVisibility(View.GONE);
+        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
+        noRecordViewOnline.setVisibility(View.GONE);
+        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
         addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
@@ -183,9 +184,9 @@ public class CloudFragment extends Fragment {
             Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
             offlineRecordList = gson.fromJson(addedRecords, listType);
             if(offlineRecordList.isEmpty()){
-                noRecordView.setVisibility(View.VISIBLE);
+                noRecordViewLocal.setVisibility(View.VISIBLE);
             }else{
-                noRecordView.setVisibility(View.GONE);
+                noRecordViewLocal.setVisibility(View.GONE);
             }
             offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
             addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -242,10 +243,11 @@ public class CloudFragment extends Fragment {
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
     private final ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
     private ArrayList<OnlineRecord> offlineRecordList = new ArrayList<>();
-    private TextView noRecordView;
+    private TextView noRecordViewOnline, noRecordViewLocal;
     private void updateOnlineList(CoordinatorLayout linearLayout){
-        noRecordView = linearLayout.findViewById(R.id.no_record_text);
-        noRecordView.setVisibility(View.GONE);
+        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
+        noRecordViewLocal.setVisibility(View.GONE);
+        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
@@ -301,9 +303,9 @@ public class CloudFragment extends Fragment {
                             onlineAdapter.notifyDataSetChanged();
                             recyclerView.scheduleLayoutAnimation();
                             if(onlineAdapter.getItemCount() == 0){
-                                noRecordView.setVisibility(View.VISIBLE);
+                                noRecordViewOnline.setVisibility(View.VISIBLE);
                             }else {
-                                noRecordView.setVisibility(View.GONE);
+                                noRecordViewOnline.setVisibility(View.GONE);
                             }
                             ItemTouchHelper itemTouchHelper = getItemTouchHelper();
                             itemTouchHelper.attachToRecyclerView(recyclerView);
@@ -407,9 +409,9 @@ public class CloudFragment extends Fragment {
                                             onlineRecordList.remove(position);
                                             onlineAdapter.notifyItemRemoved(position);
                                             if(onlineAdapter.getItemCount() == 0){
-                                                noRecordView.setVisibility(View.VISIBLE);
+                                                noRecordViewOnline.setVisibility(View.VISIBLE);
                                             }else {
-                                                noRecordView.setVisibility(View.GONE);
+                                                noRecordViewOnline.setVisibility(View.GONE);
                                             }
                                             dialog.dismiss();
                                         });

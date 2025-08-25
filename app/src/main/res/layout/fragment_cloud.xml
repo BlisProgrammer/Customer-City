@@ -126,6 +126,15 @@
                         android:textAlignment="center"
                         android:padding="10dp"
                         android:visibility="gone"/>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="30sp"
+                        android:text="@string/暫無紀錄"
+                        android:id="@+id/no_record_text_local"
+                        android:textAlignment="center"
+                        android:padding="10dp"
+                        android:visibility="gone"/>
     <!--            <ListView-->
     <!--                style="android.R.layout.simple_list_item_2"-->
     <!--                android:id="@+id/online_saved_view_list"-->
