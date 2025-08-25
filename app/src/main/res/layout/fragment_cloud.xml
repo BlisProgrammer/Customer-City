@@ -65,7 +65,7 @@
             android:orientation="vertical"
             android:visibility="visible">
             <RadioGroup
-                android:checkedButton="@+id/offer"
+                android:checkedButton="@+id/view_online_button"
                 android:id="@+id/toggle_radio_group"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"

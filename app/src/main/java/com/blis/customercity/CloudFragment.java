@@ -75,8 +75,8 @@ public class CloudFragment extends Fragment {
 
         updateUI(loggedIn);
         if(loggedIn && idToken != null){
-            updateOnlineList(linearLayout);
-            updateOfflineList(linearLayout);
+//            updateOnlineList(linearLayout);
+//            updateOfflineList(linearLayout);
         }
         recordActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -116,9 +116,23 @@ public class CloudFragment extends Fragment {
             addButton.setVisibility(View.VISIBLE);
             updateOfflineList(linearLayout);
         });
-        RadioGroup radiogroup= linearLayout.findViewById(R.id.toggle_radio_group);
-        radiogroup.check(R.id.view_online_button);
-
+        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            addButton.setVisibility(View.VISIBLE);
+            updateOfflineList(linearLayout);
+        }
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            addButton.setVisibility(View.GONE);
+            updateOnlineList(linearLayout);
+        }
 
         return linearLayout;
     }
@@ -139,7 +153,7 @@ public class CloudFragment extends Fragment {
     private TwoLineAdapter offlineAdapter;
     private void updateOfflineList(CoordinatorLayout linearLayout){
         noRecordView = linearLayout.findViewById(R.id.no_record_text);
-        noRecordView.setVisibility(View.VISIBLE);
+        noRecordView.setVisibility(View.GONE);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
         addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
@@ -167,10 +181,14 @@ public class CloudFragment extends Fragment {
 
         String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
         if(!addedRecords.isEmpty()){
-            noRecordView.setVisibility(View.GONE);
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
             offlineRecordList = gson.fromJson(addedRecords, listType);
+            if(offlineRecordList.isEmpty()){
+                noRecordView.setVisibility(View.VISIBLE);
+            }else{
+                noRecordView.setVisibility(View.GONE);
+            }
             offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
             addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
             addedRecyclerView.setAdapter(offlineAdapter);
@@ -229,6 +247,7 @@ public class CloudFragment extends Fragment {
     private TextView noRecordView;
     private void updateOnlineList(CoordinatorLayout linearLayout){
         noRecordView = linearLayout.findViewById(R.id.no_record_text);
+        noRecordView.setVisibility(View.GONE);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
