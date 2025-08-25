@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class UserFragment extends Fragment {
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);
 
         loginButton.setOnClickListener(v -> {
+            closeKeyboard();
             String emailInputString = String.valueOf(emailInput.getText());
             String passwordInputString = String.valueOf(passwordInput.getText());
             if(emailInputString.isEmpty()){
@@ -72,6 +74,7 @@ public class UserFragment extends Fragment {
         // Handle Logout
         Button logoutButton = linearLayout.findViewById(R.id.logout_button);
         logoutButton.setOnClickListener(v -> {
+            closeKeyboard();
             Main main = (Main) getActivity();
             if(isAdded() && main != null){
                 main.performLogout();
@@ -83,11 +86,13 @@ public class UserFragment extends Fragment {
         LinearLayout loginRegisterLayout = linearLayout.findViewById(R.id.login_register_layout);
         Button switchToRegisterButton = linearLayout.findViewById(R.id.switch_to_register_button);
         switchToRegisterButton.setOnClickListener(v -> {
+            closeKeyboard();
             loginLoginLayout.setVisibility(View.GONE);
             loginRegisterLayout.setVisibility(View.VISIBLE);
         });
         Button switchToLoginButton = linearLayout.findViewById(R.id.switch_to_login_button);
         switchToLoginButton.setOnClickListener(v -> {
+            closeKeyboard();
             loginLoginLayout.setVisibility(View.VISIBLE);
             loginRegisterLayout.setVisibility(View.GONE);
         });
@@ -99,6 +104,7 @@ public class UserFragment extends Fragment {
         TextInputEditText registerPasswordConfirm = linearLayout.findViewById(R.id.register_password_confirm_text);
         TextView errorRegisterTextView = linearLayout.findViewById(R.id.register_error_text_view);
         registerButton.setOnClickListener(v -> {
+            closeKeyboard();
             String emailInputString = String.valueOf(registerEmail.getText());
             String passwordInputString = String.valueOf(registerPassword.getText());
             String passwordConfirmInputString = String.valueOf(registerPasswordConfirm.getText());
@@ -145,6 +151,7 @@ public class UserFragment extends Fragment {
         });
         Button loginResetPasswordButton = linearLayout.findViewById(R.id.login_reset_password_button);
         loginResetPasswordButton.setOnClickListener(v -> {
+            closeKeyboard();
             String emailInputString = String.valueOf(emailInput.getText());
             if(emailInputString.isEmpty()){
                 errorTextView.setText("請輸入正確電郵地址");
@@ -165,6 +172,7 @@ public class UserFragment extends Fragment {
 
         Button resetPasswordButton = linearLayout.findViewById(R.id.reset_password_button);
         resetPasswordButton.setOnClickListener(v -> {
+            closeKeyboard();
             String signedEmail = loginInfo.getString("email", null);
             new Thread(()->{
                 boolean successful = DataAPI.resetPassword(signedEmail);
@@ -187,6 +195,14 @@ public class UserFragment extends Fragment {
         }
         savedToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
         savedToast.show();
+    }
+    private void closeKeyboard(){
+        // Check if no view has focus:
+        View view = getActivity().getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)requireContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
     public void updateLoginUI(boolean loggedIn){
         if(loginLayout == null || logoutLayout == null){
