@@ -2,12 +2,12 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_checked="true">
         <shape android:shape="rectangle" android:tint="@color/blue_100">
-            <corners android:radius="10dp" />
+            <corners android:radius="5dp" />
         </shape>
     </item>
     <item android:state_pressed="true">
         <shape android:shape="rectangle" android:tint="@color/blue_vari">
-            <corners android:radius="10dp" />
+            <corners android:radius="5dp" />
         </shape>
     </item>
     <item android:drawable="@color/transparent" />
