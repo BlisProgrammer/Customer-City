@@ -37,7 +37,7 @@ public class Main extends AppCompatActivity {
 
         setContentView(R.layout.main);
 
-//        FileHandler.removeFile(this, "saved_list"); // for debugging purposes
+//        FileHandler.removeFile(this, "addedRecords"); // for debugging purposes
 //        SharedPreferences preferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
 //        editor.clear();

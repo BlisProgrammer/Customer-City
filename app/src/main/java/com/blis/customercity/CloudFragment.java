@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -21,11 +22,15 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blis.customercity.data.OnlineRecord;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -44,6 +49,8 @@ import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
 
+import org.checkerframework.checker.units.qual.A;
+
 
 public class CloudFragment extends Fragment {
     private TwoLineAdapter onlineAdapter;
@@ -56,7 +63,7 @@ public class CloudFragment extends Fragment {
     private final OkHttpClient client = new OkHttpClient();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_cloud, container, false);
+        CoordinatorLayout linearLayout = (CoordinatorLayout) inflater.inflate(R.layout.fragment_cloud, container, false);
         assert getContext() != null;
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
@@ -64,10 +71,12 @@ public class CloudFragment extends Fragment {
 
         loginLayout = linearLayout.findViewById(R.id.login_layout);
         logoutLayout = linearLayout.findViewById(R.id.logout_layout);
+        addButton = linearLayout.findViewById(R.id.add_button);
 
         updateUI(loggedIn);
         if(loggedIn && idToken != null){
             updateOnlineList(linearLayout);
+            updateOfflineList(linearLayout);
         }
         recordActivityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -80,36 +89,153 @@ public class CloudFragment extends Fragment {
             main.goToSignIn();
         });
 
+        addButton.setOnClickListener(v -> {
+            Main main = (Main) getActivity();
+            if(main == null || !isAdded())return;
+            AddFragment addFragment = new AddFragment();
+            main.setCurrentFragment(addFragment);
+        });
+
+        RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
+        viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(!isChecked)return;
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            addButton.setVisibility(View.GONE);
+            updateOnlineList(linearLayout);
+        });
+        RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
+        viewLocalButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(!isChecked)return;
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            addButton.setVisibility(View.VISIBLE);
+            updateOfflineList(linearLayout);
+        });
+        RadioGroup radiogroup= linearLayout.findViewById(R.id.toggle_radio_group);
+        radiogroup.check(R.id.view_online_button);
+
+
         return linearLayout;
     }
+    FloatingActionButton addButton;
 
     public void updateUI(boolean signedIn) {
         if(loginLayout == null || logoutLayout == null) return;
         if(signedIn){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
+            addButton.setVisibility(View.VISIBLE);
         }else{
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
+            addButton.setVisibility(View.GONE);
         }
     }
+    private TwoLineAdapter offlineAdapter;
+    private void updateOfflineList(CoordinatorLayout linearLayout){
+        RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+        addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
+
+        SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
+            swipeRefreshLayout.setOnRefreshListener(() -> updateOfflineList(linearLayout)
+        );
+
+        if(offlineAdapter == null){
+            offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+            addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            addedRecyclerView.setAdapter(offlineAdapter);
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                @Override
+                public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                    removeLocalItem(viewHolder, linearLayout);
+                }
+            });
+            itemTouchHelper.attachToRecyclerView(addedRecyclerView);
+        }
+
+        String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
+        if(!addedRecords.isEmpty()){
+            Gson gson = new Gson();
+            Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
+            offlineRecordList = gson.fromJson(addedRecords, listType);
+            offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+            addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+            addedRecyclerView.setAdapter(offlineAdapter);
+            offlineAdapter.notifyDataSetChanged();
+            addedRecyclerView.scheduleLayoutAnimation();
+            swipeRefreshLayout.setRefreshing(false);
+
+            offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(int position) {
+                    if (offlineRecordList.isEmpty()) return;
+                    Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
+                    recordIntent.putExtra("selected_record", offlineRecordList.get(position));
+                    recordActivityResultLauncher.launch(recordIntent);
+                }
+
+                @Override
+                public void onDeleteClick(int position) {
+                    RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
+                    if (viewHolder != null) {
+                        removeLocalItem(viewHolder, linearLayout);
+                    }
+                }
+            });
+        }
+    }
+    private void removeLocalItem(RecyclerView.ViewHolder viewHolder, CoordinatorLayout linearLayout1){
+        //Remove swiped item from list and notify the RecyclerView
+        int position = viewHolder.getAdapterPosition();
+        ConfirmationDialog.showConfirmationDialog(
+                requireContext(),
+                "確認",
+                "移除記錄?",
+                (dialog, which) -> {
+                    offlineRecordList.remove(position);
+                    Gson gson = new Gson();
+                    String jsonString = gson.toJson(offlineRecordList);
+                    FileHandler.saveToFile(requireContext(), "addedRecords", jsonString);
+
+                    updateOfflineList(linearLayout1);
+                    savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
+                    savedToast.show();
+                    offlineAdapter.notifyItemRemoved(position);
+                },
+                (dialog, which) -> {
+                    offlineAdapter.notifyItemChanged(position);
+                    dialog.dismiss();
+                });
+    }
+
     private Toast savedToast;
     private ActivityResultLauncher<Intent> recordActivityResultLauncher;
     private final ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
+    private ArrayList<OnlineRecord> offlineRecordList = new ArrayList<>();
     private TextView noRecordView;
-
-    private void updateOnlineList(LinearLayout linearLayout){
+    private void updateOnlineList(CoordinatorLayout linearLayout){
         noRecordView = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
-        swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
+            swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
         );
-        if(onlineAdapter == null){
-            onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
-        }
+
+        onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(onlineAdapter);
+
         if(getContext() == null) return;
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);

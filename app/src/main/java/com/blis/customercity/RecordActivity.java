@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.OnlineRecord;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,14 +53,23 @@ public class RecordActivity extends AppCompatActivity {
         TextView recordViewCategory = findViewById(R.id.record_view_category);
         TextView recordViewDetails = findViewById(R.id.record_view_details);
         new Thread(()->{
-            selectedRecord.setCompany_name_cn(DataConverter.companyIDToCompany(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.companies)));
-            String subCategory = DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories));
-            String category = DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories));
+            String subCategory, category;
+            if(selectedRecord.getCompany_id() != null){
+                selectedRecord.setCompany_name_cn(DataConverter.companyIDToCompany(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.companies)));
+                subCategory = DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories));
+                category = DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories));
+            } else {
+                category = null;
+                subCategory = null;
+            }
 
             ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(this);
 
             runOnUiThread(()->{
                 recordViewCompany.setText(selectedRecord.getCompany_name_cn());
+                if(subCategory == null || category == null){
+                    recordViewCategory.setVisibility(View.GONE);
+                }
                 recordViewCategory.setText(String.format(
                         "%s/%s",
                         subCategory,
@@ -98,6 +109,10 @@ public class RecordActivity extends AppCompatActivity {
         SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         Button saveOnlineButton = findViewById(R.id.save_button);
+        if(selectedRecord.getCompany_id() == null){
+            saveOnlineButton.setVisibility(View.GONE);
+            return;
+        }
         if(!loggedIn) {
             saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
         }else{
@@ -111,23 +126,29 @@ public class RecordActivity extends AppCompatActivity {
                     }
                 });
             }).start();
-            saveOnlineButton.setOnClickListener(v -> new Thread(()->{
-                boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
-                runOnUiThread(()->{
-                    if (!result){
-                        showToast("發生錯誤，請稍後嘗試");
-                        return;
-                    }
-                    isSavedOnline = !isSavedOnline;
-                    if(isSavedOnline){
-                        saveOnlineButton.setText("取消儲存");
-                        showToast("儲存成功");
-                    }else{
-                        saveOnlineButton.setText("儲存");
-                        showToast("成功移除記錄");
-                    }
-                });
-            }).start());
+            saveOnlineButton.setOnClickListener(v -> {
+                if(selectedRecord.getCompany_id() == null){
+                    return;
+                }
+                new Thread(()->{
+                    boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
+                    runOnUiThread(()->{
+                        if (!result){
+                            showToast("發生錯誤，請稍後嘗試");
+                            return;
+                        }
+                        isSavedOnline = !isSavedOnline;
+                        if(isSavedOnline){
+                            saveOnlineButton.setText("取消儲存");
+                            showToast("儲存成功");
+                        }else{
+                            saveOnlineButton.setText("儲存");
+                            showToast("成功移除記錄");
+                        }
+                    });
+                }).start();
+
+            });
         }
     }
 }
