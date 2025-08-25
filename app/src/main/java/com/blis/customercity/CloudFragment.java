@@ -138,6 +138,8 @@ public class CloudFragment extends Fragment {
     }
     private TwoLineAdapter offlineAdapter;
     private void updateOfflineList(CoordinatorLayout linearLayout){
+        noRecordView = linearLayout.findViewById(R.id.no_record_text);
+        noRecordView.setVisibility(View.VISIBLE);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
         addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
@@ -165,6 +167,7 @@ public class CloudFragment extends Fragment {
 
         String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
         if(!addedRecords.isEmpty()){
+            noRecordView.setVisibility(View.GONE);
             Gson gson = new Gson();
             Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
             offlineRecordList = gson.fromJson(addedRecords, listType);
@@ -193,6 +196,7 @@ public class CloudFragment extends Fragment {
                 }
             });
         }
+        swipeRefreshLayout.setRefreshing(false);
     }
     private void removeLocalItem(RecyclerView.ViewHolder viewHolder, CoordinatorLayout linearLayout1){
         //Remove swiped item from list and notify the RecyclerView
@@ -307,9 +311,8 @@ public class CloudFragment extends Fragment {
                                     }
                                 }
                             });
-
-//                            onlineListView.setAdapter(onlineAdapter);
                             recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                            recyclerView.setAdapter(onlineAdapter);
                             swipeRefreshLayout.setRefreshing(false);
                         });
                     } else {
