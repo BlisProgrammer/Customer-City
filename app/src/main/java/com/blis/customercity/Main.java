@@ -173,6 +173,9 @@ public class Main extends AppCompatActivity {
         }else if(currentFragment instanceof CloudFragment){
             CloudFragment cloudFragment = (CloudFragment) currentFragment;
             cloudFragment.updateUI(true);
+        }else if(currentFragment instanceof RecordFragment){
+            RecordFragment recordFragment = (RecordFragment) currentFragment;
+            recordFragment.updateUI(true);
         }
     }
     public void performLogout(){
@@ -197,6 +200,9 @@ public class Main extends AppCompatActivity {
         }else if(currentFragment instanceof CloudFragment){
             CloudFragment cloudFragment = (CloudFragment) currentFragment;
             cloudFragment.updateUI(false);
+        }else if(currentFragment instanceof RecordFragment || currentFragment instanceof FindFragment){
+            RecordFragment recordFragment = (RecordFragment) currentFragment;
+            recordFragment.updateUI(false);
         }
         if(wasLoggedIn){
             Toast toast = new Toast(this);

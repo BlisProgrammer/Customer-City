@@ -75,9 +75,18 @@ public class ResultFragment extends Fragment{
                 progressBar.setVisibility(View.GONE);
 
                 mainListView.setOnItemClickListener((parent1, view1, position1, id1) -> {
-                    Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                    recordIntent.putExtra("selected_record", selectedRecords.get(position1));
-                    startActivity(recordIntent);
+
+                    Bundle args = new Bundle();
+                    args.putSerializable("selected_record", selectedRecords.get(position1));
+
+                    Fragment resultFragment = new RecordFragment();
+                    resultFragment.setArguments(args);
+
+                    FragmentManager fragmentManager = getParentFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.add(R.id.flFragment, resultFragment, "main_fragment");
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
                 });
             });
         }).start();

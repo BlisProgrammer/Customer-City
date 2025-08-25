@@ -10,6 +10,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,10 +21,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -48,8 +47,6 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 import com.google.gson.reflect.TypeToken;
-
-import org.checkerframework.checker.units.qual.A;
 
 
 public class CloudFragment extends Fragment {
@@ -78,9 +75,6 @@ public class CloudFragment extends Fragment {
 //            updateOnlineList(linearLayout);
 //            updateOfflineList(linearLayout);
         }
-        recordActivityResultLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> updateOnlineList(linearLayout));
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
@@ -199,9 +193,24 @@ public class CloudFragment extends Fragment {
                 @Override
                 public void onItemClick(int position) {
                     if (offlineRecordList.isEmpty()) return;
-                    Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                    recordIntent.putExtra("selected_record", offlineRecordList.get(position));
-                    recordActivityResultLauncher.launch(recordIntent);
+
+                    Bundle args = new Bundle();
+                    args.putSerializable("selected_record", offlineRecordList.get(position));
+
+                    Fragment resultFragment = new RecordFragment();
+
+                    FragmentManager fragmentManager = getParentFragmentManager();
+                    fragmentManager.addOnBackStackChangedListener(() -> {
+                        Fragment fragment = fragmentManager.findFragmentByTag("main_fragment");
+                        if(fragment instanceof CloudFragment) {
+                            CloudFragment currFrag = (CloudFragment) fragment;
+                            currFrag.updateOnlineList(linearLayout);
+                        }
+                    });
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.replace(R.id.flFragment, resultFragment, "main_fragment");
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
                 }
 
                 @Override
@@ -240,7 +249,6 @@ public class CloudFragment extends Fragment {
     }
 
     private Toast savedToast;
-    private ActivityResultLauncher<Intent> recordActivityResultLauncher;
     private final ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
     private ArrayList<OnlineRecord> offlineRecordList = new ArrayList<>();
     private TextView noRecordViewOnline, noRecordViewLocal;
@@ -314,9 +322,28 @@ public class CloudFragment extends Fragment {
                                 @Override
                                 public void onItemClick(int position) {
                                     if (onlineRecordList.isEmpty()) return;
-                                    Intent recordIntent = new Intent(getActivity(), RecordActivity.class);
-                                    recordIntent.putExtra("selected_record", onlineRecordList.get(position));
-                                    recordActivityResultLauncher.launch(recordIntent);
+
+                                    Bundle args = new Bundle();
+                                    args.putSerializable("selected_record", onlineRecordList.get(position));
+
+                                    Fragment resultFragment = new RecordFragment();
+                                    resultFragment.setArguments(args);
+
+                                    FragmentManager fragmentManager = getParentFragmentManager();
+                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                                    fragmentTransaction.add(R.id.flFragment, resultFragment, "main_fragment");
+                                    fragmentTransaction.addToBackStack(null);
+                                    fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
+                                        @Override
+                                        public void onBackStackChanged() {
+                                            Fragment fragment = fragmentManager.findFragmentByTag("main_fragment");
+                                            if(fragment instanceof CloudFragment) {
+                                                updateOnlineList(linearLayout);
+                                                fragmentManager.removeOnBackStackChangedListener(this);
+                                            }
+                                        }
+                                    });
+                                    fragmentTransaction.commit();
                                 }
 
                                 @Override

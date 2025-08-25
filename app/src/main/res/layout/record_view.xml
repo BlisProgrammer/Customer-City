@@ -84,7 +84,6 @@
             android:id="@+id/back_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
             android:text="@string/返回" />
 
     </LinearLayout>

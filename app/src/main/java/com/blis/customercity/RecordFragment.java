@@ -7,51 +7,76 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.OnlineRecord;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class RecordActivity extends AppCompatActivity {
+public class RecordFragment extends Fragment {
     private Toast savedToast;
     private boolean isSavedOnline = false;
-
     private void showToast(String text){
         if(savedToast != null){
             savedToast.cancel();
         }
-        savedToast = Toast.makeText(RecordActivity.this, text, Toast.LENGTH_SHORT);
+        savedToast = Toast.makeText(requireContext(), text, Toast.LENGTH_SHORT);
         savedToast.show();
     }
-    @Override
-    protected void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.record_view);
 
-        Intent intent = getIntent();
+    public void updateUI(boolean loggedIn){
+        if(!loggedIn){
+            if(saveOnlineButton != null) {
+                saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
+                saveOnlineButton.setText("儲存");
+            }
+        }
+    }
+    private Button saveOnlineButton;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ConstraintLayout constraintLayout = (ConstraintLayout) inflater.inflate(R.layout.record_view, container, false);
+        Bundle bundle = getArguments();
         OnlineRecord selectedRecord;
+        if(bundle == null) return constraintLayout;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            selectedRecord = intent.getSerializableExtra("selected_record", OnlineRecord.class);
-        } else {
-            selectedRecord = (OnlineRecord) intent.getSerializableExtra("selected_record");
+            selectedRecord = bundle.getSerializable("selected_record", OnlineRecord.class);
+        }else{
+            selectedRecord = (OnlineRecord) bundle.getSerializable("selected_record");
         }
-        if(selectedRecord == null){
-            return;
-        }
-        LinearLayout recordView = findViewById(R.id.record_view);
-        TextView recordViewCompany = findViewById(R.id.record_view_company);
-        TextView recordViewCategory = findViewById(R.id.record_view_category);
-        TextView recordViewDetails = findViewById(R.id.record_view_details);
+        if(selectedRecord == null)return constraintLayout;
+
+//        Intent intent = getActivity().getIntent();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            selectedRecord = intent.getSerializableExtra("selected_record", OnlineRecord.class);
+//        } else {
+//            selectedRecord = (OnlineRecord) intent.getSerializableExtra("selected_record");
+//        }
+//        if(selectedRecord == null){
+//            return constraintLayout;
+//        }
+        LinearLayout recordView = constraintLayout.findViewById(R.id.record_view);
+        TextView recordViewCompany = constraintLayout.findViewById(R.id.record_view_company);
+        TextView recordViewCategory = constraintLayout.findViewById(R.id.record_view_category);
+        TextView recordViewDetails = constraintLayout.findViewById(R.id.record_view_details);
         new Thread(()->{
             String subCategory, category;
             if(selectedRecord.getCompany_id() != null){
@@ -63,9 +88,9 @@ public class RecordActivity extends AppCompatActivity {
                 subCategory = null;
             }
 
-            ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(this);
+            ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(requireContext());
 
-            runOnUiThread(()->{
+            getActivity().runOnUiThread(()->{
                 recordViewCompany.setText(selectedRecord.getCompany_name_cn());
                 if(subCategory == null || category == null){
                     recordViewCategory.setVisibility(View.GONE);
@@ -88,15 +113,17 @@ public class RecordActivity extends AppCompatActivity {
         }).start();
 
         // back button
-        Button backButton = findViewById(R.id.back_button);
+        Button backButton = constraintLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v->{
-            Intent resultIntent = new Intent();
-            setResult(Activity.RESULT_OK, resultIntent);
-            finish();
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//            fragmentTransaction.remove(this);
+            fragmentManager.popBackStack();
+//            fragmentTransaction.commit();
         });
 
         // share button
-        Button shareButton = findViewById(R.id.share_button);
+        Button shareButton = constraintLayout.findViewById(R.id.share_button);
         shareButton.setOnClickListener(v->{
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
@@ -106,20 +133,21 @@ public class RecordActivity extends AppCompatActivity {
         });
 
         // Save online button
-        SharedPreferences loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        SharedPreferences loginInfo = requireActivity().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
-        Button saveOnlineButton = findViewById(R.id.save_button);
+        saveOnlineButton = constraintLayout.findViewById(R.id.save_button);
         if(selectedRecord.getCompany_id() == null){
             saveOnlineButton.setVisibility(View.GONE);
-            return;
+            return constraintLayout;
         }
         if(!loggedIn) {
             saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
+            saveOnlineButton.setText("儲存");
         }else{
             String idToken = loginInfo.getString("idToken", null);
             new Thread(()->{
                 HashMap<String, ArrayList<OnlineRecord>> savedRecords = DataAPI.getSavedRecords(idToken);
-                runOnUiThread(()->{
+                requireActivity().runOnUiThread(()->{
                     if(savedRecords.containsKey(selectedRecord.getId())){
                         saveOnlineButton.setText("取消儲存");
                         isSavedOnline = true;
@@ -132,7 +160,7 @@ public class RecordActivity extends AppCompatActivity {
                 }
                 new Thread(()->{
                     boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
-                    runOnUiThread(()->{
+                    requireActivity().runOnUiThread(()->{
                         if (!result){
                             showToast("發生錯誤，請稍後嘗試");
                             return;
@@ -150,5 +178,6 @@ public class RecordActivity extends AppCompatActivity {
 
             });
         }
+        return constraintLayout;
     }
 }
