@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.OnlineRecord;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class ResultFragment extends Fragment{
@@ -32,9 +33,9 @@ public class ResultFragment extends Fragment{
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.fragment_result, container, false);
         Bundle bundle = getArguments();
         if(bundle == null) return linearLayout;
-        ArrayList<String> companyIDs = bundle.getStringArrayList("company_ids");
-        if(companyIDs == null)return linearLayout;
-        if(companyIDs.isEmpty())return linearLayout;
+        String companyName = bundle.getString("company_name");
+        if(companyName == null)return linearLayout;
+        if(companyName.isEmpty())return linearLayout;
 
         TextView companyNameView = linearLayout.findViewById(R.id.company_name_view);
         ListView mainListView = linearLayout.findViewById(R.id.result_view);
@@ -42,12 +43,14 @@ public class ResultFragment extends Fragment{
         progressBar.setVisibility(View.VISIBLE);
 
         // get company name
+        companyNameView.setText(companyName);
+
         new Thread(()->{
-            String companyName = DataConverter.companyIDToCompany(companyIDs.get(0), getResources().openRawResource(R.raw.companies));
-            getActivity().runOnUiThread(()-> companyNameView.setText(companyName));
-        }).start();
-        new Thread(()->{
-            ArrayList<OnlineRecord> selectedRecords = DataAPI.companyIDtoRecords(companyIDs);
+            ArrayList<OnlineRecord> selectedOnlineRecords = DataAPI.companyNameToRecords(companyName);
+            ArrayList<OnlineRecord> selectedLocalRecords = FileHandler.companyNameToRecords(requireContext(), companyName);
+            ArrayList<OnlineRecord> selectedRecords = new ArrayList<>();
+            selectedRecords.addAll(selectedLocalRecords);
+            selectedRecords.addAll(selectedOnlineRecords);
             if(selectedRecords.isEmpty()) {
                 ArrayList<String> resultList = new ArrayList<>();
                 resultList.add("發生錯誤，請稍後嘗試");

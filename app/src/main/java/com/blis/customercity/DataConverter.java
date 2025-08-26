@@ -101,7 +101,7 @@ public class DataConverter {
             throw new RuntimeException(e);
         }
     }
-    public static ArrayList<String> getAllCompanies(InputStream inputStream){
+    public static ArrayList<String> getAllOnlineCompanies(InputStream inputStream){
         return searchCompanies("", inputStream);
     }
     public static String companyIDToCompany(String companyID, InputStream inputStream) {

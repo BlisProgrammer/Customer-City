@@ -89,21 +89,14 @@ public class DataAPI {
         }
         return null;
     }
-    public static ArrayList<OnlineRecord> companyIDtoRecords(ArrayList<String> companyIDs){
-        // https://www.customer.city/api/search/?ids={companyID}
-        ArrayList<String> ids = new ArrayList<>();
-        for(String companyId : companyIDs){
-            String[] id = companyId.split("-");
-            ids.add(id[2]);
-        }
-        String connectedId = String.join(",", ids);
-
-        if(records.containsKey(connectedId)){
-            return records.get(connectedId);
+    public static ArrayList<OnlineRecord> companyNameToRecords(String companyName){
+        // https://www.customer.city/search/?q=<CompanyName>
+        if(records.containsKey(companyName)){
+            return records.get(companyName);
         }
 
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/search").newBuilder();
-        urlBuilder.addQueryParameter("ids", connectedId);
+        urlBuilder.addQueryParameter("q", companyName);
         String finalUrl = urlBuilder.build().toString();
 
         Request request = new Request.Builder()
@@ -115,7 +108,7 @@ public class DataAPI {
                 String responseBody = response.body().string();
                 Gson gson = new Gson();
                 SearchResult searchResult = gson.fromJson(responseBody, SearchResult.class);
-                records.put(connectedId, searchResult.data.records);
+                records.put(companyName, searchResult.data.records);
                 return searchResult.data.records;
             } else {
                 System.err.println("Request failed with code: " + response.code());

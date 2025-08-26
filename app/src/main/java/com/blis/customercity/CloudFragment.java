@@ -32,6 +32,7 @@ import com.blis.customercity.data.OnlineRecord;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,50 +165,45 @@ public class CloudFragment extends Fragment {
         });
         itemTouchHelper.attachToRecyclerView(addedRecyclerView);
 
-        String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
-        if(!addedRecords.isEmpty()){
-            Gson gson = new Gson();
-            Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
-            offlineRecordList = gson.fromJson(addedRecords, listType);
-            if(offlineRecordList.isEmpty()){
-                noRecordViewLocal.setVisibility(View.VISIBLE);
-            }else{
-                noRecordViewLocal.setVisibility(View.GONE);
-            }
-            offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
-            addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-            addedRecyclerView.setAdapter(offlineAdapter);
-            offlineAdapter.notifyDataSetChanged();
-            addedRecyclerView.scheduleLayoutAnimation();
-            swipeRefreshLayout.setRefreshing(false);
-
-            offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(int position) {
-                    if (offlineRecordList.isEmpty()) return;
-
-                    Bundle args = new Bundle();
-                    args.putSerializable("selected_record", offlineRecordList.get(position));
-
-                    Fragment resultFragment = new RecordFragment();
-                    resultFragment.setArguments(args);
-
-                    FragmentManager fragmentManager = getParentFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flFragment, resultFragment, "main_fragment");
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
-                }
-
-                @Override
-                public void onDeleteClick(int position) {
-                    RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
-                    if (viewHolder != null) {
-                        removeLocalItem(viewHolder, linearLayout);
-                    }
-                }
-            });
+        ArrayList<OnlineRecord> offlineRecordList = FileHandler.getSavedRecords(requireContext());
+        if(offlineRecordList.isEmpty()){
+            noRecordViewLocal.setVisibility(View.VISIBLE);
+        }else{
+            noRecordViewLocal.setVisibility(View.GONE);
         }
+        offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+        addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+        addedRecyclerView.setAdapter(offlineAdapter);
+        offlineAdapter.notifyDataSetChanged();
+        addedRecyclerView.scheduleLayoutAnimation();
+        swipeRefreshLayout.setRefreshing(false);
+
+        offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                if (offlineRecordList.isEmpty()) return;
+
+                Bundle args = new Bundle();
+                args.putSerializable("selected_record", offlineRecordList.get(position));
+
+                Fragment resultFragment = new RecordFragment();
+                resultFragment.setArguments(args);
+
+                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flFragment, resultFragment, "main_fragment");
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+            }
+
+            @Override
+            public void onDeleteClick(int position) {
+                RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
+                if (viewHolder != null) {
+                    removeLocalItem(viewHolder, linearLayout);
+                }
+            }
+        });
         swipeRefreshLayout.setRefreshing(false);
     }
     private void removeLocalItem(RecyclerView.ViewHolder viewHolder, CoordinatorLayout linearLayout1){
@@ -219,9 +215,7 @@ public class CloudFragment extends Fragment {
                 "移除記錄?",
                 (dialog, which) -> {
                     offlineRecordList.remove(position);
-                    Gson gson = new Gson();
-                    String jsonString = gson.toJson(offlineRecordList);
-                    FileHandler.saveToFile(requireContext(), "addedRecords", jsonString);
+                    FileHandler.saveSavedRecord(requireContext(), offlineRecordList);
 
                     updateOfflineList(linearLayout1);
                     savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);

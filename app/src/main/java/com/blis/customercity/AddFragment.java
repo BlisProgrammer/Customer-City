@@ -134,20 +134,9 @@ public class AddFragment extends Fragment {
             onlineRecord.setSubCategory(subCategory);
 //            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
-            String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
-
-            ArrayList<OnlineRecord> onlineRecords = new ArrayList<>();
-            if(!addedRecords.isEmpty()){
-                Gson gson = new Gson();
-                Type listType = new TypeToken<ArrayList<OnlineRecord>>() {}.getType();
-                onlineRecords = gson.fromJson(addedRecords, listType);
-            }
-
-            onlineRecords.add(onlineRecord);
-
-            Gson gson = new Gson();
-            String jsonString = gson.toJson(onlineRecords);
-            FileHandler.saveToFile(requireContext(), "addedRecords", jsonString);
+            ArrayList<OnlineRecord> onlineRecords = FileHandler.getSavedRecords(requireContext());
+            onlineRecords.add(0, onlineRecord);
+            FileHandler.saveSavedRecord(requireContext(), onlineRecords);
 
             Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
             companyNameEdit.setText("");

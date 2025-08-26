@@ -17,7 +17,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -27,12 +26,13 @@ import com.blis.customercity.data.OnlineRecord;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-import java.lang.reflect.Type;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.stream.Collectors;
 
 public class FindFragment extends Fragment {
-    private static String selectedCategory, selectedSubCategory;
-    private static ArrayList<Company> companies;
+    private String selectedCategory, selectedSubCategory;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,40 +105,41 @@ public class FindFragment extends Fragment {
             Chip selectedChip = scrollView.findViewById(chipGroup.getCheckedChipId());
             selectedSubCategory = (String) selectedChip.getText();
 
-            // get list of companies
-            String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
 //                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
 
             new Thread(()->{
-                companies = DataAPI.subCatIDToCompanies(sub_categoryID);
-                if(companies == null){
-                    companies = new ArrayList<>();
-                    companies.add(Company.getErrorCompany());
+                // get list of companies
+                String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
+
+                ArrayList<Company> onlineCompanies = DataAPI.subCatIDToCompanies(sub_categoryID);
+
+                if(onlineCompanies == null){
+                    onlineCompanies = new ArrayList<>();
+                    onlineCompanies.add(Company.getErrorCompany());
                     resultView.setOnItemClickListener((parent, view, position, id) -> {
                         Toast.makeText(requireContext(), "發生錯誤，請稍後嘗試", Toast.LENGTH_SHORT).show();
                     });
-                }else{
-                    // List view on click
-                    resultView.setOnItemClickListener((parent, view, position, id) -> {
-                        Bundle args = new Bundle();
-                        ArrayList<String> companyIDs = new ArrayList<>();
-                        companyIDs.add(companies.get(position).getId());
-                        args.putStringArrayList("company_ids", companyIDs);
-
-                        Fragment resultFragment = new ResultFragment();
-                        resultFragment.setArguments(args);
-
-                        FragmentManager fragmentManager = getParentFragmentManager();
-                        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                        fragmentTransaction.add(R.id.flFragment, resultFragment);
-                        fragmentTransaction.addToBackStack(null);
-                        fragmentTransaction.commit();
-                    });
+                    return;
                 }
-                ArrayList<String> companyNames = new ArrayList<>();
-                for(Company company : companies){
-                    companyNames.add(company.getCompany_name_cn());
-                }
+                ArrayList<Company> offlineCompanies = FileHandler.subCategoryToRecords(requireContext(), selectedSubCategory);
+                ArrayList<Company> companies = new ArrayList<>();
+                companies.addAll(offlineCompanies);
+                companies.addAll(onlineCompanies);
+                // List view on click
+                resultView.setOnItemClickListener((parent, view, position, id) -> {
+                    Bundle args = new Bundle();
+                    args.putString("company_name", parent.getItemAtPosition(position).toString());
+
+                    Fragment resultFragment = new ResultFragment();
+                    resultFragment.setArguments(args);
+
+                    FragmentManager fragmentManager = getParentFragmentManager();
+                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                    fragmentTransaction.add(R.id.flFragment, resultFragment);
+                    fragmentTransaction.addToBackStack(null);
+                    fragmentTransaction.commit();
+                });
+                ArrayList<String> companyNames = companies.stream().map(Company::getCompany_name_cn).collect(Collectors.toCollection(ArrayList::new));
                 if(!isAdded())return;
                 ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                 if(getActivity() == null) return;
@@ -155,7 +156,13 @@ public class FindFragment extends Fragment {
         SearchView searchView = scrollView.findViewById(R.id.search_view);
         new Thread(()->{
             if(!isAdded())return;
-            ArrayList<String> allCompanies = DataConverter.getAllCompanies(getResources().openRawResource(R.raw.companies));
+            ArrayList<String> allOnlineCompanies = DataConverter.getAllOnlineCompanies(getResources().openRawResource(R.raw.companies));
+            ArrayList<String> allLocalCompanies = FileHandler.getAllLocalCompanies(requireContext());
+            ArrayList<String> allCompanies = new ArrayList<>();
+            allCompanies.addAll(allLocalCompanies);
+            allCompanies.addAll(allOnlineCompanies);
+            LinkedHashSet<String> uniqueElements = new LinkedHashSet<>(allCompanies);
+            allCompanies = new ArrayList<>(uniqueElements);
             if(!isAdded())return;
             ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, allCompanies);
             if(getView() == null) return;
@@ -189,10 +196,8 @@ public class FindFragment extends Fragment {
 
         searchListView.setOnItemClickListener((parent, view, position, id) -> {
             String selectedCompany = (String) parent.getItemAtPosition(position);
-            ArrayList<String> companyIDs = DataConverter.companyNameToIDs(selectedCompany, getResources().openRawResource(R.raw.companies));
-
             Bundle args = new Bundle();
-            args.putStringArrayList("company_ids", companyIDs);
+            args.putString("company_name", selectedCompany);
 
             Fragment resultFragment = new ResultFragment();
             resultFragment.setArguments(args);
