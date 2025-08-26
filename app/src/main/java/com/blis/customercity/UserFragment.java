@@ -73,16 +73,6 @@ public class UserFragment extends Fragment {
             }).start();
         });
 
-        // Handle Logout
-        Button logoutButton = linearLayout.findViewById(R.id.logout_button);
-        logoutButton.setOnClickListener(v -> {
-            closeKeyboard();
-            Main main = (Main) getActivity();
-            if(isAdded() && main != null){
-                main.performLogout();
-            }
-        });
-
         // Handle register
         LinearLayout loginLoginLayout = linearLayout.findViewById(R.id.login_login_layout);
         LinearLayout loginRegisterLayout = linearLayout.findViewById(R.id.login_register_layout);

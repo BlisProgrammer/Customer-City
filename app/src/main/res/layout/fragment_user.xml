@@ -173,12 +173,6 @@
             android:id="@+id/email_view"
             android:textAlignment="center"
             android:textSize="20sp"/>
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp"
-            android:id="@+id/logout_button"
-            android:text="@string/登出"/>
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
