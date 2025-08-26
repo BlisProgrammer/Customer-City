@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.blis.customercity.data.OnlineRecord;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 public class FindFragment extends Fragment {
@@ -63,7 +65,7 @@ public class FindFragment extends Fragment {
             newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
             newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
             newChip.setChipStrokeWidth(2);
-            newChip.setTextSize(15);
+            newChip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             categoryChipGroup.addView(newChip);
         }
         categoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
@@ -89,7 +91,8 @@ public class FindFragment extends Fragment {
                 newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
                 newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
                 newChip.setChipStrokeWidth(2);
-                newChip.setTextSize(15);
+
+                newChip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
                 subCategoryChipGroup.addView(newChip);
                 subCategoryLayout.setVisibility(View.VISIBLE);
             }
