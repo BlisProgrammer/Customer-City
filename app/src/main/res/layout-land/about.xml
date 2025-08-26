@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:background="@color/white">
     <ImageView
         android:layout_gravity="center_vertical"
         android:layout_width="0dp"
@@ -28,32 +29,37 @@
             android:contentDescription="@string/customer_city_background1"
             android:scaleType="fitEnd"
             app:srcCompat="@drawable/background_one" />
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="10dp"
-            android:gravity="center"
-            android:background="#A0FFFFFF">
-            <TextView
+            android:fillViewport="true">
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/全港最齊全客服資訊平台"
-                android:textSize="30sp"
-                android:textAlignment="center"
-                android:layout_margin="10dp"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/支援全港消費者"
-                android:textSize="20sp"
-                android:textAlignment="center"
-                android:layout_margin="10dp"/>
-            <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/back_button"
-                android:text="@string/開始搜尋"/>
-        </LinearLayout>
+                android:orientation="vertical"
+                android:padding="10dp"
+                android:gravity="center"
+                android:background="#A0FFFFFF">
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/全港最齊全客服資訊平台"
+                    android:textSize="30sp"
+                    android:textAlignment="center"
+                    android:layout_margin="10dp"/>
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/支援全港消費者"
+                    android:textSize="20sp"
+                    android:textAlignment="center"
+                    android:layout_margin="10dp"/>
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/back_button"
+                    android:text="@string/開始搜尋"/>
+            </LinearLayout>
+        </ScrollView>
     </RelativeLayout>
 </LinearLayout>
