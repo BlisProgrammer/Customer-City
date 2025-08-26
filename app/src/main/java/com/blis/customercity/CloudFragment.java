@@ -190,15 +190,9 @@ public class CloudFragment extends Fragment {
                     args.putSerializable("selected_record", offlineRecordList.get(position));
 
                     Fragment resultFragment = new RecordFragment();
+                    resultFragment.setArguments(args);
 
                     FragmentManager fragmentManager = getParentFragmentManager();
-                    fragmentManager.addOnBackStackChangedListener(() -> {
-                        Fragment fragment = fragmentManager.findFragmentByTag("main_fragment");
-                        if(fragment instanceof CloudFragment) {
-                            CloudFragment currFrag = (CloudFragment) fragment;
-                            currFrag.updateOnlineList(linearLayout);
-                        }
-                    });
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     fragmentTransaction.replace(R.id.flFragment, resultFragment, "main_fragment");
                     fragmentTransaction.addToBackStack(null);

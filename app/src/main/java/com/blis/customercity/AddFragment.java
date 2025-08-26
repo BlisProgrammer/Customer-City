@@ -37,8 +37,6 @@ import kotlin.jvm.internal.TypeReference;
 import okhttp3.OkHttpClient;
 
 public class AddFragment extends Fragment {
-
-    private HashMap<String, String> recordFields = new HashMap<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,50 +45,43 @@ public class AddFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ScrollView linearLayout = (ScrollView) inflater.inflate(R.layout.fragment_add, container, false);
 
-        // Find views
-        TextInputEditText companyNameInput = linearLayout.findViewById(R.id.company_name);
-        ImageButton addItemButton = linearLayout.findViewById(R.id.add_item_button);
-        LinearLayout itemInputFields = linearLayout.findViewById(R.id.item_input_fields);
+        // set spinner
+        Spinner categorySpinner = linearLayout.findViewById(R.id.category_spinner);
+        Spinner subCategorySpinner = linearLayout.findViewById(R.id.sub_category_spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                requireContext(),
+                R.array.default_categories, // Your data source (string array from strings.xml)
+                android.R.layout.simple_spinner_item // Default layout for spinner items
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        categorySpinner.setAdapter(adapter);
+        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                new Thread(()->{
+                    String selectedCategory = parent.getItemAtPosition(position).toString();
+                    String categoryID = DataConverter.categoryNameToID(selectedCategory, getResources().openRawResource(R.raw.categories));
+                    ArrayList<String> subCategories = DataConverter.getSubCategories(categoryID, getResources().openRawResource(R.raw.sub_categories));
 
-        // Add item fields
-        addItemButton.setOnClickListener(v -> {
-            if(itemInputFields.getChildCount() >= 6) return;
-            View newView = getLayoutInflater().inflate(R.layout.add_item_field, itemInputFields, false);
-
-            // delete button
-            ImageButton deleteButton = newView.findViewById(R.id.delete_button);
-            deleteButton.setOnClickListener(v2 -> {
-                if(itemInputFields.getChildCount() <= 1) return;
-                itemInputFields.removeView(newView);
-            });
-
-            // Spinner
-            Spinner itemSpinner = newView.findViewById(R.id.item_spinner);
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                    requireContext(),
-                    R.array.default_item_names,
-                    android.R.layout.simple_spinner_item
-            );
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            itemSpinner.setAdapter(adapter);
-
-            // Input field hint
-            TextInputLayout textInputLayout = newView.findViewById(R.id.text_input_layout);
-            itemSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                @Override
-                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    textInputLayout.setHint(adapter.getItem(itemSpinner.getSelectedItemPosition()));
-                }
-
-                @Override
-                public void onNothingSelected(AdapterView<?> parent) {
-                }
-            });
-
-
-            itemInputFields.addView(newView);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, subCategories);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    if(getActivity() == null || !isAdded())return;
+                    getActivity().runOnUiThread(()-> subCategorySpinner.setAdapter(adapter));
+                }).start();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
-        addItemButton.callOnClick();
+
+        // Find views
+        TextInputEditText companyNameEdit = linearLayout.findViewById(R.id.add_company_name_edit);
+        TextInputEditText companyScopeEdit = linearLayout.findViewById(R.id.add_company_scope_edit);
+        TextInputEditText companyAddressEdit = linearLayout.findViewById(R.id.add_company_address_edit);
+        TextInputEditText companyDetailEdit = linearLayout.findViewById(R.id.add_company_detail_edit);
+        TextInputEditText companyEmailEdit = linearLayout.findViewById(R.id.add_company_email_edit);
+        TextInputEditText companyHintEdit = linearLayout.findViewById(R.id.add_company_hint_edit);
+        TextInputEditText companyHotlineEdit = linearLayout.findViewById(R.id.add_company_hotline_edit);
 
         // back button
         Button backButton = linearLayout.findViewById(R.id.back_button);
@@ -104,42 +95,44 @@ public class AddFragment extends Fragment {
         Button saveButton = linearLayout.findViewById(R.id.save_button);
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);
         saveButton.setOnClickListener(v -> {
-            recordFields.clear();
             errorTextView.setText("");
 
-            for (int i = 0; i < itemInputFields.getChildCount(); i++) {
-                View thisView = itemInputFields.getChildAt(i);
-                if(!(thisView instanceof LinearLayout)) continue;
-                LinearLayout thisField = (LinearLayout) thisView;
-
-                Spinner itemSpinner = thisField.findViewById(R.id.item_spinner);
-                String fieldName = itemSpinner.getSelectedItem().toString();
-                TextInputEditText textInput = thisField.findViewById(R.id.text_input_field);
-                String inputString = textInput.getText().toString();
-                if(recordFields.containsKey(fieldName)){
-                    errorTextView.setText("不能使用重複項目");
-                    return;
-                }
-                if(inputString.isEmpty()){
-                    errorTextView.setText("不能留空白");
-                    return;
-                }
-                recordFields.put(fieldName, inputString);
-            }
-
-            String companyName = companyNameInput.getText().toString();
+            String companyName = String.valueOf(companyNameEdit.getText());
             if(companyName.isEmpty()){
-                errorTextView.setText("不能留空白");
+                errorTextView.setText("請輸入公司名稱");
                 return;
             }
+            String companyScope = String.valueOf(companyScopeEdit.getText());
+            String companyAddress = String.valueOf(companyAddressEdit.getText());
+            String companyDetail = String.valueOf(companyDetailEdit.getText());
+            String companyEmail = String.valueOf(companyEmailEdit.getText());
+            String companyHint = String.valueOf(companyHintEdit.getText());
+            String companyHotline = String.valueOf(companyHotlineEdit.getText());
+            if(companyScope.isEmpty()
+                    && companyAddress.isEmpty()
+                    && companyDetail.isEmpty()
+                    && companyEmail.isEmpty()
+                    && companyHint.isEmpty()
+                    && companyHotline.isEmpty()){
+                errorTextView.setText("請至少輸入一項資訊");
+                return;
+            }
+
+            String category = categorySpinner.getSelectedItem().toString();
+            String subCategory = subCategorySpinner.getSelectedItem().toString();
+
             OnlineRecord onlineRecord = new OnlineRecord();
             onlineRecord.setCompany_name_cn(companyName);
-            onlineRecord.setServices_scope_cn(recordFields.getOrDefault("服務範圍", ""));
-            onlineRecord.setService_hotline(recordFields.getOrDefault("電話號碼", ""));
-            onlineRecord.setEmail(recordFields.getOrDefault("電郵地址", ""));
-            onlineRecord.setAddress_cn(recordFields.getOrDefault("地址", ""));
-            onlineRecord.setAdded_detail_cn(recordFields.getOrDefault("其他", ""));
-            onlineRecord.setTips_cn(recordFields.getOrDefault("提示", ""));
+            onlineRecord.setServices_scope_cn(companyScope);
+            onlineRecord.setService_hotline(companyHotline);
+            onlineRecord.setEmail(companyEmail);
+            onlineRecord.setAddress_cn(companyAddress);
+            onlineRecord.setAdded_detail_cn(companyDetail);
+            onlineRecord.setTips_cn(companyHint);
+
+            onlineRecord.setCategory(category);
+            onlineRecord.setSubCategory(subCategory);
+//            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
             String addedRecords = FileHandler.loadFromFile(requireContext(), "addedRecords");
 
@@ -157,6 +150,13 @@ public class AddFragment extends Fragment {
             FileHandler.saveToFile(requireContext(), "addedRecords", jsonString);
 
             Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
+            companyNameEdit.setText("");
+            companyScopeEdit.setText("");
+            companyAddressEdit.setText("");
+            companyDetailEdit.setText("");
+            companyEmailEdit.setText("");
+            companyHintEdit.setText("");
+            companyHotlineEdit.setText("");
         });
 
         return linearLayout;

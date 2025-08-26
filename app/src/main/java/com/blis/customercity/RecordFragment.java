@@ -84,8 +84,8 @@ public class RecordFragment extends Fragment {
                 subCategory = DataConverter.companyIDToSubCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.sub_categories));
                 category = DataConverter.companyIDToCategory(selectedRecord.getCompany_id(), getResources().openRawResource(R.raw.categories));
             } else {
-                category = null;
-                subCategory = null;
+                category = selectedRecord.getCategory();
+                subCategory = selectedRecord.getSubCategory();
             }
 
             ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(requireContext());

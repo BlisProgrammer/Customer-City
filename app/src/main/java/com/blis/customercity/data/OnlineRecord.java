@@ -38,6 +38,8 @@ public class OnlineRecord implements Serializable {
     private String companies_meta_keywords_cn;
     private String companies_meta_desc_en;
     private String companies_meta_desc_cn;
+    private String subCategory, category;
+
 
     public String getId() {
         return id;
@@ -310,5 +312,21 @@ public class OnlineRecord implements Serializable {
     }
     public String getLine2Text() {
         return formatToString();
+    }
+
+    public String getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 }
