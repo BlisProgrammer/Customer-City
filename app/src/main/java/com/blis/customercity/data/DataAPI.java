@@ -49,6 +49,12 @@ class RegisterResult{
     public ArrayList<HashMap<String, String>> errors;
 }
 
+class UpdateResult{
+    public String kind, localId, email, idToken, passwordHash;
+    public HashMap<String, ArrayList<HashMap<String, String>>> providerUserInfo;
+    public boolean emailVerified;
+}
+
 public class DataAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final HashMap<String, ArrayList<Company>> companies = new HashMap<>();
@@ -255,6 +261,33 @@ public class DataAPI {
         Call call = client.newCall(request);
 
         try (Response response = call.execute()){
+            return response.isSuccessful();
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return false;
+    }
+    public static boolean updatePassword(String idToken, String newPassword){
+        // POST https://identitytoolkit.googleapis.com/v1/accounts:setAccountInfo?key=YOUR_API_KEY
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:update").newBuilder();
+        urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
+        String finalUrl = urlBuilder.build().toString();
+
+        HashMap<String, String> body = new HashMap<>();
+        body.put("idToken", idToken);
+        body.put("password", newPassword);
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(body);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()){
+            System.out.println("Response: " + response.body());
             return response.isSuccessful();
         } catch (IOException e) {
             System.err.println("Error during request: " + e.getMessage());

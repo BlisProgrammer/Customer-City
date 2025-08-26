@@ -305,7 +305,9 @@ public class CloudFragment extends Fragment {
                             if(!isAdded()) return;
                             onlineRecordList.add(thisOnlineRecord);
                         }
-                        assert getActivity() != null;
+                        if(getActivity() == null ||  !isAdded()){
+                            return;
+                        }
                         getActivity().runOnUiThread(() -> {
                             if(!isAdded())return;
                             onlineAdapter.notifyDataSetChanged();

@@ -170,22 +170,6 @@ public class UserFragment extends Fragment {
             }).start();
         });
 
-        Button resetPasswordButton = linearLayout.findViewById(R.id.reset_password_button);
-        resetPasswordButton.setOnClickListener(v -> {
-            closeKeyboard();
-            String signedEmail = loginInfo.getString("email", null);
-            new Thread(()->{
-                boolean successful = DataAPI.resetPassword(signedEmail);
-                getActivity().runOnUiThread(()->{
-                    if(!successful){
-                        showToast(getActivity(), "重設發生錯誤");
-                        return;
-                    }
-                    showToast(getActivity(), "重設連結己發送");
-                });
-            }).start();
-        });
-
         return linearLayout;
     }
     private Toast savedToast;
@@ -204,6 +188,65 @@ public class UserFragment extends Fragment {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    private void updateLogin(LinearLayout linearLayout){
+        String signedEmail = loginInfo.getString("email", null);
+        TextView emailView = linearLayout.findViewById(R.id.email_view);
+        emailView.setText(signedEmail);
+
+        TextInputEditText oldPasswordEdit = linearLayout.findViewById(R.id.old_password);
+        TextInputEditText newPasswordEdit = linearLayout.findViewById(R.id.new_password);
+        TextInputEditText confirmNewPasswordEdit = linearLayout.findViewById(R.id.confirm_new_password);
+
+        Button updatePasswordButton = linearLayout.findViewById(R.id.update_password_button);
+
+        TextView errorView = linearLayout.findViewById(R.id.update_password_error_text_view);
+        updatePasswordButton.setOnClickListener(v -> {
+            errorView.setText("");
+            closeKeyboard();
+            String oldPassword = String.valueOf(oldPasswordEdit.getText());
+            String newPassword = String.valueOf(newPasswordEdit.getText());
+            String confirmNewPassword = String.valueOf(confirmNewPasswordEdit.getText());
+
+            new Thread(()->{
+                // check if old password is correct
+                if(newPassword.isEmpty() || oldPassword.isEmpty()){
+                    if(getActivity() != null && isAdded())
+                        getActivity().runOnUiThread(()-> errorView.setText("請填寫密碼"));
+                    return;
+                }
+
+                if(!newPassword.equals(confirmNewPassword)){
+                    if(getActivity() != null && isAdded())
+                        getActivity().runOnUiThread(()-> errorView.setText("新密碼驗證錯誤"));
+                    return;
+                }
+
+                String confirmIdToken = DataAPI.getToken(signedEmail, oldPassword);
+                if (confirmIdToken == null){
+                    if(getActivity() != null && isAdded())
+                        getActivity().runOnUiThread(()-> errorView.setText("舊密碼驗證錯誤"));
+                    return;
+                }
+
+                // get new password
+                boolean successful = DataAPI.updatePassword(confirmIdToken, newPassword);
+                getActivity().runOnUiThread(()->{
+                    if(!successful){
+                        showToast(getActivity(), "更改過程發生錯誤");
+                        return;
+                    }
+                    oldPasswordEdit.setText("");
+                    newPasswordEdit.setText("");
+                    confirmNewPasswordEdit.setText("");
+                    showToast(getActivity(), "更改成功，請重新登入");
+
+                    Main main = (Main) getActivity();
+                    main.performLogout();
+                });
+            }).start();
+        });
+    }
     public void updateLoginUI(boolean loggedIn){
         if(loginLayout == null || logoutLayout == null){
             return;
@@ -214,6 +257,7 @@ public class UserFragment extends Fragment {
         }else{
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
+            updateLogin(logoutLayout);
         }
     }
 }
