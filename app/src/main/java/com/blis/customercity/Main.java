@@ -227,6 +227,13 @@ public class Main extends AppCompatActivity {
         return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
     }
     public void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
+        // Fire Firebase
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, fragment.getClass().getName());
+        bundle.putString(FirebaseAnalytics.Param.SOURCE_PLATFORM, "Customer City");
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment, "main_fragment")
