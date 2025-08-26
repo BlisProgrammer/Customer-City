@@ -62,7 +62,20 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="#f5f5f5"/>
+            android:background="#f5f5f5">
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/add_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:src="@drawable/add_record_icon"
+                app:maxImageSize="32dp"
+                android:backgroundTint="#FFFFFF"
+                app:backgroundTint="@color/blue_100"
+                app:borderWidth="2dp"
+                android:layout_margin="16dp"/>
+        </FrameLayout>
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/navigation_view"

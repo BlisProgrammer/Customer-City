@@ -96,9 +96,8 @@ public class AddFragment extends Fragment {
         Button backButton = linearLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener( v -> {
             Main main = (Main) getActivity();
-            CloudFragment fragment = new CloudFragment();
-            assert main != null;
-            main.setCurrentFragment(fragment);
+            if(main == null || !isAdded())return;
+            main.goToCurrent();
         });
 
         // On save record
@@ -158,10 +157,6 @@ public class AddFragment extends Fragment {
             FileHandler.saveToFile(requireContext(), "addedRecords", jsonString);
 
             Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
-
-            Main main = (Main) getActivity();
-            assert main != null;
-            main.setCurrentFragment(new AddFragment());
         });
 
         return linearLayout;

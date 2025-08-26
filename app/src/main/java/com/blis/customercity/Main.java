@@ -19,6 +19,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -155,6 +156,13 @@ public class Main extends AppCompatActivity {
 
             }
         });
+
+        FloatingActionButton addButton;
+        addButton = findViewById(R.id.add_button);
+        addButton.setOnClickListener(v -> {
+            AddFragment addFragment = new AddFragment();
+            setCurrentFragment(addFragment);
+        });
     }
 
     public void performLogin(String idToken, String emailInputString){
@@ -222,6 +230,7 @@ public class Main extends AppCompatActivity {
     public void goToSearch(){
         bottomNavigationView.setSelectedItemId(R.id.nav_search);
     }
+    public void goToCurrent(){bottomNavigationView.setSelectedItemId(bottomNavigationView.getSelectedItemId());}
 
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
@@ -237,6 +246,7 @@ public class Main extends AppCompatActivity {
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.flFragment, fragment, "main_fragment")
+                .addToBackStack(null)
                 .commit();
     }
     @Override

@@ -57,6 +57,28 @@ public class CloudFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        CoordinatorLayout linearLayout = (CoordinatorLayout) getView();
+        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            updateOfflineList(linearLayout);
+        }
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            updateOnlineList(linearLayout);
+        }
+    }
+
     private final OkHttpClient client = new OkHttpClient();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -68,7 +90,6 @@ public class CloudFragment extends Fragment {
 
         loginLayout = linearLayout.findViewById(R.id.login_layout);
         logoutLayout = linearLayout.findViewById(R.id.logout_layout);
-        addButton = linearLayout.findViewById(R.id.add_button);
 
         updateUI(loggedIn);
         if(loggedIn && idToken != null){
@@ -83,13 +104,6 @@ public class CloudFragment extends Fragment {
             main.goToSignIn();
         });
 
-        addButton.setOnClickListener(v -> {
-            Main main = (Main) getActivity();
-            if(main == null || !isAdded())return;
-            AddFragment addFragment = new AddFragment();
-            main.setCurrentFragment(addFragment);
-        });
-
         RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
         viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if(!isChecked)return;
@@ -97,7 +111,6 @@ public class CloudFragment extends Fragment {
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
-            addButton.setVisibility(View.GONE);
             updateOnlineList(linearLayout);
         });
         RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
@@ -107,46 +120,25 @@ public class CloudFragment extends Fragment {
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
-            addButton.setVisibility(View.VISIBLE);
             updateOfflineList(linearLayout);
         });
-        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
-        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
-            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-            addedRecyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            addButton.setVisibility(View.VISIBLE);
-            updateOfflineList(linearLayout);
-        }
-        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
-            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-            addedRecyclerView.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            addButton.setVisibility(View.GONE);
-            updateOnlineList(linearLayout);
-        }
 
         return linearLayout;
     }
-    FloatingActionButton addButton;
 
     public void updateUI(boolean signedIn) {
         if(loginLayout == null || logoutLayout == null) return;
         if(signedIn){
             loginLayout.setVisibility(View.GONE);
             logoutLayout.setVisibility(View.VISIBLE);
-            addButton.setVisibility(View.VISIBLE);
         }else{
             loginLayout.setVisibility(View.VISIBLE);
             logoutLayout.setVisibility(View.GONE);
-            addButton.setVisibility(View.GONE);
         }
     }
     private TwoLineAdapter offlineAdapter;
     private void updateOfflineList(CoordinatorLayout linearLayout){
-        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
+        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text);
         noRecordViewOnline.setVisibility(View.GONE);
         noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
