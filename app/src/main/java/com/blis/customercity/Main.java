@@ -25,7 +25,7 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 public class Main extends AppCompatActivity {
     private DrawerLayout navDrawer;
     private Toolbar toolbar;
-    public BottomNavigationView bottomNavigationView;
+    private BottomNavigationView bottomNavigationView;
 
     private Button signinButton;
     private SharedPreferences loginInfo;
@@ -69,16 +69,22 @@ public class Main extends AppCompatActivity {
         Fragment findFragment = new FindFragment();
         Fragment userFragment = new UserFragment();
         Fragment cloudFragment = new CloudFragment();
+        Fragment aboutFragment = new AboutFragment();
         Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
         if(currentFragment != null) {
             setCurrentFragment(currentFragment);
         }else{
-            setCurrentFragment(findFragment);
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            setCurrentFragment(aboutFragment);
         }
 
         // navigation view
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
+            if(id == R.id.nav_home){
+                setCurrentFragment(aboutFragment);
+                return true;
+            }
             if(id == R.id.nav_search){
                 setCurrentFragment(findFragment);
                 return true;
@@ -212,6 +218,9 @@ public class Main extends AppCompatActivity {
     }
     public void goToSignIn(){
         bottomNavigationView.setSelectedItemId(R.id.nav_user);
+    }
+    public void goToSearch(){
+        bottomNavigationView.setSelectedItemId(R.id.nav_search);
     }
 
     private ActionBarDrawerToggle setupDrawerToggle() {
