@@ -242,6 +242,7 @@ public class CloudFragment extends Fragment {
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
             swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
         );
+        swipeRefreshLayout.setRefreshing(true);
 
         onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

@@ -230,6 +230,9 @@ public class Main extends AppCompatActivity {
     public void goToSearch(){
         bottomNavigationView.setSelectedItemId(R.id.nav_search);
     }
+    public void goToCloud(){
+        bottomNavigationView.setSelectedItemId(R.id.nav_save);
+    }
     public void goToCurrent(){bottomNavigationView.setSelectedItemId(bottomNavigationView.getSelectedItemId());}
 
     private ActionBarDrawerToggle setupDrawerToggle() {

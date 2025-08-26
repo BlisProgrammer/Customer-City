@@ -67,6 +67,8 @@ public class UserFragment extends Fragment {
                         return;
                     }
                     main.performLogin(newIdToken, emailInputString);
+                    main.goToCloud();
+                    showToast(requireContext(), "登入成功");
                 });
             }).start();
         });
