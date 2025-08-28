@@ -160,6 +160,7 @@ public class Main extends AppCompatActivity {
         FloatingActionButton addButton;
         addButton = findViewById(R.id.add_button);
         addButton.setOnClickListener(v -> {
+            FirebaseHandler.logActionButtonClick(this, this, addButton);
             AddFragment addFragment = new AddFragment();
             setCurrentFragment(addFragment);
         });
@@ -172,7 +173,10 @@ public class Main extends AppCompatActivity {
         editor.putString("email", emailInputString);
         editor.apply();
         signinButton.setText(R.string.sign_out);
-        signinButton.setOnClickListener(v2 -> performLogout());
+        signinButton.setOnClickListener(v2 -> {
+            FirebaseHandler.logButtonClick(this, this, signinButton);
+            performLogout();
+        });
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu navMenu = navigationView.getMenu();
@@ -199,7 +203,10 @@ public class Main extends AppCompatActivity {
         editor.putBoolean("loggedIn", false);
         editor.apply();
         signinButton.setText(R.string.sign_in);
-        signinButton.setOnClickListener(v2 -> bottomNavigationView.setSelectedItemId(R.id.nav_user));
+        signinButton.setOnClickListener(v2 -> {
+            FirebaseHandler.logButtonClick(this, this, signinButton);
+            bottomNavigationView.setSelectedItemId(R.id.nav_user);
+        });
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu navMenu = navigationView.getMenu();

@@ -120,6 +120,7 @@ public class FindFragment extends Fragment {
                     onlineCompanies = new ArrayList<>();
                     onlineCompanies.add(Company.getErrorCompany());
                     resultView.setOnItemClickListener((parent, view, position, id) -> {
+                        FirebaseHandler.logItemClick(requireContext(), this, parent, view, position, id);
                         Toast.makeText(requireContext(), "發生錯誤，請稍後嘗試", Toast.LENGTH_SHORT).show();
                     });
                     return;
@@ -130,6 +131,7 @@ public class FindFragment extends Fragment {
                 companies.addAll(onlineCompanies);
                 // List view on click
                 resultView.setOnItemClickListener((parent, view, position, id) -> {
+                    FirebaseHandler.logItemClick(requireContext(), this, parent, view, position, id);
                     Bundle args = new Bundle();
                     args.putString("company_name", parent.getItemAtPosition(position).toString());
 
@@ -198,6 +200,8 @@ public class FindFragment extends Fragment {
 
 
         searchListView.setOnItemClickListener((parent, view, position, id) -> {
+            FirebaseHandler.logItemClick(requireContext(), this, parent, view, position, id);
+            
             String selectedCompany = (String) parent.getItemAtPosition(position);
             Bundle args = new Bundle();
             args.putString("company_name", selectedCompany);

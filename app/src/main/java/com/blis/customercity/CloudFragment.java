@@ -96,6 +96,7 @@ public class CloudFragment extends Fragment {
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
         switchToUserButton.setOnClickListener(v->{
+            FirebaseHandler.logButtonClick(requireContext(), this, switchToUserButton);
             Main main = (Main) getActivity();
             if(main == null) return;
             main.goToSignIn();
@@ -161,7 +162,7 @@ public class CloudFragment extends Fragment {
         });
         itemTouchHelper.attachToRecyclerView(addedRecyclerView);
 
-        ArrayList<OnlineRecord> offlineRecordList = FileHandler.getSavedRecords(requireContext());
+        offlineRecordList = FileHandler.getSavedRecords(requireContext());
         if(offlineRecordList.isEmpty()){
             noRecordViewLocal.setVisibility(View.VISIBLE);
         }else{

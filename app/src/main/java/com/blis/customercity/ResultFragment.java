@@ -92,6 +92,7 @@ public class ResultFragment extends Fragment{
         }).start();
         Button backButton = linearLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, backButton);
             FragmentManager fragmentManager = getParentFragmentManager();
             fragmentManager.popBackStack();
         });

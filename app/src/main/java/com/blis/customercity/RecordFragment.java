@@ -40,6 +40,7 @@ public class RecordFragment extends Fragment {
     public void updateUI(boolean loggedIn){
         if(!loggedIn){
             if(saveOnlineButton != null) {
+                FirebaseHandler.logButtonClick(requireContext(), this, saveOnlineButton);
                 saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
                 saveOnlineButton.setText("儲存");
             }
@@ -115,6 +116,7 @@ public class RecordFragment extends Fragment {
         // back button
         Button backButton = constraintLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v->{
+            FirebaseHandler.logButtonClick(requireContext(), this, backButton);
             FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
             fragmentManager.popBackStack();
         });
@@ -122,6 +124,8 @@ public class RecordFragment extends Fragment {
         // share button
         Button shareButton = constraintLayout.findViewById(R.id.share_button);
         shareButton.setOnClickListener(v->{
+            FirebaseHandler.logButtonClick(requireContext(), this, shareButton);
+
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setType("text/plain");
             shareIntent.putExtra(Intent.EXTRA_TEXT, selectedRecord.getShareString());
@@ -138,7 +142,10 @@ public class RecordFragment extends Fragment {
             return constraintLayout;
         }
         if(!loggedIn) {
-            saveOnlineButton.setOnClickListener(v -> showToast("請先登入"));
+            saveOnlineButton.setOnClickListener(v -> {
+                FirebaseHandler.logButtonClick(requireContext(), this, saveOnlineButton);
+                showToast("請先登入");
+            });
             saveOnlineButton.setText("儲存");
         }else{
             String idToken = loginInfo.getString("idToken", null);
@@ -152,6 +159,8 @@ public class RecordFragment extends Fragment {
                 });
             }).start();
             saveOnlineButton.setOnClickListener(v -> {
+                FirebaseHandler.logButtonClick(requireContext(), this, saveOnlineButton);
+
                 if(selectedRecord.getCompany_id() == null){
                     return;
                 }

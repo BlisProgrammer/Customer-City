@@ -10,6 +10,8 @@ import android.widget.RelativeLayout;
 
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 public class AboutFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -19,8 +21,10 @@ public class AboutFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         LinearLayout linearLayout = (LinearLayout) inflater.inflate(R.layout.about, container, false);
-        Button backButton = linearLayout.findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> {
+        Button searchButton = linearLayout.findViewById(R.id.back_button);
+        searchButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, searchButton);
+
             Main main = (Main) getActivity();
             if(main == null) return;
             main.goToSearch();

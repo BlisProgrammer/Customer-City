@@ -45,6 +45,7 @@ public class UserFragment extends Fragment {
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);
 
         loginButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, loginButton);
             closeKeyboard();
             String emailInputString = String.valueOf(emailInput.getText());
             String passwordInputString = String.valueOf(passwordInput.getText());
@@ -78,12 +79,14 @@ public class UserFragment extends Fragment {
         LinearLayout loginRegisterLayout = linearLayout.findViewById(R.id.login_register_layout);
         Button switchToRegisterButton = linearLayout.findViewById(R.id.switch_to_register_button);
         switchToRegisterButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, switchToRegisterButton);
             closeKeyboard();
             loginLoginLayout.setVisibility(View.GONE);
             loginRegisterLayout.setVisibility(View.VISIBLE);
         });
         Button switchToLoginButton = linearLayout.findViewById(R.id.switch_to_login_button);
         switchToLoginButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, switchToLoginButton);
             closeKeyboard();
             loginLoginLayout.setVisibility(View.VISIBLE);
             loginRegisterLayout.setVisibility(View.GONE);
@@ -96,6 +99,7 @@ public class UserFragment extends Fragment {
         TextInputEditText registerPasswordConfirm = linearLayout.findViewById(R.id.register_password_confirm_text);
         TextView errorRegisterTextView = linearLayout.findViewById(R.id.register_error_text_view);
         registerButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, registerButton);
             closeKeyboard();
             String emailInputString = String.valueOf(registerEmail.getText());
             String passwordInputString = String.valueOf(registerPassword.getText());
@@ -143,6 +147,7 @@ public class UserFragment extends Fragment {
         });
         Button loginResetPasswordButton = linearLayout.findViewById(R.id.login_reset_password_button);
         loginResetPasswordButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, loginResetPasswordButton);
             closeKeyboard();
             String emailInputString = String.valueOf(emailInput.getText());
             if(emailInputString.isEmpty()){
@@ -194,6 +199,7 @@ public class UserFragment extends Fragment {
 
         TextView errorView = linearLayout.findViewById(R.id.update_password_error_text_view);
         updatePasswordButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, updatePasswordButton);
             errorView.setText("");
             closeKeyboard();
             String oldPassword = String.valueOf(oldPasswordEdit.getText());

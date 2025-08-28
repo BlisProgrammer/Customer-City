@@ -12,6 +12,9 @@ public class HelpActivity extends AppCompatActivity {
         setContentView(R.layout.help);
 
         Button backButton = findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> finish());
+        backButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(this, this, backButton);
+            finish();
+        });
     }
 }

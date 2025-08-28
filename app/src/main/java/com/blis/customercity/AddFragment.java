@@ -70,6 +70,7 @@ public class AddFragment extends Fragment {
         // back button
         Button backButton = linearLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener( v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, backButton);
             Main main = (Main) getActivity();
             if(main == null || !isAdded())return;
             main.goToCurrent();
@@ -79,6 +80,7 @@ public class AddFragment extends Fragment {
         Button saveButton = linearLayout.findViewById(R.id.save_button);
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);
         saveButton.setOnClickListener(v -> {
+            FirebaseHandler.logButtonClick(requireContext(), this, saveButton);
             errorTextView.setText("");
 
             String companyName = String.valueOf(companyNameEdit.getText());
