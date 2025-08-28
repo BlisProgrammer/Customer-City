@@ -1,6 +1,5 @@
 package com.blis.customercity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,9 +16,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.blis.customercity.data.DataAPI;
+import com.blis.customercity.data.FileHandler;
 import com.blis.customercity.data.OnlineRecord;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class ResultFragment extends Fragment{
@@ -85,11 +84,9 @@ public class ResultFragment extends Fragment{
                     Fragment resultFragment = new RecordFragment();
                     resultFragment.setArguments(args);
 
-                    FragmentManager fragmentManager = getParentFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.add(R.id.flFragment, resultFragment, "main_fragment");
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                    Main main = (Main) getActivity();
+                    if(main == null || !isAdded())return;
+                    main.setCurrentFragment(resultFragment);
                 });
             });
         }).start();
