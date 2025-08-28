@@ -67,15 +67,6 @@ public class AddFragment extends Fragment {
         TextInputEditText companyHintEdit = linearLayout.findViewById(R.id.add_company_hint_edit);
         TextInputEditText companyHotlineEdit = linearLayout.findViewById(R.id.add_company_hotline_edit);
 
-        // back button
-        Button backButton = linearLayout.findViewById(R.id.back_button);
-        backButton.setOnClickListener( v -> {
-            FirebaseHandler.logButtonClick(requireContext(), this, backButton);
-            Main main = (Main) getActivity();
-            if(main == null || !isAdded())return;
-            main.goToCurrent();
-        });
-
         // On save record
         Button saveButton = linearLayout.findViewById(R.id.save_button);
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);

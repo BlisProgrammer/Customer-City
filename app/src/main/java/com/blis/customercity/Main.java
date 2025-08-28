@@ -98,6 +98,9 @@ public class Main extends AppCompatActivity {
                 setCurrentFragment(userFragment);
                 return true;
             }
+            if(id == R.id.nav_empty){
+                return true;
+            }
             return false;
         });
 
@@ -160,6 +163,8 @@ public class Main extends AppCompatActivity {
         FloatingActionButton addButton;
         addButton = findViewById(R.id.add_button);
         addButton.setOnClickListener(v -> {
+            bottomNavigationView.setSelectedItemId(R.id.nav_empty);
+
             FirebaseHandler.logActionButtonClick(this, this, addButton);
             AddFragment addFragment = new AddFragment();
             setCurrentFragment(addFragment);
@@ -240,7 +245,6 @@ public class Main extends AppCompatActivity {
     public void goToCloud(){
         bottomNavigationView.setSelectedItemId(R.id.nav_save);
     }
-    public void goToCurrent(){bottomNavigationView.setSelectedItemId(bottomNavigationView.getSelectedItemId());}
 
     private ActionBarDrawerToggle setupDrawerToggle() {
         return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);

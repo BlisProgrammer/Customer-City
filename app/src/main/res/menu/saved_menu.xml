@@ -10,6 +10,9 @@
         android:icon="@drawable/search_icon"
         android:id="@+id/nav_search"/>
     <item
+        android:title=""
+        android:id="@+id/nav_empty"/>
+    <item
         android:title="@string/記錄"
         android:icon="@drawable/saved_icon"
         android:id="@+id/nav_save"/>
