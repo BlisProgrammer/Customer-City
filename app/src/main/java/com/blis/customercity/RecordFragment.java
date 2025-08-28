@@ -116,10 +116,7 @@ public class RecordFragment extends Fragment {
         Button backButton = constraintLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v->{
             FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-//            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//            fragmentTransaction.remove(this);
             fragmentManager.popBackStack();
-//            fragmentTransaction.commit();
         });
 
         // share button

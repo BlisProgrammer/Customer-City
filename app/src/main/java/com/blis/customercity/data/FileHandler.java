@@ -1,9 +1,7 @@
-package com.blis.customercity;
+package com.blis.customercity.data;
 
 import android.content.Context;
 
-import com.blis.customercity.data.Company;
-import com.blis.customercity.data.OnlineRecord;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

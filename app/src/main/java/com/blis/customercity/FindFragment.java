@@ -1,5 +1,6 @@
 package com.blis.customercity;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -22,17 +23,32 @@ import android.widget.Toast;
 
 import com.blis.customercity.data.Company;
 import com.blis.customercity.data.DataAPI;
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.FileHandler;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+class FindChips extends Chip{
+    public FindChips(Context context, String category, LinearLayout.LayoutParams params) {
+        super(context);
+        setText(category);
+        setLayoutParams(params);
+        setCheckable(true);
+        setCheckedIconVisible(false);
+        setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
+        setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
+        setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
+        setChipStrokeWidth(2);
+        setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+    }
+}
+
 public class FindFragment extends Fragment {
     private String selectedCategory, selectedSubCategory;
+    private Thread companyListThread;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,16 +72,7 @@ public class FindFragment extends Fragment {
 
         String[] categories = getResources().getStringArray(R.array.default_categories);
         for(String category : categories){
-            Chip newChip = new Chip(requireContext());
-            newChip.setText(category);
-            newChip.setLayoutParams(params);
-            newChip.setCheckable(true);
-            newChip.setCheckedIconVisible(false);
-            newChip.setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
-            newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
-            newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
-            newChip.setChipStrokeWidth(2);
-            newChip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            Chip newChip = new FindChips(requireContext(), category, params);
             categoryChipGroup.addView(newChip);
         }
         categoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
@@ -82,20 +89,10 @@ public class FindFragment extends Fragment {
 
             // create next chip group
             for(String category : subCategories){
-                Chip newChip = new Chip(requireContext());
-                newChip.setText(category);
-                newChip.setLayoutParams(params);
-                newChip.setCheckable(true);
-                newChip.setCheckedIconVisible(false);
-                newChip.setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
-                newChip.setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
-                newChip.setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
-                newChip.setChipStrokeWidth(2);
-
-                newChip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                Chip newChip = new FindChips(requireContext(), category, params);
                 subCategoryChipGroup.addView(newChip);
-                subCategoryLayout.setVisibility(View.VISIBLE);
             }
+            subCategoryLayout.setVisibility(View.VISIBLE);
         });
         subCategoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
             if(list.isEmpty())return;
@@ -107,7 +104,10 @@ public class FindFragment extends Fragment {
 
 //                ArrayList<String> companies = DataConverter.getCompanies(sub_categoryID, getResources().openRawResource(R.raw.companies));
 
-            new Thread(()->{
+            if(companyListThread != null && companyListThread.isAlive()){
+                companyListThread.interrupt();
+            }
+            companyListThread = new Thread(()->{
                 // get list of companies
                 String sub_categoryID = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
 
@@ -133,22 +133,22 @@ public class FindFragment extends Fragment {
                     Fragment resultFragment = new ResultFragment();
                     resultFragment.setArguments(args);
 
-                    FragmentManager fragmentManager = getParentFragmentManager();
-                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.add(R.id.flFragment, resultFragment);
-                    fragmentTransaction.addToBackStack(null);
-                    fragmentTransaction.commit();
+                    Main main = (Main) getActivity();
+                    if(main == null || !isAdded())return;
+                    main.setCurrentFragment(resultFragment);
                 });
                 ArrayList<String> companyNames = companies.stream().map(Company::getCompany_name_cn).collect(Collectors.toCollection(ArrayList::new));
                 if(!isAdded())return;
                 ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), android.R.layout.simple_list_item_1, companyNames);
                 if(getActivity() == null) return;
+                if(Thread.interrupted())return;
                 getActivity().runOnUiThread(() -> {
                     resultLayout.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     resultView.setAdapter(adapter1);
                 });
-            }).start();
+            });
+            companyListThread.start();
         });
 
         LinearLayout filterSection = scrollView.findViewById(R.id.filter_section);
@@ -202,11 +202,9 @@ public class FindFragment extends Fragment {
             Fragment resultFragment = new ResultFragment();
             resultFragment.setArguments(args);
 
-            FragmentManager fragmentManager = getParentFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.add(R.id.flFragment, resultFragment);
-            fragmentTransaction.addToBackStack(null);
-            fragmentTransaction.commit();
+            Main main = (Main) getActivity();
+            if(main == null || !isAdded())return;
+            main.setCurrentFragment(resultFragment);
         });
 
         return scrollView;

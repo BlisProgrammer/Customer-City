@@ -1,12 +1,9 @@
 package com.blis.customercity;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
@@ -28,11 +25,10 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blis.customercity.data.FileHandler;
 import com.blis.customercity.data.OnlineRecord;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -189,11 +185,9 @@ public class CloudFragment extends Fragment {
                 Fragment resultFragment = new RecordFragment();
                 resultFragment.setArguments(args);
 
-                FragmentManager fragmentManager = getParentFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.flFragment, resultFragment, "main_fragment");
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                Main main = (Main) getActivity();
+                if(main == null || !isAdded())return;
+                main.setCurrentFragment(resultFragment);
             }
 
             @Override
@@ -312,21 +306,9 @@ public class CloudFragment extends Fragment {
                                     Fragment resultFragment = new RecordFragment();
                                     resultFragment.setArguments(args);
 
-                                    FragmentManager fragmentManager = getParentFragmentManager();
-                                    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                                    fragmentTransaction.add(R.id.flFragment, resultFragment, "main_fragment");
-                                    fragmentTransaction.addToBackStack(null);
-                                    fragmentManager.addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
-                                        @Override
-                                        public void onBackStackChanged() {
-                                            Fragment fragment = fragmentManager.findFragmentByTag("main_fragment");
-                                            if(fragment instanceof CloudFragment) {
-                                                updateOnlineList(linearLayout);
-                                                fragmentManager.removeOnBackStackChangedListener(this);
-                                            }
-                                        }
-                                    });
-                                    fragmentTransaction.commit();
+                                    Main main = (Main) getActivity();
+                                    if(main == null || !isAdded())return;
+                                    main.setCurrentFragment(resultFragment);
                                 }
 
                                 @Override
