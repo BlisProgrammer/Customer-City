@@ -31,22 +31,22 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
-class FindChips extends Chip{
-    public FindChips(Context context, String category, LinearLayout.LayoutParams params) {
-        super(context);
-        setText(category);
-        setLayoutParams(params);
-        setCheckable(true);
-        setCheckedIconVisible(false);
-        setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
-        setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
-        setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
-        setChipStrokeWidth(2);
-        setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-    }
-}
 
 public class FindFragment extends Fragment {
+    private class FindChips extends Chip{
+        public FindChips(Context context, String category, LinearLayout.LayoutParams params) {
+            super(context);
+            setText(category);
+            setLayoutParams(params);
+            setCheckable(true);
+            setCheckedIconVisible(false);
+            setChipBackgroundColor(getResources().getColorStateList(R.color.chip_background_color_selector, null));
+            setTextColor(getResources().getColorStateList(R.color.chip_text_color_selector, null));
+            setChipStrokeColor(ColorStateList.valueOf(Color.parseColor("#03A9F4")));
+            setChipStrokeWidth(2);
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        }
+    }
     private String selectedCategory, selectedSubCategory;
     private Thread companyListThread;
     @Override
@@ -77,6 +77,9 @@ public class FindFragment extends Fragment {
         }
         categoryChipGroup.setOnCheckedStateChangeListener((chipGroup, list) -> {
             if(list.isEmpty())return;
+            if(companyListThread != null && companyListThread.isAlive()){
+                companyListThread.interrupt();
+            }
             resultLayout.setVisibility(View.INVISIBLE);
             progressBar.setVisibility(View.GONE);
             subCategoryChipGroup.removeAllViews();
