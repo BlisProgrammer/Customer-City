@@ -214,7 +214,7 @@ public class Main extends AppCompatActivity {
         }else if(currentFragment instanceof CloudFragment){
             CloudFragment cloudFragment = (CloudFragment) currentFragment;
             cloudFragment.updateUI(false);
-        }else if(currentFragment instanceof RecordFragment || currentFragment instanceof FindFragment){
+        }else if(currentFragment instanceof RecordFragment){
             RecordFragment recordFragment = (RecordFragment) currentFragment;
             recordFragment.updateUI(false);
         }

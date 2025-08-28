@@ -62,7 +62,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:background="#f5f5f5">
+            android:background="#FFFFFF">
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/add_button"
@@ -86,6 +86,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:menu="@menu/saved_menu"
+            android:background="#F5F5F5"
             app:labelVisibilityMode="labeled"/>
     </LinearLayout>
 
