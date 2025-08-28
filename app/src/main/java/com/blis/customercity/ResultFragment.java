@@ -96,9 +96,7 @@ public class ResultFragment extends Fragment{
         Button backButton = linearLayout.findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> {
             FragmentManager fragmentManager = getParentFragmentManager();
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.remove(this);
-            fragmentTransaction.commit();
+            fragmentManager.popBackStack();
         });
         return linearLayout;
     }
