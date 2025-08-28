@@ -212,7 +212,6 @@ public class CloudFragment extends Fragment {
                     offlineRecordList.remove(position);
                     FileHandler.saveSavedRecord(requireContext(), offlineRecordList);
 
-                    updateOfflineList(linearLayout1);
                     savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
                     savedToast.show();
                     offlineAdapter.notifyItemRemoved(position);
