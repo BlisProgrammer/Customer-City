@@ -145,6 +145,14 @@ public class Main extends AppCompatActivity {
                     Intent intent = new Intent(Main.this, HelpActivity.class);
                     startActivity(intent);
                 }
+                if(id == R.id.nav_privacy){
+                    Intent intent = new Intent(Main.this, PrivacyActivity.class);
+                    startActivity(intent);
+                }
+                if(id == R.id.nav_service){
+                    Intent intent = new Intent(Main.this, ServiceActivity.class);
+                    startActivity(intent);
+                }
                 if(id == R.id.nav_logout){
                     performLogout();
                 }

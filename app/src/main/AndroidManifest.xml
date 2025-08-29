@@ -18,6 +18,8 @@
         </activity>
         <activity android:name=".AboutActivity" />
         <activity android:name=".HelpActivity" />
+        <activity android:name=".PrivacyActivity" />
+        <activity android:name=".ServiceActivity" />
     </application>
 </manifest>
 
