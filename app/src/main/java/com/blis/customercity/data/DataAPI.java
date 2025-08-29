@@ -59,6 +59,12 @@ public class DataAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final HashMap<String, ArrayList<Company>> companies = new HashMap<>();
     private static final HashMap<String, ArrayList<OnlineRecord>> records = new HashMap<>();
+
+    /**
+     * Get companies in a subCategory from API: {@code https://www.customer.city/api/getCompanies/?subCatId={subCatID}}.
+     * @param subCatID ID of subcategory in the form of 7 character String, example: {@code 001-001}
+     * @return The List of companies if found, or {@code null} if no company with the given ID exists.
+     */
     public static ArrayList<Company> subCatIDToCompanies(String subCatID){
         // https://www.customer.city/api/getCompanies/?subCatId={subCatID}
 
@@ -89,6 +95,12 @@ public class DataAPI {
         }
         return null;
     }
+
+    /**
+     * Get records in a company from API: {@code https://www.customer.city/search/?q={companyName}}.
+     * @param companyName String of company name cn
+     * @return The List of records if found, or <b>empty array</b> if no records with the given company name exists.
+     */
     public static ArrayList<OnlineRecord> companyNameToRecords(String companyName){
         // https://www.customer.city/search/?q=<CompanyName>
         if(records.containsKey(companyName)){
@@ -118,6 +130,12 @@ public class DataAPI {
         }
         return new ArrayList<>();
     }
+
+    /**
+     * Get all saved record of an account from {@code  https://www.customer.city/api/getHistory/}
+     * @param idToken
+     * @return
+     */
     public static HashMap<String, ArrayList<OnlineRecord>> getSavedRecords(String idToken){
         Request request = new Request.Builder()
                 .url("https://www.customer.city/api/getHistory/")

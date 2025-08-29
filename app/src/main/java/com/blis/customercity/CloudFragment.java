@@ -136,7 +136,7 @@ public class CloudFragment extends Fragment {
     }
     private TwoLineAdapter offlineAdapter;
     private void updateOfflineList(CoordinatorLayout linearLayout){
-        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text);
+        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
         noRecordViewOnline.setVisibility(View.GONE);
         noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);

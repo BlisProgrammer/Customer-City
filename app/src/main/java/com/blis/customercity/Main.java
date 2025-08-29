@@ -27,59 +27,52 @@ public class Main extends AppCompatActivity {
     private DrawerLayout navDrawer;
     private Toolbar toolbar;
     private BottomNavigationView bottomNavigationView;
-
     private Button signinButton;
     private SharedPreferences loginInfo;
     private int clickedNavigationItemID;
+    MenuItem navLoginItem, navLogoutItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.main);
 
-//        FileHandler.removeFile(this, "addedRecords"); // for debugging purposes
+//        // for debugging purposes
+//        FileHandler.removeFile(this, "addedRecords");
 //        SharedPreferences preferences = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = preferences.edit();
 //        editor.clear();
 //        editor.apply();
 
-        // on navigate
+        // Setup navigation menu
         NavigationView navigationView = findViewById(R.id.nav_view);
-
-        // Sign in button
-        loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
-        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
-        String idToken = loginInfo.getString("idToken", null);
-        String email = loginInfo.getString("email", null);
-        signinButton = findViewById(R.id.account_button);
-        if(loggedIn && idToken != null) {
-            performLogin(idToken, email);
-        }else{
-            performLogout();
-        }
-
-        // on navigate
+        Menu navMenu = navigationView.getMenu();
+        navLoginItem = navMenu.findItem(R.id.nav_login);
+        navLogoutItem = navMenu.findItem(R.id.nav_logout);
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             clickedNavigationItemID = menuItem.getItemId();
             navDrawer.closeDrawer(GravityCompat.START);
             return true;
         });
 
+        // Set up initial sign in UI
+        signinButton = findViewById(R.id.account_button);
+        loginInfo = getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+        String idToken = loginInfo.getString("idToken", null);
+        String email = loginInfo.getString("email", null);
+        if(loggedIn && idToken != null) {
+            performLogin(idToken, email);
+        }else{
+            performLogout();
+        }
+
+        // Set up bottom navigation view and fragments
         bottomNavigationView = findViewById(R.id.navigation_view);
         Fragment findFragment = new FindFragment();
         Fragment userFragment = new UserFragment();
         Fragment cloudFragment = new CloudFragment();
         Fragment aboutFragment = new AboutFragment();
-        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
-        if(currentFragment != null) {
-            setCurrentFragment(currentFragment);
-        }else{
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
-            setCurrentFragment(aboutFragment);
-        }
-
-        // navigation view
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
             if(id == R.id.nav_home){
@@ -104,8 +97,15 @@ public class Main extends AppCompatActivity {
             return false;
         });
 
+        // Set initial fragment
+        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
+        if(currentFragment != null) {
+            setCurrentFragment(currentFragment);
+        }else{
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        }
 
-        // Fire Firebase
+        // Fire Firebase: Fire app open signal
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Bundle bundle = new Bundle();
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "Customer City");
@@ -119,7 +119,7 @@ public class Main extends AppCompatActivity {
         setSupportActionBar(toolbar);
         assert getSupportActionBar() != null;
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ActionBarDrawerToggle drawerToggle = setupDrawerToggle();
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerToggle.syncState();
         navDrawer.addDrawerListener(drawerToggle);
@@ -160,95 +160,127 @@ public class Main extends AppCompatActivity {
             }
         });
 
-        FloatingActionButton addButton;
-        addButton = findViewById(R.id.add_button);
+        // Floating action button
+        FloatingActionButton addButton = findViewById(R.id.add_button);
         addButton.setOnClickListener(v -> {
             bottomNavigationView.setSelectedItemId(R.id.nav_empty);
-
             FirebaseHandler.logActionButtonClick(this, this, addButton);
             AddFragment addFragment = new AddFragment();
             setCurrentFragment(addFragment);
         });
     }
 
+    /**
+     * Store login info to shared preference, and update login ui of activity and main_fragment. <br>
+     * <b>Requires {@code signinButton} and {@code navLoginItem} to be initiated. </b>
+     * @param idToken The {@code idToken} generated when login through
+     * @param emailInputString Email of the account
+     * @see com.blis.customercity.data.DataAPI#getToken(String, String) DataAPI#getToken(email, password)
+     */
     public void performLogin(String idToken, String emailInputString){
+        // Update shared preference
         SharedPreferences.Editor editor = loginInfo.edit();
         editor.putString("idToken", idToken);
         editor.putBoolean("loggedIn", true);
         editor.putString("email", emailInputString);
         editor.apply();
+
+        // Update text on sign in button
         signinButton.setText(R.string.sign_out);
         signinButton.setOnClickListener(v2 -> {
             FirebaseHandler.logButtonClick(this, this, signinButton);
             performLogout();
         });
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        Menu navMenu = navigationView.getMenu();
-        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
-        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
+        // Update menu options on drawer menu
         navLogoutItem.setVisible(true);
         navLoginItem.setVisible(false);
-        Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
-        if(currentFragment instanceof UserFragment){
-            UserFragment findFragment = (UserFragment) currentFragment;
-            findFragment.updateLoginUI(true);
-        }else if(currentFragment instanceof CloudFragment){
-            CloudFragment cloudFragment = (CloudFragment) currentFragment;
-            cloudFragment.updateUI(true);
-        }else if(currentFragment instanceof RecordFragment){
-            RecordFragment recordFragment = (RecordFragment) currentFragment;
-            recordFragment.updateUI(true);
-        }
+
+        // Update UI of current fragment
+        updateCurrentFragmentLoginUI(true);
     }
     public void performLogout(){
+        // Update shared preference
         boolean wasLoggedIn = loginInfo.getBoolean("loggedIn", false);
         SharedPreferences.Editor editor = loginInfo.edit();
         editor.putString("idToken", null);
         editor.putBoolean("loggedIn", false);
         editor.apply();
+
+        // Update text on sign in button
         signinButton.setText(R.string.sign_in);
         signinButton.setOnClickListener(v2 -> {
             FirebaseHandler.logButtonClick(this, this, signinButton);
             bottomNavigationView.setSelectedItemId(R.id.nav_user);
         });
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        Menu navMenu = navigationView.getMenu();
-        MenuItem navLoginItem = navMenu.findItem(R.id.nav_login);
-        MenuItem navLogoutItem = navMenu.findItem(R.id.nav_logout);
+        // Update menu options on drawer menu
         navLoginItem.setVisible(true);
         navLogoutItem.setVisible(false);
+
+        // Update UI of current fragment
+        updateCurrentFragmentLoginUI(false);
+
+        // Show logged out hint
+        if(wasLoggedIn){
+            Toast.makeText(this, "登出成功", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    /**
+     * Search for "main_fragment" and perform updateLoginUI method for different fragments.
+     * @param loggedIn The result of this update. (true = changes into logged in mode)
+     */
+    private void updateCurrentFragmentLoginUI(boolean loggedIn){
         Fragment currentFragment = getSupportFragmentManager().findFragmentByTag("main_fragment");
         if(currentFragment instanceof UserFragment){
             UserFragment findFragment = (UserFragment) currentFragment;
-            findFragment.updateLoginUI(false);
+            findFragment.updateLoginUI(loggedIn);
         }else if(currentFragment instanceof CloudFragment){
             CloudFragment cloudFragment = (CloudFragment) currentFragment;
-            cloudFragment.updateUI(false);
+            cloudFragment.updateUI(loggedIn);
         }else if(currentFragment instanceof RecordFragment){
             RecordFragment recordFragment = (RecordFragment) currentFragment;
-            recordFragment.updateUI(false);
-        }
-        if(wasLoggedIn){
-            Toast toast = new Toast(this);
-            toast.setText("登出成功");
-            toast.show();
+            recordFragment.updateUI(loggedIn);
         }
     }
+
+    /**
+     * Perform click on <b>User</b> button at bottom navigation view.
+     * @see #goToCloud()
+     * @see #goToSearch()
+     */
     public void goToSignIn(){
         bottomNavigationView.setSelectedItemId(R.id.nav_user);
     }
+
+    /**
+     * Perform click on <b>Search</b> button at bottom navigation view.
+     * @see #goToCloud()
+     * @see #goToSignIn()
+     */
     public void goToSearch(){
         bottomNavigationView.setSelectedItemId(R.id.nav_search);
     }
+
+    /**
+     * Perform click on <b>Saved</b> button at bottom navigation view.
+     * @see #goToSignIn()
+     * @see #goToSearch()
+     */
     public void goToCloud(){
         bottomNavigationView.setSelectedItemId(R.id.nav_save);
     }
 
-    private ActionBarDrawerToggle setupDrawerToggle() {
-        return new ActionBarDrawerToggle(this, navDrawer, toolbar, R.string.drawer_open,  R.string.drawer_close);
-    }
+
+    /**
+     * Replaces current "main_fragment" into another fragment. <br>
+     * Use {@link #goToSignIn()}, {@link #goToCloud()}, {@link #goToSearch()} to update bottom navigation view selected item as well.
+     * @param fragment Fragment to change into.
+     * @see #goToSearch()
+     * @see #goToCloud()
+     * @see #goToSearch()
+     */
     public void setCurrentFragment(Fragment fragment) { // Support function for setting fragment
         // Fire Firebase
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
@@ -262,13 +294,5 @@ public class Main extends AppCompatActivity {
                 .replace(R.id.flFragment, fragment, "main_fragment")
                 .addToBackStack(null)
                 .commit();
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            navDrawer.openDrawer(GravityCompat.START);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
