@@ -91,6 +91,7 @@ public class RecordFragment extends Fragment {
 
             ArrayList<LinearLayout> recordItems = selectedRecord.formatToLayouts(requireContext());
 
+            if(getActivity() == null || !isAdded()) return;
             getActivity().runOnUiThread(()->{
                 recordViewCompany.setText(selectedRecord.getCompany_name_cn());
                 if(subCategory == null || category == null){
