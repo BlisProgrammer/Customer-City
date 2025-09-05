@@ -92,6 +92,8 @@ public class Main extends AppCompatActivity {
                 return true;
             }
             if(id == R.id.nav_empty){
+                AddFragment addFragment = new AddFragment();
+                setCurrentFragment(addFragment);
                 return true;
             }
             return false;
@@ -173,8 +175,6 @@ public class Main extends AppCompatActivity {
         addButton.setOnClickListener(v -> {
             bottomNavigationView.setSelectedItemId(R.id.nav_empty);
             FirebaseHandler.logActionButtonClick(this, this, addButton);
-            AddFragment addFragment = new AddFragment();
-            setCurrentFragment(addFragment);
         });
     }
 

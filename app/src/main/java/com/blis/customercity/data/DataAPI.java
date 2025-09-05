@@ -133,8 +133,8 @@ public class DataAPI {
 
     /**
      * Get all saved record of an account from {@code  https://www.customer.city/api/getHistory/}
-     * @param idToken
-     * @return
+     * @param idToken token for identification of user account
+     * @return empty hashmap error, hashmap with arraylist of online record if successful
      */
     public static HashMap<String, ArrayList<OnlineRecord>> getSavedRecords(String idToken){
         Request request = new Request.Builder()
@@ -157,6 +157,11 @@ public class DataAPI {
         }
         return new HashMap<>();
     }
+    /**
+     * Toggle history (records saved status) of online database. If it is saved, remove from saved list; if it is not saved, add to saved list. {@code  https://www.customer.city/api/editHistory/}
+     * @param idToken token for identification of user account
+     * @return true if history is changed, false if not
+     */
     public static boolean updateHistory(String idToken, String recordID){
         HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
         HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
@@ -178,6 +183,12 @@ public class DataAPI {
         }
         return false;
     }
+    /**
+     * Get token with email and password, through {@code  https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword}
+     * @param emailInput account email
+     * @param passwordInput account password
+     * @return idToken in string if successful, null if login failed
+     */
     public static String getToken(String emailInput, String passwordInput){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword").newBuilder();
         urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
@@ -213,6 +224,12 @@ public class DataAPI {
         }
         return null;
     }
+    /**
+     * Create account with email and password {@code  https://identitytoolkit.googleapis.com/v1/accounts:signUp}
+     * @param emailInput new account email
+     * @param passwordInput new account password
+     * @return {@code "ERROR OCCURRED"} or other error message if error, {@code "SUCCESS"} if account created successfully
+     */
     public static String createAccount(String emailInput, String passwordInput){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:signUp").newBuilder();
         urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
@@ -253,6 +270,11 @@ public class DataAPI {
         }
         return "ERROR OCCURRED";
     }
+    /**
+     * Send reset password link through email, with: {@code  https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode}
+     * @param emailInput account email
+     * @return true if email sent successfully, false if email failed to send
+     */
     public static boolean resetPassword(String emailInput){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode").newBuilder();
         urlBuilder.addQueryParameter("key", "AIzaSyAJ5XXmXlPuHPqRysgfYIFPkF4cwKrCICU");
@@ -278,6 +300,12 @@ public class DataAPI {
         }
         return false;
     }
+    /**
+     * Change password with idToken and new password {@code  https://identitytoolkit.googleapis.com/v1/accounts:update}
+     * @param idToken token for identification of user account
+     * @param newPassword password to change into
+     * @return true if password changed successfully, false if failed to change password
+     */
     public static boolean updatePassword(String idToken, String newPassword){
         // POST https://identitytoolkit.googleapis.com/v1/accounts:setAccountInfo?key=YOUR_API_KEY
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://identitytoolkit.googleapis.com/v1/accounts:update").newBuilder();
