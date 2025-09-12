@@ -90,7 +90,12 @@ public class DataAPI {
             } else {
                 System.err.println("Request failed with code: " + response.code());
             }
-        } catch (IOException e) {
+            Thread.sleep(1);
+        }catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Thread was interrupted while waiting for a response.");
+        }
+        catch (IOException e) {
             System.err.println("Error during request: " + e.getMessage());
         }
         return null;
