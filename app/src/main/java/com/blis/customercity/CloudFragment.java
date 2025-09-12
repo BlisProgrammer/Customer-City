@@ -7,8 +7,6 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,7 +24,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blis.customercity.data.FileHandler;
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.Record;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -124,6 +122,10 @@ public class CloudFragment extends Fragment {
         return linearLayout;
     }
 
+    /**
+     * Update the UI according to signed in status. If not signed in, show login page. If yes, show logout page.
+     * @param signedIn Sign in status, true to change into signed in version
+     */
     public void updateUI(boolean signedIn) {
         if(loginLayout == null || logoutLayout == null) return;
         if(signedIn){
@@ -135,6 +137,11 @@ public class CloudFragment extends Fragment {
         }
     }
     private TwoLineAdapter offlineAdapter;
+
+    /**
+     * Create or reset all the content of Offline saved records
+     * @param linearLayout layout of cloud fragment
+     */
     private void updateOfflineList(CoordinatorLayout linearLayout){
         noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
         noRecordViewOnline.setVisibility(View.GONE);
@@ -157,7 +164,7 @@ public class CloudFragment extends Fragment {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                removeLocalItem(viewHolder, linearLayout);
+                removeLocalItem(viewHolder);
             }
         });
         itemTouchHelper.attachToRecyclerView(addedRecyclerView);
@@ -195,15 +202,20 @@ public class CloudFragment extends Fragment {
             public void onDeleteClick(int position) {
                 RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
                 if (viewHolder != null) {
-                    removeLocalItem(viewHolder, linearLayout);
+                    removeLocalItem(viewHolder);
                 }
             }
         });
         swipeRefreshLayout.setRefreshing(false);
     }
-    private void removeLocalItem(RecyclerView.ViewHolder viewHolder, CoordinatorLayout linearLayout1){
+
+    /**
+     * Remove specific recycler view holder from recycler view list
+     * @param viewHolder Holder of recycler view with item to be removed
+     */
+    private void removeLocalItem(RecyclerView.ViewHolder viewHolder){
         //Remove swiped item from list and notify the RecyclerView
-        int position = viewHolder.getAdapterPosition();
+        int position = viewHolder.getBindingAdapterPosition();
         ConfirmationDialog.showConfirmationDialog(
                 requireContext(),
                 "確認",
@@ -223,9 +235,13 @@ public class CloudFragment extends Fragment {
     }
 
     private Toast savedToast;
-    private final ArrayList<OnlineRecord> onlineRecordList = new ArrayList<>();
-    private ArrayList<OnlineRecord> offlineRecordList = new ArrayList<>();
+    private final ArrayList<Record> onlineRecordList = new ArrayList<>();
+    private ArrayList<Record> offlineRecordList = new ArrayList<>();
     private TextView noRecordViewOnline, noRecordViewLocal;
+    /**
+     * Create or reset all the content of online saved records
+     * @param linearLayout layout of cloud fragment
+     */
     private void updateOnlineList(CoordinatorLayout linearLayout){
         noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         noRecordViewLocal.setVisibility(View.GONE);
@@ -270,13 +286,13 @@ public class CloudFragment extends Fragment {
                         String responseBody = response.body().string();
                         System.out.println("Response: " + responseBody);
                         Gson gson = new Gson();
-                        Type type = new TypeToken<HashMap<String, HashMap<String, List<OnlineRecord>>>>() {}.getType();
-                        HashMap<String, HashMap<String, List<OnlineRecord>>> hashMap = gson.fromJson(responseBody, type);
-                        HashMap<String, List<OnlineRecord>> allData = hashMap.get("data");
+                        Type type = new TypeToken<HashMap<String, HashMap<String, List<Record>>>>() {}.getType();
+                        HashMap<String, HashMap<String, List<Record>>> hashMap = gson.fromJson(responseBody, type);
+                        HashMap<String, List<Record>> allData = hashMap.get("data");
                         if(allData == null) return;
                         onlineRecordList.clear();
-                        for (List<OnlineRecord> value : allData.values()) {
-                            OnlineRecord thisOnlineRecord = value.get(0);
+                        for (List<Record> value : allData.values()) {
+                            Record thisOnlineRecord = value.get(0);
                             if(!isAdded()) return;
                             onlineRecordList.add(thisOnlineRecord);
                         }
@@ -355,13 +371,13 @@ public class CloudFragment extends Fragment {
 
                 private void removeItem(RecyclerView.ViewHolder viewHolder) {
                     //Remove swiped item from list and notify the RecyclerView
-                    int position = viewHolder.getAdapterPosition();
+                    int position = viewHolder.getBindingAdapterPosition();
                     ConfirmationDialog.showConfirmationDialog(
                         requireContext(),
                         "確認",
                         "移除記錄?",
                         (dialog, which) -> {
-                            OnlineRecord selectedRecord = onlineRecordList.get(position);
+                            Record selectedRecord = onlineRecordList.get(position);
 
                             // remove with api call
                             HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");

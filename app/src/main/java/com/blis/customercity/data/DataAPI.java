@@ -37,7 +37,7 @@ class CompanyResult{
 class SearchResult{
     static class Data{
         public ArrayList<Company> companies;
-        public ArrayList<OnlineRecord> records;
+        public ArrayList<Record> records;
     }
     public Data data;
     public HashMap<String, String> meta;
@@ -58,7 +58,7 @@ class UpdateResult{
 public class DataAPI {
     private static final OkHttpClient client = new OkHttpClient();
     private static final HashMap<String, ArrayList<Company>> companies = new HashMap<>();
-    private static final HashMap<String, ArrayList<OnlineRecord>> records = new HashMap<>();
+    private static final HashMap<String, ArrayList<Record>> records = new HashMap<>();
 
     /**
      * Get companies in a subCategory from API: {@code https://www.customer.city/api/getCompanies/?subCatId={subCatID}}.
@@ -101,7 +101,7 @@ public class DataAPI {
      * @param companyName String of company name cn
      * @return The List of records if found, or <b>empty array</b> if no records with the given company name exists.
      */
-    public static ArrayList<OnlineRecord> companyNameToRecords(String companyName){
+    public static ArrayList<Record> companyNameToRecords(String companyName){
         // https://www.customer.city/search/?q=<CompanyName>
         if(records.containsKey(companyName)){
             return records.get(companyName);
@@ -136,7 +136,7 @@ public class DataAPI {
      * @param idToken token for identification of user account
      * @return empty hashmap error, hashmap with arraylist of online record if successful
      */
-    public static HashMap<String, ArrayList<OnlineRecord>> getSavedRecords(String idToken){
+    public static HashMap<String, ArrayList<Record>> getSavedRecords(String idToken){
         Request request = new Request.Builder()
                 .url("https://www.customer.city/api/getHistory/")
                 .addHeader("Cookie", "token=" + idToken)
@@ -146,8 +146,8 @@ public class DataAPI {
             if (response.isSuccessful()) {
                 String responseBody = response.body().string();
                 Gson gson = new Gson();
-                Type type = new TypeToken<HashMap<String, HashMap<String, ArrayList<OnlineRecord>>>>() {}.getType();
-                HashMap<String, HashMap<String, ArrayList<OnlineRecord>>> hashMap = gson.fromJson(responseBody, type);
+                Type type = new TypeToken<HashMap<String, HashMap<String, ArrayList<Record>>>>() {}.getType();
+                HashMap<String, HashMap<String, ArrayList<Record>>> hashMap = gson.fromJson(responseBody, type);
                 return hashMap.get("data");
             } else {
                 System.err.println("Request failed with code: " + response.code());

@@ -15,7 +15,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.blis.customercity.data.FileHandler;
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.Record;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -98,22 +98,22 @@ public class AddFragment extends Fragment {
             String category = categorySpinner.getSelectedItem().toString();
             String subCategory = subCategorySpinner.getSelectedItem().toString();
 
-            OnlineRecord onlineRecord = new OnlineRecord();
-            onlineRecord.setCompany_name_cn(companyName);
-            onlineRecord.setServices_scope_cn(companyScope);
-            onlineRecord.setService_hotline(companyHotline);
-            onlineRecord.setEmail(companyEmail);
-            onlineRecord.setAddress_cn(companyAddress);
-            onlineRecord.setAdded_detail_cn(companyDetail);
-            onlineRecord.setTips_cn(companyHint);
+            Record record = new Record();
+            record.setCompany_name_cn(companyName);
+            record.setServices_scope_cn(companyScope);
+            record.setService_hotline(companyHotline);
+            record.setEmail(companyEmail);
+            record.setAddress_cn(companyAddress);
+            record.setAdded_detail_cn(companyDetail);
+            record.setTips_cn(companyHint);
 
-            onlineRecord.setCategory(category);
-            onlineRecord.setSubCategory(subCategory);
+            record.setCategory(category);
+            record.setSubCategory(subCategory);
 //            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
-            ArrayList<OnlineRecord> onlineRecords = FileHandler.getSavedRecords(requireContext());
-            onlineRecords.add(0, onlineRecord);
-            FileHandler.saveSavedRecord(requireContext(), onlineRecords);
+            ArrayList<Record> records = FileHandler.getSavedRecords(requireContext());
+            records.add(0, record);
+            FileHandler.saveSavedRecord(requireContext(), records);
 
             Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
             companyNameEdit.setText("");

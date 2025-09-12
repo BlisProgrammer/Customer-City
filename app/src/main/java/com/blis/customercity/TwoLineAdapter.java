@@ -4,29 +4,28 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.Record;
 
 import java.util.ArrayList;
 
 public class TwoLineAdapter extends RecyclerView.Adapter<TwoLineAdapter.RecordViewHolder> {
-    private final ArrayList<OnlineRecord> itemList;
+    private final ArrayList<Record> itemList;
     private final Context context;
-    public TwoLineAdapter(Context context, ArrayList<OnlineRecord> itemList) {
+
+    public TwoLineAdapter(Context context, ArrayList<Record> itemList) {
         this.itemList = itemList;
         this.context = context;
     }
 
     @Override
     public void onBindViewHolder(@NonNull RecordViewHolder holder, int position) {
-        OnlineRecord item = itemList.get(position);
+        Record item = itemList.get(position);
         holder.titleTextView.setText(item.getLine1Text());
         holder.descriptionTextView.setText(item.getLine2Text());
     }

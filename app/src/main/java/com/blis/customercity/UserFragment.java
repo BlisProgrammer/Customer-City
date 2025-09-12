@@ -170,6 +170,12 @@ public class UserFragment extends Fragment {
         return linearLayout;
     }
     private Toast savedToast;
+
+    /**
+     * Show toast message without waiting. Override existing toast made by the same function
+     * @param text Text to show on the toast
+     * @param context context of the toast
+     */
     private void showToast(Context context, String text){
         if(savedToast != null){
             savedToast.cancel();
@@ -177,6 +183,10 @@ public class UserFragment extends Fragment {
         savedToast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
         savedToast.show();
     }
+
+    /**
+     * Close the keyboard
+     */
     private void closeKeyboard(){
         // Check if no view has focus:
         View view = getActivity().getCurrentFocus();
@@ -186,6 +196,10 @@ public class UserFragment extends Fragment {
         }
     }
 
+    /**
+     * Set up or reset Login page.
+     * @param linearLayout layout of login page
+     */
     private void updateLogin(LinearLayout linearLayout){
         String signedEmail = loginInfo.getString("email", null);
         TextView emailView = linearLayout.findViewById(R.id.email_view);
@@ -245,6 +259,11 @@ public class UserFragment extends Fragment {
             }).start();
         });
     }
+
+    /**
+     * Update ui according to login status
+     * @param loggedIn login status
+     */
     public void updateLoginUI(boolean loggedIn){
         if(loginLayout == null || logoutLayout == null){
             return;

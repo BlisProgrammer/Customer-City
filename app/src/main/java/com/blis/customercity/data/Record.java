@@ -13,7 +13,7 @@ import com.blis.customercity.R;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class OnlineRecord implements Serializable {
+public class Record implements Serializable {
     private String id;
     private String company_id;
     private String company_name_en;

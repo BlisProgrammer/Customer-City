@@ -1,7 +1,6 @@
 package com.blis.customercity;
 
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,10 +17,9 @@ import android.widget.Toast;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.blis.customercity.data.DataAPI;
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.Record;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +27,11 @@ import java.util.HashMap;
 public class RecordFragment extends Fragment {
     private Toast savedToast;
     private boolean isSavedOnline = false;
+
+    /**
+     * Show toast message without waiting. Override existing toast made by the same function
+     * @param text Text to show on the toast
+     */
     private void showToast(String text){
         if(savedToast != null){
             savedToast.cancel();
@@ -37,6 +40,10 @@ public class RecordFragment extends Fragment {
         savedToast.show();
     }
 
+    /**
+     * Update UI according to login status
+     * @param loggedIn login status
+     */
     public void updateUI(boolean loggedIn){
         if(!loggedIn){
             if(saveOnlineButton != null) {
@@ -56,12 +63,12 @@ public class RecordFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ConstraintLayout constraintLayout = (ConstraintLayout) inflater.inflate(R.layout.record_view, container, false);
         Bundle bundle = getArguments();
-        OnlineRecord selectedRecord;
+        Record selectedRecord;
         if(bundle == null) return constraintLayout;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            selectedRecord = bundle.getSerializable("selected_record", OnlineRecord.class);
+            selectedRecord = bundle.getSerializable("selected_record", Record.class);
         }else{
-            selectedRecord = (OnlineRecord) bundle.getSerializable("selected_record");
+            selectedRecord = (Record) bundle.getSerializable("selected_record");
         }
         if(selectedRecord == null)return constraintLayout;
 
@@ -151,7 +158,7 @@ public class RecordFragment extends Fragment {
         }else{
             String idToken = loginInfo.getString("idToken", null);
             new Thread(()->{
-                HashMap<String, ArrayList<OnlineRecord>> savedRecords = DataAPI.getSavedRecords(idToken);
+                HashMap<String, ArrayList<Record>> savedRecords = DataAPI.getSavedRecords(idToken);
                 requireActivity().runOnUiThread(()->{
                     if(savedRecords.containsKey(selectedRecord.getId())){
                         saveOnlineButton.setText("取消儲存");

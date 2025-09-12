@@ -13,6 +13,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class FirebaseHandler {
+    /**
+     * Log button click to firebase analytics
+     * @param context context of button parent
+     * @param fragment fragment object of parent
+     * @param button the button object
+     */
     public static void logButtonClick(Context context, Fragment fragment, Button button){
         // Fire Firebase
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -23,6 +29,12 @@ public class FirebaseHandler {
         bundle.putString("button_text", button.getText().toString());
         mFirebaseAnalytics.logEvent("button_click", bundle);
     }
+    /**
+     * Log action button click to firebase analytics
+     * @param context context of button parent
+     * @param activity activity object of parent
+     * @param button the button object
+     */
     public static void logActionButtonClick(Context context, Activity activity, FloatingActionButton button){
         // Fire Firebase
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -33,6 +45,13 @@ public class FirebaseHandler {
         bundle.putString("button_text", button.getClass().getName());
         mFirebaseAnalytics.logEvent("button_click", bundle);
     }
+
+    /**
+     * Log button click events to firebase analytics
+     * @param context context of button parent
+     * @param activity Activity object of parent
+     * @param button the button object
+     */
     public static void logButtonClick(Context context, Activity activity, Button button){
         // Fire Firebase
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
@@ -43,6 +62,13 @@ public class FirebaseHandler {
         bundle.putString("button_text", button.getText().toString());
         mFirebaseAnalytics.logEvent("button_click", bundle);
     }
+    /**
+     * Log item click events to firebase analytics
+     * @param context context of item parent
+     * @param fragment fragment of item parent
+     * @param position position of item clicked
+     * @param parent adapter view of item parent
+     */
     public static void logItemClick(Context context, Fragment fragment, AdapterView<?> parent, View view, int position, long id){
         // Fire Firebase
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);

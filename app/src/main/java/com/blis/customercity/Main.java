@@ -207,6 +207,10 @@ public class Main extends AppCompatActivity {
         // Update UI of current fragment
         updateCurrentFragmentLoginUI(true);
     }
+
+    /**
+     * Update UI and saved SharedPreferences for logout
+     */
     public void performLogout(){
         // Update shared preference
         boolean wasLoggedIn = loginInfo.getBoolean("loggedIn", false);

@@ -13,11 +13,10 @@ import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.FileHandler;
-import com.blis.customercity.data.OnlineRecord;
+import com.blis.customercity.data.Record;
 
 import java.util.ArrayList;
 
@@ -45,9 +44,9 @@ public class ResultFragment extends Fragment{
         companyNameView.setText(companyName);
 
         new Thread(()->{
-            ArrayList<OnlineRecord> selectedOnlineRecords = DataAPI.companyNameToRecords(companyName);
-            ArrayList<OnlineRecord> selectedLocalRecords = FileHandler.companyNameToRecords(requireContext(), companyName);
-            ArrayList<OnlineRecord> selectedRecords = new ArrayList<>();
+            ArrayList<Record> selectedOnlineRecords = DataAPI.companyNameToRecords(companyName);
+            ArrayList<Record> selectedLocalRecords = FileHandler.companyNameToRecords(requireContext(), companyName);
+            ArrayList<Record> selectedRecords = new ArrayList<>();
             selectedRecords.addAll(selectedLocalRecords);
             selectedRecords.addAll(selectedOnlineRecords);
             if(selectedRecords.isEmpty()) {
@@ -65,7 +64,7 @@ public class ResultFragment extends Fragment{
 
             // set list view
             ArrayList<String> resultList = new ArrayList<>();
-            for (OnlineRecord record : selectedRecords) {
+            for (Record record : selectedRecords) {
                 resultList.add(record.formatToString());
             }
             ArrayAdapter<String> adapter1 = new ArrayAdapter<>(requireContext(), R.layout.result_item, resultList);
