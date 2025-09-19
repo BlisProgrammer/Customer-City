@@ -338,4 +338,20 @@ public class DataAPI {
         }
         return false;
     }
+
+    /**
+     * Get all custom records from API
+     * @return all custom records that is saved in customer city Database
+     * @deprecated Haven't implemented
+     */
+    public static ArrayList<Record> getAllCustomRecords(){
+        return null;
+    }
+
+    /**
+     * @deprecated Haven't implemented
+     */
+    public static ArrayList<Record> createOnlineCustomRecord(){
+        return null;
+    }
 }
