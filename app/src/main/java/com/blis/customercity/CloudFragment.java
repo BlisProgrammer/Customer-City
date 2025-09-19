@@ -57,21 +57,21 @@ public class CloudFragment extends Fragment {
     public void onResume() {
         super.onResume();
         CoordinatorLayout linearLayout = (CoordinatorLayout) getView();
-        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
-        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
-            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-            addedRecyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            updateOfflineList(linearLayout);
-        }
-        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
+//        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
+//        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
+//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+//            addedRecyclerView.setVisibility(View.VISIBLE);
+//            recyclerView.setVisibility(View.GONE);
+//            updateOfflineList(linearLayout);
+//        }
+//        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
             RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             updateOnlineList(linearLayout);
-        }
+//        }
     }
 
     private final OkHttpClient client = new OkHttpClient();
@@ -100,24 +100,24 @@ public class CloudFragment extends Fragment {
             main.goToSignIn();
         });
 
-        RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
-        viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(!isChecked)return;
-            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-            addedRecyclerView.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-            updateOnlineList(linearLayout);
-        });
-        RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
-        viewLocalButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if(!isChecked)return;
-            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-            addedRecyclerView.setVisibility(View.VISIBLE);
-            recyclerView.setVisibility(View.GONE);
-            updateOfflineList(linearLayout);
-        });
+//        RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
+//        viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//            if(!isChecked)return;
+//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+//            addedRecyclerView.setVisibility(View.GONE);
+//            recyclerView.setVisibility(View.VISIBLE);
+//            updateOnlineList(linearLayout);
+//        });
+//        RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
+//        viewLocalButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+//            if(!isChecked)return;
+//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+//            addedRecyclerView.setVisibility(View.VISIBLE);
+//            recyclerView.setVisibility(View.GONE);
+//            updateOfflineList(linearLayout);
+//        });
 
         return linearLayout;
     }
@@ -265,7 +265,7 @@ public class CloudFragment extends Fragment {
         if(loggedIn && idToken != null){
             // get records from online
             Request request = new Request.Builder()
-                    .url("https://www.customer.city/api/getHistory/")
+                    .url("https://www.customer.city/api/getHistoryBoth/")
                     .addHeader("Cookie", "token=" + idToken)
                     .build();
             client.newCall(request).enqueue(new Callback() {
@@ -381,6 +381,9 @@ public class CloudFragment extends Fragment {
 
                             // remove with api call
                             HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
+                            if(selectedRecord.isCustom()){
+                                originalUrl = HttpUrl.parse("https://www.customer.city/api/editCustomBookmark/");
+                            }
                             assert originalUrl != null;
                             HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
                             urlBuilder.addQueryParameter("id", selectedRecord.getId());

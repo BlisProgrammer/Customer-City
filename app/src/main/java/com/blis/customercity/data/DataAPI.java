@@ -475,4 +475,48 @@ public class DataAPI {
         }
         return new ArrayList<>();
     }
+
+    public static boolean updateCustomBookmarks(String idToken, String recordID){
+        HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editCustomBookmark/");
+        HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
+        urlBuilder.addQueryParameter("id", recordID);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .addHeader("Cookie", "token=" + idToken)
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                return true;
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return false;
+    }
+
+    public static HashMap<String, ArrayList<Record>> getCustomBookmark(String idToken){
+        Request request = new Request.Builder()
+                .url("https://www.customer.city/api/getCustomBookmark/")
+                .addHeader("Cookie", "token=" + idToken)
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                Type type = new TypeToken<HashMap<String, HashMap<String, ArrayList<Record>>>>() {}.getType();
+                HashMap<String, HashMap<String, ArrayList<Record>>> hashMap = gson.fromJson(responseBody, type);
+                return hashMap.get("data");
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return new HashMap<>();
+    }
 }

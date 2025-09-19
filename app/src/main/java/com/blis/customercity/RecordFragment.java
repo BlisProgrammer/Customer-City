@@ -145,10 +145,11 @@ public class RecordFragment extends Fragment {
         SharedPreferences loginInfo = requireActivity().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         saveOnlineButton = constraintLayout.findViewById(R.id.save_button);
-        if(selectedRecord.getCompany_id() == null){
-            saveOnlineButton.setVisibility(View.GONE);
-            return constraintLayout;
-        }
+        boolean isRecordCustom = (selectedRecord.getCompany_id() == null);
+//        if(selectedRecord.getCompany_id() == null){
+//            saveOnlineButton.setVisibility(View.GONE);
+//            return constraintLayout;
+//        }
         if(!loggedIn) {
             saveOnlineButton.setOnClickListener(v -> {
                 FirebaseHandler.logButtonClick(requireContext(), this, saveOnlineButton);
@@ -158,7 +159,13 @@ public class RecordFragment extends Fragment {
         }else{
             String idToken = loginInfo.getString("idToken", null);
             new Thread(()->{
-                HashMap<String, ArrayList<Record>> savedRecords = DataAPI.getSavedRecords(idToken);
+                HashMap<String, ArrayList<Record>> savedRecords;
+                if(isRecordCustom){
+                    savedRecords = DataAPI.getCustomBookmark(idToken);
+                }else{
+                    savedRecords = DataAPI.getSavedRecords(idToken);
+                }
+                if(!isAdded()) return;
                 requireActivity().runOnUiThread(()->{
                     if(savedRecords.containsKey(selectedRecord.getId())){
                         saveOnlineButton.setText("取消儲存");
@@ -168,8 +175,24 @@ public class RecordFragment extends Fragment {
             }).start();
             saveOnlineButton.setOnClickListener(v -> {
                 FirebaseHandler.logButtonClick(requireContext(), this, saveOnlineButton);
-
-                if(selectedRecord.getCompany_id() == null){
+                if(isRecordCustom){
+                    new Thread(()->{
+                        boolean result = DataAPI.updateCustomBookmarks(idToken, selectedRecord.getId());
+                        requireActivity().runOnUiThread(()->{
+                            if (!result){
+                                showToast("發生錯誤，請稍後嘗試");
+                                return;
+                            }
+                            isSavedOnline = !isSavedOnline;
+                            if(isSavedOnline){
+                                saveOnlineButton.setText("取消儲存");
+                                showToast("儲存成功");
+                            }else{
+                                saveOnlineButton.setText("儲存");
+                                showToast("成功移除記錄");
+                            }
+                        });
+                    }).start();
                     return;
                 }
                 new Thread(()->{
@@ -189,7 +212,6 @@ public class RecordFragment extends Fragment {
                         }
                     });
                 }).start();
-
             });
         }
         return constraintLayout;

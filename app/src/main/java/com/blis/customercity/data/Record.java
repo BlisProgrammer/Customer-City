@@ -344,4 +344,7 @@ public class Record implements Serializable {
         response.put("category", this.getCategory());
         return response;
     }
+    public boolean isCustom(){
+        return company_id == null;
+    }
 }
