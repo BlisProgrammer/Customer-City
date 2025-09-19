@@ -125,7 +125,9 @@ public class FindFragment extends Fragment {
                     });
                     return;
                 }
-                ArrayList<Company> offlineCompanies = FileHandler.subCategoryToRecords(requireContext(), selectedSubCategory);
+                String subCategoryId = DataConverter.subCategoryToID(selectedSubCategory, getResources().openRawResource(R.raw.sub_categories));
+                ArrayList<Company> offlineCompanies = DataAPI.subCategoryIdToCustomCompanies(subCategoryId);
+//                ArrayList<Company> offlineCompanies = FileHandler.subCategoryToRecords(requireContext(), selectedSubCategory);
                 ArrayList<Company> companies = new ArrayList<>();
                 companies.addAll(offlineCompanies);
                 companies.addAll(onlineCompanies);
@@ -162,7 +164,8 @@ public class FindFragment extends Fragment {
         new Thread(()->{
             if(!isAdded())return;
             ArrayList<String> allOnlineCompanies = DataConverter.getAllOnlineCompanies(getResources().openRawResource(R.raw.companies));
-            ArrayList<String> allLocalCompanies = FileHandler.getAllLocalCompanies(requireContext());
+//            ArrayList<String> allLocalCompanies = FileHandler.getAllLocalCompanies(requireContext());
+            ArrayList<String> allLocalCompanies = DataAPI.getAllCustomCompanies();
             ArrayList<String> allCompanies = new ArrayList<>();
             allCompanies.addAll(allLocalCompanies);
             allCompanies.addAll(allOnlineCompanies);

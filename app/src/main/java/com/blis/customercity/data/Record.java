@@ -12,6 +12,7 @@ import com.blis.customercity.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Record implements Serializable {
     private String id;
@@ -328,5 +329,19 @@ public class Record implements Serializable {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public HashMap<String, String> toHashMap(){
+        HashMap<String, String> response = new HashMap<>();
+        response.put("id", "");
+        response.put("company_name", this.getCompany_name_cn());
+        response.put("services_scope_cn", this.getServices_scope_cn());
+        response.put("email", this.getEmail());
+        response.put("address_cn", this.getAddress_cn());
+        response.put("added_detail_cn", this.getAdded_detail_cn());
+        response.put("tips_cn", this.getTips_cn());
+        response.put("sub_category", this.getSubCategory());
+        response.put("category", this.getCategory());
+        return response;
     }
 }

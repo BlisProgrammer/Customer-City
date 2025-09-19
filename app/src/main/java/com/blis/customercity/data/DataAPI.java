@@ -33,6 +33,30 @@ class CompanyResult{
         this.meta = meta;
     }
 }
+class CustomCompanyResult{
+    private ArrayList<String> data;
+    private HashMap<String, String> meta;
+
+    public ArrayList<String> getData() {
+        return data;
+    }
+
+    public void setData(ArrayList<String> data) {
+        this.data = data;
+    }
+}
+class CustomRecordResult{
+    private ArrayList<Record> data;
+    private HashMap<String, String> meta;
+
+    public ArrayList<Record> getData() {
+        return data;
+    }
+
+    public void setData(ArrayList<Record> data) {
+        this.data = data;
+    }
+}
 
 class SearchResult{
     static class Data{
@@ -342,16 +366,113 @@ public class DataAPI {
     /**
      * Get all custom records from API
      * @return all custom records that is saved in customer city Database
-     * @deprecated Haven't implemented
      */
-    public static ArrayList<Record> getAllCustomRecords(){
-        return null;
+    public static ArrayList<String> getAllCustomCompanies(){
+        Request request = new Request.Builder()
+                .url("https://www.customer.city/api/getAllCustomCompanyNames/")
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                Type type = new TypeToken<CustomCompanyResult>() {}.getType();
+                CustomCompanyResult customCompanyResult = gson.fromJson(responseBody, type);
+                return customCompanyResult.getData();
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return new ArrayList<>();
     }
 
     /**
-     * @deprecated Haven't implemented
+     * Create and push custom record to online database
      */
-    public static ArrayList<Record> createOnlineCustomRecord(){
-        return null;
+    public static boolean createOnlineCustomRecord(Record record){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/createCustomRecord/").newBuilder();
+        String finalUrl = urlBuilder.build().toString();
+
+        HashMap<String, String> body = record.toHashMap();
+
+        Gson gson = new Gson();
+        String jsonBody = gson.toJson(body);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .post(requestBody)
+                .build();
+        Call call = client.newCall(request);
+
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                return true;
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return false;
+    }
+    public static ArrayList<Company> subCategoryIdToCustomCompanies(String subCategoryId){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/subCategoryIdToRecord/").newBuilder();
+        urlBuilder.addQueryParameter("subCatId", subCategoryId);
+        String finalUrl = urlBuilder.build().toString();
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                Type type = new TypeToken<CustomCompanyResult>() {}.getType();
+                CustomCompanyResult customCompanyResult = gson.fromJson(responseBody, type);
+
+                ArrayList<Company> companies = new ArrayList<>();
+                customCompanyResult.getData().forEach(x ->{
+                    System.out.println(x);
+                    Company thisCompany = new Company();
+                    thisCompany.setCompany_name_cn(x);
+                    companies.add(thisCompany);
+                });
+                System.out.println(finalUrl);
+                System.out.println(customCompanyResult.getData().size());
+                return companies;
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+    public static ArrayList<Record> companyNameToCustomRecords(String companyName){
+        HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/companyNameToCustomRecord").newBuilder();
+        urlBuilder.addQueryParameter("company_name", companyName);
+        String finalUrl = urlBuilder.build().toString();
+
+        Request request = new Request.Builder()
+                .url(finalUrl)
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                CustomRecordResult searchResult = gson.fromJson(responseBody, CustomRecordResult.class);
+                return searchResult.getData();
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return new ArrayList<>();
     }
 }

@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.FileHandler;
 import com.blis.customercity.data.Record;
 import com.google.android.material.textfield.TextInputEditText;
@@ -111,18 +112,30 @@ public class AddFragment extends Fragment {
             record.setSubCategory(subCategory);
 //            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
-            ArrayList<Record> records = FileHandler.getSavedRecords(requireContext());
-            records.add(0, record);
-            FileHandler.saveSavedRecord(requireContext(), records);
+            new Thread(()->{
+                boolean success = DataAPI.createOnlineCustomRecord(record);
+                if(!success){
+                    getActivity().runOnUiThread(()-> {
+                        Toast.makeText(requireContext(),"發生錯誤", Toast.LENGTH_SHORT).show();
+                    });
+                    return;
+                }
 
-            Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
-            companyNameEdit.setText("");
-            companyScopeEdit.setText("");
-            companyAddressEdit.setText("");
-            companyDetailEdit.setText("");
-            companyEmailEdit.setText("");
-            companyHintEdit.setText("");
-            companyHotlineEdit.setText("");
+//                ArrayList<Record> records = FileHandler.getSavedRecords(requireContext());
+//                records.add(0, record);
+//                FileHandler.saveSavedRecord(requireContext(), records);
+
+                getActivity().runOnUiThread(()-> {
+                    Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
+                    companyNameEdit.setText("");
+                    companyScopeEdit.setText("");
+                    companyAddressEdit.setText("");
+                    companyDetailEdit.setText("");
+                    companyEmailEdit.setText("");
+                    companyHintEdit.setText("");
+                    companyHotlineEdit.setText("");
+                });
+            }).start();
         });
 
         return linearLayout;

@@ -45,7 +45,8 @@ public class ResultFragment extends Fragment{
 
         new Thread(()->{
             ArrayList<Record> selectedOnlineRecords = DataAPI.companyNameToRecords(companyName);
-            ArrayList<Record> selectedLocalRecords = FileHandler.companyNameToRecords(requireContext(), companyName);
+//            ArrayList<Record> selectedLocalRecords = FileHandler.companyNameToRecords(requireContext(), companyName);
+            ArrayList<Record> selectedLocalRecords = DataAPI.companyNameToCustomRecords(companyName);
             ArrayList<Record> selectedRecords = new ArrayList<>();
             selectedRecords.addAll(selectedLocalRecords);
             selectedRecords.addAll(selectedOnlineRecords);
