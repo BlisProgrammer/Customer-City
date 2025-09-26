@@ -65,6 +65,7 @@ public class CloudFragment extends Fragment {
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
+            noRecordViewOnline.setVisibility(View.GONE);
             updateMyCustomRecords(linearLayout);
         }
         if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
@@ -72,6 +73,7 @@ public class CloudFragment extends Fragment {
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+            noRecordViewLocal.setVisibility(View.GONE);
             updateOnlineList(linearLayout);
         }
     }
@@ -186,13 +188,13 @@ public class CloudFragment extends Fragment {
                 }else{
                     noRecordViewLocal.setVisibility(View.GONE);
                 }
-                offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
-                addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                addedRecyclerView.setAdapter(offlineAdapter);
-                offlineAdapter.notifyDataSetChanged();
-                addedRecyclerView.scheduleLayoutAnimation();
-                swipeRefreshLayout.setRefreshing(false);
-
+                if(offlineAdapter == null){
+                    offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+                    addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                    addedRecyclerView.setAdapter(offlineAdapter);
+                }
+                offlineAdapter.updateList(offlineRecordList);
+//                offlineAdapter.notifyDataSetChanged();
 
                 offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
                     @Override
@@ -315,6 +317,7 @@ public class CloudFragment extends Fragment {
                         }
                         getActivity().runOnUiThread(() -> {
                             if(!isAdded())return;
+
                             onlineAdapter.notifyDataSetChanged();
                             recyclerView.scheduleLayoutAnimation();
                             if(onlineAdapter.getItemCount() == 0){
