@@ -73,6 +73,7 @@ public class Main extends AppCompatActivity {
         Fragment userFragment = new UserFragment();
         Fragment cloudFragment = new CloudFragment();
         Fragment aboutFragment = new AboutFragment();
+        AddFragment addFragment = new AddFragment();
         bottomNavigationView.setOnItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
             if(id == R.id.nav_home){
@@ -92,7 +93,7 @@ public class Main extends AppCompatActivity {
                 return true;
             }
             if(id == R.id.nav_empty){
-                AddFragment addFragment = new AddFragment();
+//                AddFragment addFragment = new AddFragment();
                 setCurrentFragment(addFragment);
                 return true;
             }

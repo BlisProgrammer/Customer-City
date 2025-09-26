@@ -1,5 +1,7 @@
 package com.blis.customercity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,6 +74,16 @@ public class AddFragment extends Fragment {
         Button saveButton = linearLayout.findViewById(R.id.save_button);
         TextView errorTextView = linearLayout.findViewById(R.id.error_text_view);
         saveButton.setOnClickListener(v -> {
+            if(!isAdded() || getContext() == null) return;
+            SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+            boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+            String idToken = loginInfo.getString("idToken", null);
+
+            if(!loggedIn || idToken == null){
+                Toast.makeText(requireContext(),"登入後才能儲存", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             FirebaseHandler.logButtonClick(requireContext(), this, saveButton);
             errorTextView.setText("");
 
@@ -113,7 +125,7 @@ public class AddFragment extends Fragment {
 //            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
             new Thread(()->{
-                String recordId = DataAPI.createOnlineCustomRecord(record);
+                String recordId = DataAPI.createOnlineCustomRecord(record, idToken);
                 if(recordId.equalsIgnoreCase("ERROR")){
                     getActivity().runOnUiThread(()-> {
                         Toast.makeText(requireContext(),"發生錯誤", Toast.LENGTH_SHORT).show();

@@ -392,7 +392,7 @@ public class DataAPI {
      * Create and push custom record to online database
      * @return UUID of record created
      */
-    public static String createOnlineCustomRecord(Record record){
+    public static String createOnlineCustomRecord(Record record, String idToken){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/createCustomRecord/").newBuilder();
         String finalUrl = urlBuilder.build().toString();
 
@@ -404,6 +404,7 @@ public class DataAPI {
 
         Request request = new Request.Builder()
                 .url(finalUrl)
+                .addHeader("Cookie", "token=" + idToken)
                 .post(requestBody)
                 .build();
         Call call = client.newCall(request);
