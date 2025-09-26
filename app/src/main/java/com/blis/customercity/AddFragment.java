@@ -126,20 +126,30 @@ public class AddFragment extends Fragment {
 
             new Thread(()->{
                 String recordId = DataAPI.createOnlineCustomRecord(record, idToken);
-                if(recordId.equalsIgnoreCase("ERROR")){
-                    getActivity().runOnUiThread(()-> {
-                        Toast.makeText(requireContext(),"發生錯誤", Toast.LENGTH_SHORT).show();
-                    });
-                    return;
-                }
+
+                getActivity().runOnUiThread(()-> {
+                    if (recordId.equalsIgnoreCase("ERROR")) {
+                        Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(requireContext(),"製作成功", Toast.LENGTH_SHORT).show();
+                });
                 record.setId(recordId);
+
+                boolean result = DataAPI.updateCustomBookmarks(idToken, record.getId());
+                getActivity().runOnUiThread(()->{
+                    if (!result){
+                        Toast.makeText(requireContext(),"發生錯誤，請稍後嘗試", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
+                });
 
 //                ArrayList<Record> records = FileHandler.getSavedRecords(requireContext());
 //                records.add(0, record);
 //                FileHandler.saveSavedRecord(requireContext(), records);
 
                 getActivity().runOnUiThread(()-> {
-                    Toast.makeText(requireContext(),"製作成功", Toast.LENGTH_SHORT).show();
                     companyNameEdit.setText("");
                     companyScopeEdit.setText("");
                     companyAddressEdit.setText("");
