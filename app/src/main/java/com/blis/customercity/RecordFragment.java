@@ -167,6 +167,7 @@ public class RecordFragment extends Fragment {
                 }
                 if(!isAdded()) return;
                 requireActivity().runOnUiThread(()->{
+                    if(savedRecords == null) return;
                     if(savedRecords.containsKey(selectedRecord.getId())){
                         saveOnlineButton.setText("取消儲存");
                         isSavedOnline = true;

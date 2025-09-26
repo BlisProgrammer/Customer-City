@@ -30,6 +30,7 @@ import com.blis.customercity.data.Record;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -258,7 +259,7 @@ public class CloudFragment extends Fragment {
      * Create or reset all the content of online saved records
      * @param linearLayout layout of cloud fragment
      */
-    private void updateOnlineList(CoordinatorLayout linearLayout){
+    private void updateOnlineList(CoordinatorLayout linearLayout) {
         noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         noRecordViewLocal.setVisibility(View.GONE);
         noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
@@ -266,200 +267,136 @@ public class CloudFragment extends Fragment {
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
-            swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout)
-        );
+        swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout));
         swipeRefreshLayout.setRefreshing(true);
 
         onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(onlineAdapter);
 
-        if(getContext() == null) return;
+        if (getContext() == null) return;
         SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
         boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
         String idToken = loginInfo.getString("idToken", null);
-        if(loggedIn && idToken != null){
-            // get records from online
-            Request request = new Request.Builder()
-                    .url("https://www.customer.city/api/getHistoryBoth/")
-                    .addHeader("Cookie", "token=" + idToken)
-                    .build();
-            client.newCall(request).enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                    Main main = (Main) getActivity();
-                    if(main == null || !isAdded())return;
-                    main.runOnUiThread(()->{
-                        swipeRefreshLayout.setRefreshing(false);
-                        Toast.makeText(requireContext(), "網路發生錯誤，正在登出", Toast.LENGTH_LONG).show();
-                        main.performLogout();
-                    });
-                }
+        if (!loggedIn || idToken == null) return;
+        new Thread(()->{
+            HashMap<String, ArrayList<Record>> savedRecords = DataAPI.getSavedRecords(idToken);
+            if (savedRecords == null) {
+                Main main = (Main) getActivity();
+                if (main == null || !isAdded()) return;
+                main.runOnUiThread(() -> {
+                    swipeRefreshLayout.setRefreshing(false);
+                    Toast.makeText(requireContext(), "網路發生錯誤，正在登出", Toast.LENGTH_LONG).show();
+                    main.performLogout();
+                });
+                return;
+            }
+            savedRecords.putAll(DataAPI.getCustomBookmark(idToken));
 
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (response.isSuccessful()) {
-                        String responseBody = response.body().string();
-                        System.out.println("Response: " + responseBody);
-                        Gson gson = new Gson();
-                        Type type = new TypeToken<HashMap<String, HashMap<String, List<Record>>>>() {}.getType();
-                        HashMap<String, HashMap<String, List<Record>>> hashMap = gson.fromJson(responseBody, type);
-                        HashMap<String, List<Record>> allData = hashMap.get("data");
-                        if(allData == null) return;
-                        onlineRecordList.clear();
-                        for (List<Record> value : allData.values()) {
-                            Record thisOnlineRecord = value.get(0);
-                            if(!isAdded()) return;
-                            onlineRecordList.add(thisOnlineRecord);
+            ArrayList<Record> finalList = new ArrayList<>();
+            for (String recordId : savedRecords.keySet()) {
+                ArrayList<Record> thisRecord = savedRecords.get(recordId);
+                if (thisRecord == null) return;
+                finalList.addAll(thisRecord);
+            }
+            if (getActivity() == null || !isAdded()) return;
+            getActivity().runOnUiThread(() -> {
+                if (!isAdded()) return;
+
+//                onlineAdapter.notifyDataSetChanged();
+//                recyclerView.scheduleLayoutAnimation();
+
+                recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                recyclerView.setAdapter(onlineAdapter);
+
+                if (onlineAdapter.getItemCount() == 0) {
+                    noRecordViewOnline.setVisibility(View.VISIBLE);
+                } else {
+                    noRecordViewOnline.setVisibility(View.GONE);
+                }
+                ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+                    @Override
+                    public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                        removeItem(viewHolder, idToken);
+                    }
+                });
+                itemTouchHelper.attachToRecyclerView(recyclerView);
+
+                onlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        if (onlineRecordList.isEmpty()) return;
+
+                        Bundle args = new Bundle();
+                        args.putSerializable("selected_record", onlineRecordList.get(position));
+
+                        Fragment resultFragment = new RecordFragment();
+                        resultFragment.setArguments(args);
+
+                        Main main = (Main) getActivity();
+                        if (main == null || !isAdded()) return;
+                        main.setCurrentFragment(resultFragment);
+                    }
+
+                    @Override
+                    public void onDeleteClick(int position) {
+                        RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
+                        if (viewHolder != null) {
+                            removeItem(viewHolder, idToken);
                         }
-                        if(getActivity() == null ||  !isAdded()){
+                    }
+                });
+                onlineAdapter.updateList(finalList);
+                swipeRefreshLayout.setRefreshing(false);
+            });
+        }).start();
+    }
+    private void removeItem(RecyclerView.ViewHolder viewHolder, String idToken) {
+        //Remove swiped item from list and notify the RecyclerView
+        int position = viewHolder.getBindingAdapterPosition();
+        ConfirmationDialog.showConfirmationDialog(
+            requireContext(),
+            "確認",
+            "移除記錄?",
+            (dialog, which) -> {
+                Record selectedRecord = onlineRecordList.get(position);
+                new Thread(()->{
+                    boolean result = DataAPI.updateHistory(idToken, selectedRecord.getId());
+                    requireActivity().runOnUiThread(()->{
+                        if (!result){
+                            if (savedToast != null) {
+                                savedToast.cancel();
+                            }
+                            savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
+                            savedToast.show();
+                            onlineAdapter.notifyItemChanged(position);
                             return;
                         }
-                        getActivity().runOnUiThread(() -> {
-                            if(!isAdded())return;
-
-                            onlineAdapter.notifyDataSetChanged();
-                            recyclerView.scheduleLayoutAnimation();
-                            if(onlineAdapter.getItemCount() == 0){
-                                noRecordViewOnline.setVisibility(View.VISIBLE);
-                            }else {
-                                noRecordViewOnline.setVisibility(View.GONE);
-                            }
-                            ItemTouchHelper itemTouchHelper = getItemTouchHelper();
-                            itemTouchHelper.attachToRecyclerView(recyclerView);
-
-                            onlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(int position) {
-                                    if (onlineRecordList.isEmpty()) return;
-
-                                    Bundle args = new Bundle();
-                                    args.putSerializable("selected_record", onlineRecordList.get(position));
-
-                                    Fragment resultFragment = new RecordFragment();
-                                    resultFragment.setArguments(args);
-
-                                    Main main = (Main) getActivity();
-                                    if(main == null || !isAdded())return;
-                                    main.setCurrentFragment(resultFragment);
-                                }
-
-                                @Override
-                                public void onDeleteClick(int position) {
-                                    RecyclerView.ViewHolder viewHolder = recyclerView.findViewHolderForAdapterPosition(position);
-                                    if (viewHolder != null) {
-                                        removeItem(viewHolder);
-                                    }
-                                }
-                            });
-                            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-                            recyclerView.setAdapter(onlineAdapter);
-                            swipeRefreshLayout.setRefreshing(false);
-                        });
-                    } else {
-                        if(response.code() == 401){
-                            Main main = (Main) getActivity();
-                            if(!isAdded() || main == null) return;
-                            getActivity().runOnUiThread(() -> {
-                                Toast.makeText(requireContext(), "發生錯誤，正在登出", Toast.LENGTH_LONG).show();
-                                main.performLogout();
-                                swipeRefreshLayout.setRefreshing(false);
-                            });
+                        if (savedToast != null) {
+                            savedToast.cancel();
                         }
-                        System.out.println("Unsuccessful response: " + response.code());
-                    }
-                    response.body().close();
-                }
+                        savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
+                        savedToast.show();
 
-                @NonNull
-                private ItemTouchHelper getItemTouchHelper() {
-                    ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-                        @Override
-                        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                            return false;
+                        onlineRecordList.remove(position);
+                        onlineAdapter.notifyItemRemoved(position);
+                        if(onlineAdapter.getItemCount() == 0){
+                            noRecordViewOnline.setVisibility(View.VISIBLE);
+                        }else {
+                            noRecordViewOnline.setVisibility(View.GONE);
                         }
-                        @Override
-                        public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                            removeItem(viewHolder);
-                        }
-                    };
-                    return new ItemTouchHelper(simpleItemTouchCallback);
-                }
-
-                private void removeItem(RecyclerView.ViewHolder viewHolder) {
-                    //Remove swiped item from list and notify the RecyclerView
-                    int position = viewHolder.getBindingAdapterPosition();
-                    ConfirmationDialog.showConfirmationDialog(
-                        requireContext(),
-                        "確認",
-                        "移除記錄?",
-                        (dialog, which) -> {
-                            Record selectedRecord = onlineRecordList.get(position);
-
-                            // remove with api call
-                            HttpUrl originalUrl = HttpUrl.parse("https://www.customer.city/api/editHistory/");
-                            if(selectedRecord.isCustom()){
-                                originalUrl = HttpUrl.parse("https://www.customer.city/api/editCustomBookmark/");
-                            }
-                            assert originalUrl != null;
-                            HttpUrl.Builder urlBuilder = originalUrl.newBuilder();
-                            urlBuilder.addQueryParameter("id", selectedRecord.getId());
-
-                            Request request = new Request.Builder()
-                                    .url(urlBuilder.build())
-                                    .addHeader("Cookie", "token=" + idToken)
-                                    .build();
-                            client.newCall(request).enqueue(new Callback() {
-                                @Override
-                                public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                                    assert getActivity() != null;
-                                    getActivity().runOnUiThread(()->{
-                                        if (savedToast != null) {
-                                            savedToast.cancel();
-                                        }
-                                        savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-                                        savedToast.show();
-                                        onlineAdapter.notifyItemChanged(position);
-                                    });
-                                }
-
-                                @Override
-                                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                                    if (response.isSuccessful()) {
-                                        assert getActivity() != null;
-                                        getActivity().runOnUiThread(() -> {
-                                            if (savedToast != null) {
-                                                savedToast.cancel();
-                                            }
-                                            savedToast = Toast.makeText(requireContext(), "成功移除記錄", Toast.LENGTH_SHORT);
-                                            savedToast.show();
-
-                                            onlineRecordList.remove(position);
-                                            onlineAdapter.notifyItemRemoved(position);
-                                            if(onlineAdapter.getItemCount() == 0){
-                                                noRecordViewOnline.setVisibility(View.VISIBLE);
-                                            }else {
-                                                noRecordViewOnline.setVisibility(View.GONE);
-                                            }
-                                            dialog.dismiss();
-                                        });
-                                    } else {
-                                        if (savedToast != null) {
-                                            savedToast.cancel();
-                                        }
-                                        savedToast = Toast.makeText(requireContext(), "發生錯誤", Toast.LENGTH_SHORT);
-                                        savedToast.show();
-                                    }
-                                    response.body().close();
-                                }
-                            });
-                        },
-                        (dialog, which) -> {
-                            onlineAdapter.notifyItemChanged(position);
-                            dialog.dismiss();
-                        });
-                }
+                        dialog.dismiss();
+                    });
+                }).start();
+            },
+            (dialog, which) -> {
+                onlineAdapter.notifyItemChanged(position);
+                dialog.dismiss();
             });
-        }
     }
 }

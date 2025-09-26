@@ -184,7 +184,7 @@ public class DataAPI {
         } catch (IOException e) {
             System.err.println("Error during request: " + e.getMessage());
         }
-        return new HashMap<>();
+        return null;
     }
     /**
      * Toggle history (records saved status) of online database. If it is saved, remove from saved list; if it is not saved, add to saved list. {@code  https://www.customer.city/api/editHistory/}
