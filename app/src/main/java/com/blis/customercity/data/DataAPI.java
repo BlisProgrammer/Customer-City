@@ -390,8 +390,9 @@ public class DataAPI {
 
     /**
      * Create and push custom record to online database
+     * @return UUID of record created
      */
-    public static boolean createOnlineCustomRecord(Record record){
+    public static String createOnlineCustomRecord(Record record){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/createCustomRecord/").newBuilder();
         String finalUrl = urlBuilder.build().toString();
 
@@ -409,14 +410,17 @@ public class DataAPI {
 
         try (Response response = call.execute()){
             if (response.isSuccessful()) {
-                return true;
+                String responseBody = response.body().string();
+                Type type = new TypeToken<HashMap<String, String>>() {}.getType();
+                HashMap<String, String> hashMap = gson.fromJson(responseBody, type);
+                return hashMap.get("id");
             } else {
                 System.err.println("Request failed with code: " + response.code());
             }
         } catch (IOException e) {
             System.err.println("Error during request: " + e.getMessage());
         }
-        return false;
+        return "ERROR";
     }
     public static ArrayList<Company> subCategoryIdToCustomCompanies(String subCategoryId){
         HttpUrl.Builder urlBuilder = HttpUrl.parse("https://www.customer.city/api/subCategoryIdToRecord/").newBuilder();

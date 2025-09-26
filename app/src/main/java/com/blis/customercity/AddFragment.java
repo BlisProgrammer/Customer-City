@@ -113,20 +113,21 @@ public class AddFragment extends Fragment {
 //            onlineRecord.setCompany_id(DataConverter.generateCompanyID(category, subCategory, getResources().openRawResource(R.raw.categories), getResources().openRawResource(R.raw.sub_categories)));
 
             new Thread(()->{
-                boolean success = DataAPI.createOnlineCustomRecord(record);
-                if(!success){
+                String recordId = DataAPI.createOnlineCustomRecord(record);
+                if(recordId.equalsIgnoreCase("ERROR")){
                     getActivity().runOnUiThread(()-> {
                         Toast.makeText(requireContext(),"發生錯誤", Toast.LENGTH_SHORT).show();
                     });
                     return;
                 }
+                record.setId(recordId);
 
 //                ArrayList<Record> records = FileHandler.getSavedRecords(requireContext());
 //                records.add(0, record);
 //                FileHandler.saveSavedRecord(requireContext(), records);
 
                 getActivity().runOnUiThread(()-> {
-                    Toast.makeText(requireContext(),"儲存成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(requireContext(),"製作成功", Toast.LENGTH_SHORT).show();
                     companyNameEdit.setText("");
                     companyScopeEdit.setText("");
                     companyAddressEdit.setText("");
@@ -134,6 +135,17 @@ public class AddFragment extends Fragment {
                     companyEmailEdit.setText("");
                     companyHintEdit.setText("");
                     companyHotlineEdit.setText("");
+
+                    // Open record fragment
+                    Bundle args = new Bundle();
+                    args.putSerializable("selected_record", record);
+
+                    Fragment resultFragment = new RecordFragment();
+                    resultFragment.setArguments(args);
+
+                    Main main = (Main) getActivity();
+                    if(main == null || !isAdded())return;
+                    main.setCurrentFragment(resultFragment);
                 });
             }).start();
         });
