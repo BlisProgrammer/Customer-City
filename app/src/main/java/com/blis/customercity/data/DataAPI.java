@@ -524,4 +524,25 @@ public class DataAPI {
         }
         return new HashMap<>();
     }
+
+    public static ArrayList<Record> getMyCustomRecords(String idToken){
+        Request request = new Request.Builder()
+                .url("https://www.customer.city/api/getMyRecords/")
+                .addHeader("Cookie", "token=" + idToken)
+                .build();
+        Call call = client.newCall(request);
+        try (Response response = call.execute()){
+            if (response.isSuccessful()) {
+                String responseBody = response.body().string();
+                Gson gson = new Gson();
+                CustomRecordResult searchResult = gson.fromJson(responseBody, CustomRecordResult.class);
+                return searchResult.getData();
+            } else {
+                System.err.println("Request failed with code: " + response.code());
+            }
+        } catch (IOException e) {
+            System.err.println("Error during request: " + e.getMessage());
+        }
+        return new ArrayList<>();
+    }
 }

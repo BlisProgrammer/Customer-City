@@ -16,6 +16,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -23,6 +24,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.blis.customercity.data.DataAPI;
 import com.blis.customercity.data.FileHandler;
 import com.blis.customercity.data.Record;
 import com.google.gson.Gson;
@@ -57,21 +59,21 @@ public class CloudFragment extends Fragment {
     public void onResume() {
         super.onResume();
         CoordinatorLayout linearLayout = (CoordinatorLayout) getView();
-//        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
-//        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
-//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-//            addedRecyclerView.setVisibility(View.VISIBLE);
-//            recyclerView.setVisibility(View.GONE);
-//            updateOfflineList(linearLayout);
-//        }
-//        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
+        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button){
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            updateMyCustomRecords(linearLayout);
+        }
+        if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
             RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
             RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
             addedRecyclerView.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             updateOnlineList(linearLayout);
-//        }
+        }
     }
 
     private final OkHttpClient client = new OkHttpClient();
@@ -88,8 +90,8 @@ public class CloudFragment extends Fragment {
 
         updateUI(loggedIn);
         if(loggedIn && idToken != null){
-//            updateOnlineList(linearLayout);
-//            updateOfflineList(linearLayout);
+            updateOnlineList(linearLayout);
+            updateMyCustomRecords(linearLayout);
         }
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
@@ -100,24 +102,24 @@ public class CloudFragment extends Fragment {
             main.goToSignIn();
         });
 
-//        RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
-//        viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-//            if(!isChecked)return;
-//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-//            addedRecyclerView.setVisibility(View.GONE);
-//            recyclerView.setVisibility(View.VISIBLE);
-//            updateOnlineList(linearLayout);
-//        });
-//        RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
-//        viewLocalButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-//            if(!isChecked)return;
-//            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
-//            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
-//            addedRecyclerView.setVisibility(View.VISIBLE);
-//            recyclerView.setVisibility(View.GONE);
-//            updateOfflineList(linearLayout);
-//        });
+        RadioButton viewOnlineButton = linearLayout.findViewById(R.id.view_online_button);
+        viewOnlineButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(!isChecked)return;
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+            updateOnlineList(linearLayout);
+        });
+        RadioButton viewLocalButton = linearLayout.findViewById(R.id.view_local_button);
+        viewLocalButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if(!isChecked)return;
+            RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
+            RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
+            addedRecyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            updateMyCustomRecords(linearLayout);
+        });
 
         return linearLayout;
     }
@@ -142,7 +144,7 @@ public class CloudFragment extends Fragment {
      * Create or reset all the content of Offline saved records
      * @param linearLayout layout of cloud fragment
      */
-    private void updateOfflineList(CoordinatorLayout linearLayout){
+    private void updateMyCustomRecords(CoordinatorLayout linearLayout){
         noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
         noRecordViewOnline.setVisibility(View.GONE);
         noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
@@ -150,63 +152,75 @@ public class CloudFragment extends Fragment {
         addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
-            swipeRefreshLayout.setOnRefreshListener(() -> updateOfflineList(linearLayout)
+            swipeRefreshLayout.setOnRefreshListener(() -> updateMyCustomRecords(linearLayout)
         );
 
         offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
         addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         addedRecyclerView.setAdapter(offlineAdapter);
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+//        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT) {
+//            @Override
+//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+//                removeLocalItem(viewHolder);
+//            }
+//        });
+//        itemTouchHelper.attachToRecyclerView(addedRecyclerView);
+//        offlineRecordList = FileHandler.getSavedRecords(requireContext());
 
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                removeLocalItem(viewHolder);
-            }
-        });
-        itemTouchHelper.attachToRecyclerView(addedRecyclerView);
+        SharedPreferences loginInfo = getContext().getSharedPreferences("loginInfo", Context.MODE_PRIVATE);
+        boolean loggedIn = loginInfo.getBoolean("loggedIn", false);
+        String idToken = loginInfo.getString("idToken", null);
+        if(!loggedIn && idToken == null) return;
 
-        offlineRecordList = FileHandler.getSavedRecords(requireContext());
-        if(offlineRecordList.isEmpty()){
-            noRecordViewLocal.setVisibility(View.VISIBLE);
-        }else{
-            noRecordViewLocal.setVisibility(View.GONE);
-        }
-        offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
-        addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        addedRecyclerView.setAdapter(offlineAdapter);
-        offlineAdapter.notifyDataSetChanged();
-        addedRecyclerView.scheduleLayoutAnimation();
-        swipeRefreshLayout.setRefreshing(false);
-
-        offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(int position) {
-                if (offlineRecordList.isEmpty()) return;
-
-                Bundle args = new Bundle();
-                args.putSerializable("selected_record", offlineRecordList.get(position));
-
-                Fragment resultFragment = new RecordFragment();
-                resultFragment.setArguments(args);
-
-                Main main = (Main) getActivity();
-                if(main == null || !isAdded())return;
-                main.setCurrentFragment(resultFragment);
-            }
-
-            @Override
-            public void onDeleteClick(int position) {
-                RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
-                if (viewHolder != null) {
-                    removeLocalItem(viewHolder);
+        new Thread(()->{
+            offlineRecordList = DataAPI.getMyCustomRecords(idToken);
+            if(!isAdded() || getActivity()==null) return;
+            getActivity().runOnUiThread(()->{
+                if(offlineRecordList.isEmpty()){
+                    noRecordViewLocal.setVisibility(View.VISIBLE);
+                }else{
+                    noRecordViewLocal.setVisibility(View.GONE);
                 }
-            }
-        });
-        swipeRefreshLayout.setRefreshing(false);
+                offlineAdapter = new TwoLineAdapter(requireContext(), offlineRecordList);
+                addedRecyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+                addedRecyclerView.setAdapter(offlineAdapter);
+                offlineAdapter.notifyDataSetChanged();
+                addedRecyclerView.scheduleLayoutAnimation();
+                swipeRefreshLayout.setRefreshing(false);
+
+
+                offlineAdapter.setOnItemClickListener(new TwoLineAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(int position) {
+                        if (offlineRecordList.isEmpty()) return;
+
+                        Bundle args = new Bundle();
+                        args.putSerializable("selected_record", offlineRecordList.get(position));
+
+                        Fragment resultFragment = new RecordFragment();
+                        resultFragment.setArguments(args);
+
+                        Main main = (Main) getActivity();
+                        if(main == null || !isAdded())return;
+                        main.setCurrentFragment(resultFragment);
+                    }
+
+                    @Override
+                    public void onDeleteClick(int position) {
+//                        RecyclerView.ViewHolder viewHolder = addedRecyclerView.findViewHolderForAdapterPosition(position);
+//                        if (viewHolder != null) {
+//                            removeLocalItem(viewHolder);
+//                        }
+                    }
+                });
+                swipeRefreshLayout.setRefreshing(false);
+            });
+        }).start();
     }
 
     /**
