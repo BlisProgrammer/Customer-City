@@ -90,11 +90,18 @@ public class CloudFragment extends Fragment {
 
         loginLayout = linearLayout.findViewById(R.id.login_layout);
         logoutLayout = linearLayout.findViewById(R.id.logout_layout);
+        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
+        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
 
         updateUI(loggedIn);
+        RadioGroup radiogroup = linearLayout.findViewById(R.id.toggle_radio_group);
         if(loggedIn && idToken != null){
-            updateOnlineList(linearLayout);
-            updateMyCustomRecords(linearLayout);
+            if(radiogroup.getCheckedRadioButtonId() == R.id.view_local_button) {
+                updateMyCustomRecords(linearLayout);
+            }
+            if(radiogroup.getCheckedRadioButtonId() == R.id.view_online_button){
+                updateOnlineList(linearLayout);
+            }
         }
 
         Button switchToUserButton = linearLayout.findViewById(R.id.switch_to_user_button);
@@ -148,9 +155,7 @@ public class CloudFragment extends Fragment {
      * @param linearLayout layout of cloud fragment
      */
     private void updateMyCustomRecords(CoordinatorLayout linearLayout){
-        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
         noRecordViewOnline.setVisibility(View.GONE);
-        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         RecyclerView addedRecyclerView = linearLayout.findViewById(R.id.addedRecyclerView);
         addedRecyclerView.addItemDecoration(new DividerItemDecoration(addedRecyclerView.getContext(), DividerItemDecoration.VERTICAL));
 
@@ -260,15 +265,12 @@ public class CloudFragment extends Fragment {
      * @param linearLayout layout of cloud fragment
      */
     private void updateOnlineList(CoordinatorLayout linearLayout) {
-        noRecordViewLocal = linearLayout.findViewById(R.id.no_record_text_local);
         noRecordViewLocal.setVisibility(View.GONE);
-        noRecordViewOnline = linearLayout.findViewById(R.id.no_record_text);
 //        ListView onlineListView = linearLayout.findViewById(R.id.online_saved_view_list);
         RecyclerView recyclerView = linearLayout.findViewById(R.id.recyclerView);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
         SwipeRefreshLayout swipeRefreshLayout = linearLayout.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(() -> updateOnlineList(linearLayout));
-        swipeRefreshLayout.setRefreshing(true);
 
         onlineAdapter = new TwoLineAdapter(requireContext(), onlineRecordList);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -309,7 +311,7 @@ public class CloudFragment extends Fragment {
                 recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                 recyclerView.setAdapter(onlineAdapter);
 
-                if (onlineAdapter.getItemCount() == 0) {
+                if (finalList.isEmpty()) {
                     noRecordViewOnline.setVisibility(View.VISIBLE);
                 } else {
                     noRecordViewOnline.setVisibility(View.GONE);
