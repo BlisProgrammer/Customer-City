@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,8 +14,8 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.blis.customercity.data.FileHandler;
-import com.blis.customercity.data.Record;
+import com.hotdesk.customercity.data.FileHandler;
+import com.hotdesk.customercity.data.Record;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;

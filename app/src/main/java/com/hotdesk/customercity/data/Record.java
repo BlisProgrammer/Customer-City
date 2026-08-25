@@ -1,4 +1,4 @@
-package com.blis.customercity.data;
+package com.hotdesk.customercity.data;
 
 import android.content.Context;
 import android.text.util.Linkify;
@@ -8,7 +8,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.blis.customercity.R;
+import com.hotdesk.customercity.R;
 
 import java.io.Serializable;
 import java.util.ArrayList;

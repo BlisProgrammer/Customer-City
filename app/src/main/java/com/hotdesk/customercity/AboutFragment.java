@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

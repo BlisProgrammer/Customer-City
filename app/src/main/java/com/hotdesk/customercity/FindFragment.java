@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -21,9 +21,9 @@ import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.Toast;
 
-import com.blis.customercity.data.Company;
-import com.blis.customercity.data.DataAPI;
-import com.blis.customercity.data.FileHandler;
+import com.hotdesk.customercity.data.Company;
+import com.hotdesk.customercity.data.DataAPI;
+import com.hotdesk.customercity.data.FileHandler;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 

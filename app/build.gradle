@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.blis.customercity'
+    namespace 'com.hotdesk.customercity'
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.blis.customercity"
+        applicationId "com.hotdesk.customercity"
         minSdk 24
         targetSdk 36
         versionCode 1
@@ -17,9 +17,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    // 1. ADD THIS SIGNING CONFIGS BLOCK
+    signingConfigs {
+        release {
+            storeFile file("customercity.jks") // Looks inside the 'app' folder
+            storePassword "customercity"      // Put your password here
+            keyAlias "customercity_alias"
+            keyPassword "customercity"        // Put your password here
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
+            // 2. ADD THIS LINE TO LINK THE SIGNING CONFIG
+            signingConfig signingConfigs.release 
+            
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -28,6 +41,7 @@ android {
         targetCompatibility JavaVersion.VERSION_11
     }
 }
+
 
 dependencies {
 

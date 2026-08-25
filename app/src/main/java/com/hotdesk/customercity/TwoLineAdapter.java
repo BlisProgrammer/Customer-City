@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.blis.customercity.data.Record;
+import com.hotdesk.customercity.data.Record;
 
 import java.util.ArrayList;
 

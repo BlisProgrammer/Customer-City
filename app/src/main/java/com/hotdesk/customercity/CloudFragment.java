@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,8 +23,8 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blis.customercity.data.FileHandler;
-import com.blis.customercity.data.Record;
+import com.hotdesk.customercity.data.FileHandler;
+import com.hotdesk.customercity.data.Record;
 import com.google.gson.Gson;
 
 import java.io.IOException;

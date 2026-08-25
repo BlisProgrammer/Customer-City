@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.content.Context;
 import android.content.Intent;
@@ -108,12 +108,54 @@ public class Main extends AppCompatActivity {
         }
 
         // Fire Firebase: Fire app open signal
+        // FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        // Bundle bundle = new Bundle();
+        // bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "Customer City");
+        // bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Android App");
+        // bundle.putString(FirebaseAnalytics.Param.CONTENT, "Customer City opened");
+        // mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
+
+        // Parse Incoming Intent for App Links
+        Intent intent = getIntent();
+        android.net.Uri data = intent.getData();
+
+        // Establish safe fallback values
+        String utmSource = "direct";
+        String utmMedium = "none";
+
+        // Extract URL parameters if the app was opened via a link
+        if (data != null) {
+            String sourceParam = data.getQueryParameter("utm_source");
+            String mediumParam = data.getQueryParameter("utm_medium");
+
+            if (sourceParam != null && !sourceParam.isEmpty()) {
+                utmSource = sourceParam;
+            }
+            if (mediumParam != null && !mediumParam.isEmpty()) {
+                utmMedium = mediumParam;
+            }
+        }
+
+        // Fire Firebase: Fire app open signal with attribution
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Bundle bundle = new Bundle();
+        
+        // Standard item parameters
         bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "Customer City");
         bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Android App");
         bundle.putString(FirebaseAnalytics.Param.CONTENT, "Customer City opened");
+        
+        // Inject the extracted UTM parameters
+        bundle.putString(FirebaseAnalytics.Param.SOURCE, utmSource);
+        bundle.putString(FirebaseAnalytics.Param.MEDIUM, utmMedium);
+
+        // Log the standard APP_OPEN event
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, bundle);
+        
+        // (Optional but Recommended) Log CAMPAIGN_DETAILS for Google Analytics attribution reporting
+        if (!utmSource.equals("direct")) {
+            mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.CAMPAIGN_DETAILS, bundle);
+        }
 
         // navigation drawer
         navDrawer = findViewById(R.id.drawer_layout);
@@ -183,7 +225,7 @@ public class Main extends AppCompatActivity {
      * <b>Requires {@code signinButton} and {@code navLoginItem} to be initiated. </b>
      * @param idToken The {@code idToken} generated when login through
      * @param emailInputString Email of the account
-     * @see com.blis.customercity.data.DataAPI#getToken(String, String) DataAPI#getToken(email, password)
+     * @see com.hotdesk.customercity.data.DataAPI#getToken(String, String) DataAPI#getToken(email, password)
      */
     public void performLogin(String idToken, String emailInputString){
         // Update shared preference

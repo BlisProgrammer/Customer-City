@@ -1,4 +1,4 @@
-package com.blis.customercity;
+package com.hotdesk.customercity;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
-import com.blis.customercity.data.DataAPI;
+import com.hotdesk.customercity.data.DataAPI;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class UserFragment extends Fragment {

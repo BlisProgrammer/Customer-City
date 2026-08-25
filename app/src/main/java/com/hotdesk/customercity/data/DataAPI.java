@@ -1,4 +1,4 @@
-package com.blis.customercity.data;
+package com.hotdesk.customercity.data;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

@@ -1,4 +1,4 @@
-package com.blis.customercity.data;
+package com.hotdesk.customercity.data;
 
 public class Company {
     public static Company getErrorCompany(){
